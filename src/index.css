@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-chess-dark: #0d0e12;
+  --color-chess-surface: #1a1d24;
+  --color-chess-gold: #d4af37;
+  --color-chess-gold-hover: #f3cd57;
+  --color-chess-text: #f3f4f6;
+  --color-chess-muted: #9ca3af;
+  --color-chess-border: #2d323f;
+  
+  --font-playfair: "Playfair Display", serif;
+  --font-inter: "Inter", sans-serif;
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
