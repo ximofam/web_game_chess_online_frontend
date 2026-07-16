@@ -3,6 +3,7 @@ import { useAuth } from '../auth/context/AuthContext';
 import { authService } from '../auth/services/authService';
 import { setAccessToken } from '../auth/api/authClient';
 import { LogOut, RefreshCw, Shield, User, Trophy, Play, CheckCircle } from 'lucide-react';
+import Navbar from './components/Navbar';
 
 export default function Dashboard() {
   const { currentUser, logout, refreshToken, showToast } = useAuth();
@@ -48,28 +49,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-[#0d0e12] flex flex-col justify-between select-none">
       {/* HEADER */}
-      <header className="border-b border-chess-border bg-[#13161c] px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <Trophy className="w-6 h-6 text-chess-gold animate-bounce" />
-          <h1 className="font-playfair text-lg font-bold tracking-widest text-chess-text m-0!">
-            CHESS ARENA
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex flex-col text-right">
-            <span className="text-sm font-semibold text-chess-text">{currentUser?.username}</span>
-            <span className="text-[10px] uppercase tracking-wider text-chess-gold font-medium">{currentUser?.rank}</span>
-          </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-950/40 border border-red-500/30 hover:bg-red-900/40 hover:border-red-500/60 text-xs font-semibold text-red-200 transition-all cursor-pointer"
-            aria-label="Log out of session"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>LOGOUT</span>
-          </button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* BODY */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 md:p-12">
@@ -78,8 +58,12 @@ export default function Dashboard() {
           {/* PROFILE SUMMARY */}
           <div className="md:col-span-5 bg-chess-surface border border-chess-border p-6 rounded-xl flex flex-col justify-between">
             <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full border-2 border-chess-gold flex items-center justify-center bg-chess-dark text-chess-gold mb-4 relative">
-                <User className="w-10 h-10" />
+              <div className="w-20 h-20 rounded-full border-2 border-chess-gold flex items-center justify-center bg-chess-dark text-chess-gold mb-4 relative overflow-hidden">
+                {currentUser?.avatarUrl ? (
+                  <img src={currentUser.avatarUrl} alt={currentUser.username} className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10" />
+                )}
                 <span className="absolute bottom-0 right-0 bg-[#d4af37] text-[#0d0e12] rounded-full p-1 border border-chess-surface">
                   <Shield className="w-3 h-3" />
                 </span>
@@ -87,7 +71,7 @@ export default function Dashboard() {
               <h2 className="font-playfair text-2xl font-bold text-chess-text">{currentUser?.username}</h2>
               <p className="text-xs text-chess-muted tracking-wider uppercase mb-1">{currentUser?.email}</p>
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-chess-gold/10 border border-chess-gold/30 text-chess-gold mt-2">
-                <CheckCircle className="w-3.5 h-3.5" /> {currentUser?.rank}
+                <CheckCircle className="w-3.5 h-3.5" /> {currentUser?.role || 'Grandmaster'}
               </span>
             </div>
 

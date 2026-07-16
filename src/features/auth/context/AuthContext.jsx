@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
+import { profileService } from '../../profile/services/profileService';
 
 const AuthContext = createContext(null);
 
@@ -48,12 +49,22 @@ export const AuthProvider = ({ children }) => {
   // Login handler
   const login = async (usernameOrEmail, password) => {
     const data = await authService.login(usernameOrEmail, password);
-    console.log(data)
     setAccessToken(data.accessToken);
-    setCurrentUser(data.user);
-    setIsAuthenticated(true);
-    showToast(`Welcome back, ${data.user.username}! Your battlefield is ready.`, 'success');
-    return data.user;
+    
+    // Fetch detailed profile immediately
+    try {
+      const userProfile = await profileService.getCurrentUser();
+      setCurrentUser(userProfile);
+      setIsAuthenticated(true);
+      showToast(`Welcome back, ${userProfile.username}! Your battlefield is ready.`, 'success');
+      return userProfile;
+    } catch (err) {
+      // In case getCurrentUser fails, fallback to user field if available
+      setCurrentUser(data.user);
+      setIsAuthenticated(true);
+      showToast(`Welcome back, ${data.user?.username || 'player'}!`, 'success');
+      return data.user;
+    }
   };
 
   // Refresh token helper
@@ -62,19 +73,18 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.refresh();
       setAccessToken(data.accessToken);
 
-      const profile = await authService.getProfile();
-      setCurrentUser({
-        id: 'u1',
-        username: profile.username || 'grandmaster',
-        email: profile.email || 'gm@chess.com',
-        rank: profile.rank || 'Grandmaster'
-      });
+      const userProfile = await profileService.getCurrentUser();
+      setCurrentUser(userProfile);
       setIsAuthenticated(true);
       return data.accessToken;
     } catch (err) {
       logoutLocal();
       throw err;
     }
+  };
+
+  const updateCurrentUser = (updatedUser) => {
+    setCurrentUser(updatedUser);
   };
 
   // Setup callbacks on mount
@@ -104,7 +114,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     refreshToken,
-    showToast
+    showToast,
+    updateCurrentUser
   };
 
   return (

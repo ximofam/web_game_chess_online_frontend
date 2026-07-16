@@ -104,6 +104,74 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
   let mockUsers = [
     { username: 'grandmaster', email: 'gm@chess.com', password: 'Password123!' }
   ];
+  let mockProfileDb = {
+    'grandmaster': {
+      id: 1,
+      username: 'grandmaster',
+      email: 'gm@chess.com',
+      avatarUrl: null,
+      role: 'USER',
+      profile: {
+        fullName: 'Grandmaster Chess',
+        gender: 'MALE',
+        dateOfBirth: '16/07/2000'
+      }
+    }
+  };
+  let currentMockUsername = 'grandmaster';
+
+  let mockNotificationsDb = [
+    {
+      id: 1,
+      sender: {
+        id: 2,
+        username: "magnus_c",
+        avatarUrl: null
+      },
+      type: "ROOM_INVITE",
+      title: "Friendly Arena Invite",
+      message: "Magnus Carlsen invited you to join Chess Room #99.",
+      metadata: {
+        roomId: 99
+      },
+      createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+      read: false
+    },
+    {
+      id: 2,
+      sender: {
+        id: 3,
+        username: "hikaru_n",
+        avatarUrl: null
+      },
+      type: "POST_LIKE",
+      title: "New Like",
+      message: "Hikaru Nakamura liked your game analysis post.",
+      metadata: {
+        postId: 42
+      },
+      createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+      read: true
+    },
+    {
+      id: 3,
+      sender: {
+        id: 4,
+        username: "garry_k",
+        avatarUrl: null
+      },
+      type: "FOLLOW",
+      title: "New Follower",
+      message: "Garry Kasparov started following your profile.",
+      metadata: {},
+      createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+      read: true
+    }
+  ];
+
+  if (typeof window !== 'undefined') {
+    window.mockNotificationsDb = mockNotificationsDb;
+  }
 
   authClient.interceptors.request.use(async (config) => {
     // Intercept API calls and simulate responses
@@ -140,14 +208,26 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
 
       // Success
       mockHasCookie = true;
-      const responseData = {
-        accessToken: `mock_jwt_access_${Date.now()}`,
-        user: {
-          id: 'u1',
+      currentMockUsername = matchedUser.username;
+
+      if (!mockProfileDb[currentMockUsername]) {
+        mockProfileDb[currentMockUsername] = {
+          id: mockUsers.indexOf(matchedUser) + 1,
           username: matchedUser.username,
           email: matchedUser.email,
-          rank: 'Grandmaster'
-        }
+          avatarUrl: null,
+          role: 'USER',
+          profile: {
+            fullName: matchedUser.username === 'grandmaster' ? 'Grandmaster Chess' : '',
+            gender: 'MALE',
+            dateOfBirth: '16/07/2000'
+          }
+        };
+      }
+
+      const responseData = {
+        accessToken: `mock_jwt_access_${Date.now()}`,
+        user: mockProfileDb[currentMockUsername]
       };
 
       return {
@@ -220,6 +300,236 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       mockHasCookie = false;
       return {
         data: { message: 'Logged out successfully.' },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    // Mock endpoints for User Profile
+    if (url.includes('/api/users/me/avatar') && config.method === 'patch') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      
+      let mockUrl = 'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=200&h=200&fit=crop';
+      if (config.data && typeof config.data.get === 'function') {
+        const file = config.data.get('file');
+        if (file) {
+          try {
+            mockUrl = URL.createObjectURL(file);
+          } catch (e) {
+            console.warn('Failed to create object URL for file, using default mock image', e);
+          }
+        }
+      }
+
+      const userProfile = mockProfileDb[currentMockUsername];
+      if (userProfile) {
+        userProfile.avatarUrl = mockUrl;
+      }
+      
+      return {
+        data: { avatarUrl: mockUrl },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/users/me') && config.method === 'patch') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const updateData = JSON.parse(config.data);
+      const userProfile = mockProfileDb[currentMockUsername];
+      if (userProfile) {
+        userProfile.profile = {
+          ...userProfile.profile,
+          ...updateData
+        };
+      }
+      return {
+        data: userProfile,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/users/me') && config.method === 'get') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const profile = mockProfileDb[currentMockUsername] || {
+        id: 99,
+        username: currentMockUsername,
+        email: `${currentMockUsername}@example.com`,
+        avatarUrl: null,
+        role: 'USER',
+        profile: { fullName: '', gender: 'MALE', dateOfBirth: '01/01/2000' }
+      };
+      return {
+        data: profile,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    // Mock endpoints for Notifications
+    if (url.includes('/api/notifications/unread-count') && config.method === 'get') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const list = window.mockNotificationsDb || [];
+      const count = list.filter(n => !n.read).length;
+      return {
+        data: { count },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/notifications/read-all') && config.method === 'patch') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const list = window.mockNotificationsDb || [];
+      list.forEach(n => { n.read = true; });
+      return {
+        data: null,
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config
+      };
+    }
+
+    const readMatch = url.match(/\/api\/notifications\/(\d+)\/read/);
+    if (readMatch && config.method === 'patch') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const id = parseInt(readMatch[1], 10);
+      const list = window.mockNotificationsDb || [];
+      const notif = list.find(n => n.id === id);
+      if (notif) {
+        notif.read = true;
+      }
+      return {
+        data: null,
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config
+      };
+    }
+
+    const deleteMatch = url.match(/\/api\/notifications\/(\d+)$/);
+    if (deleteMatch && config.method === 'delete') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const id = parseInt(deleteMatch[1], 10);
+      if (window.mockNotificationsDb) {
+        window.mockNotificationsDb = window.mockNotificationsDb.filter(n => n.id !== id);
+      }
+      return {
+        data: null,
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/notifications') && config.method === 'delete') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      window.mockNotificationsDb = [];
+      return {
+        data: null,
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/notifications') && config.method === 'get') {
+      if (!mockHasCookie) {
+        throw {
+          response: {
+            status: 401,
+            data: { message: 'Unauthorized. Please log in again.' }
+          }
+        };
+      }
+      const params = new URLSearchParams(url.split('?')[1] || '');
+      const page = parseInt(params.get('page') || '0', 10);
+      const size = parseInt(params.get('size') || '20', 10);
+      
+      const list = window.mockNotificationsDb || [];
+      const sorted = [...list].sort((a, b) => b.id - a.id);
+      const startIdx = page * size;
+      const endIdx = startIdx + size;
+      const paginatedItems = sorted.slice(startIdx, endIdx);
+      
+      return {
+        data: {
+          content: paginatedItems,
+          pageable: { pageNumber: page, pageSize: size },
+          totalElements: list.length,
+          last: endIdx >= list.length
+        },
         status: 200,
         statusText: 'OK',
         headers: {},
