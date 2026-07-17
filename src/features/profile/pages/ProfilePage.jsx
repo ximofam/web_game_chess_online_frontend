@@ -6,6 +6,7 @@ import ProfileCard from '../components/ProfileCard';
 import ProfileForm from '../components/ProfileForm';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorState from '../components/ErrorState';
+import Footer from '../../../shared/components/Footer';
 
 /**
  * ProfilePage is the main view controller for the "/profile" route.
@@ -63,9 +64,7 @@ export const ProfilePage = () => {
             onRetry={handleRetry}
           />
         </main>
-        <footer className="border-t border-[#2d323f] bg-[#13161c] px-6 py-4 text-center text-xs text-[#9ca3af]">
-          <span>© 2026 CHESS ARENA. ALL RIGHTS RESERVED.</span>
-        </footer>
+        <Footer />
       </div>
     );
   }
@@ -103,9 +102,7 @@ export const ProfilePage = () => {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#2d323f] bg-[#13161c] px-6 py-4 text-center text-xs text-[#9ca3af]">
-        <span>© 2026 CHESS ARENA. ALL RIGHTS RESERVED. ACCESSIBILITY READY.</span>
-      </footer>
+      <Footer />
     </div>
   );
 };

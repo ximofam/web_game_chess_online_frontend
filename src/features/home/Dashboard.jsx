@@ -4,6 +4,7 @@ import { authService } from '../auth/services/authService';
 import { setAccessToken } from '../auth/api/authClient';
 import { LogOut, RefreshCw, Shield, User, Trophy, Play, CheckCircle } from 'lucide-react';
 import Navbar from './components/Navbar';
+import Footer from '../../shared/components/Footer';
 
 export default function Dashboard() {
   const { currentUser, logout, refreshToken, showToast } = useAuth();
@@ -156,9 +157,7 @@ export default function Dashboard() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-chess-border bg-[#13161c] px-6 py-4 text-center text-xs text-chess-muted">
-        <span>© 2026 CHESS ARENA. ALL RIGHTS RESERVED. ACCESSIBILITY READY.</span>
-      </footer>
+      <Footer />
     </div>
   );
 }

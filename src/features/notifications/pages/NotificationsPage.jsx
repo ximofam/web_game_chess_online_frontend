@@ -4,6 +4,7 @@ import Navbar from '../../home/components/Navbar';
 import NotificationItem from '../components/NotificationItem';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
+import Footer from '../../../shared/components/Footer';
 import { CheckCheck, Trash2, RefreshCw, ArrowDown } from 'lucide-react';
 
 /**
@@ -140,9 +141,7 @@ export const NotificationsPage = () => {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#2d323f] bg-[#13161c] px-6 py-4 text-center text-xs text-[#9ca3af]">
-        <span>© 2026 CHESS ARENA. ALL RIGHTS RESERVED. ACCESSIBILITY READY.</span>
-      </footer>
+      <Footer />
     </div>
   );
 };
