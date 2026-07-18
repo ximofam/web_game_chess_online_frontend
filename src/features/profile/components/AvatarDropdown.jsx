@@ -39,7 +39,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2.5 w-64 bg-[#1a1d24] border border-[#2d323f] rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in text-left"
+      className="absolute right-0 top-full mt-2 w-64 bg-[#1a1d24] border border-[#2d323f] rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in text-left"
       role="menu"
       aria-label="User profile dropdown"
     >

@@ -64,7 +64,7 @@ export const Navbar = () => {
       {/* User Actions & Auth Status */}
       <div className="flex items-center gap-3">
         {isRegisteredUser ? (
-          <div className="relative flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-semibold text-[#f3f4f6] leading-tight">
                 {currentUser?.username}
@@ -76,19 +76,21 @@ export const Navbar = () => {
 
             <NotificationBell />
 
-            <NavbarAvatar
-              src={currentUser?.avatarUrl}
-              username={currentUser?.username}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            />
-
-            {isDropdownOpen && (
-              <AvatarDropdown
-                user={currentUser}
-                onClose={() => setIsDropdownOpen(false)}
-                onLogout={logout}
+            <div className="relative">
+              <NavbarAvatar
+                src={currentUser?.avatarUrl}
+                username={currentUser?.username}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               />
-            )}
+
+              {isDropdownOpen && (
+                <AvatarDropdown
+                  user={currentUser}
+                  onClose={() => setIsDropdownOpen(false)}
+                  onLogout={logout}
+                />
+              )}
+            </div>
           </div>
         ) : (
           /* Guest or Unauthenticated Status */
