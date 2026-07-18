@@ -6,8 +6,6 @@ import { forumService } from '../services/forumService';
 import CommentItem from '../components/CommentItem';
 import CommentForm from '../components/CommentForm';
 import LikeButton from '../components/LikeButton';
-import Navbar from '../../home/components/Navbar';
-import Footer from '../../../shared/components/Footer';
 import { useAuth } from '../../auth/context/AuthContext';
 
 function fmtDate(iso) {
@@ -69,12 +67,12 @@ const STATUS_BADGE = {
 
 /**
  * PostDetailPage — chi tiết bài viết + comments + replies.
+ * Layout Header & Footer được đảm nhận bởi PublicLayout.
  */
 export default function PostDetailPage() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const { isAuthenticated, currentUser } = useAuth();
-  const isAuth = isAuthenticated;
   const canInteract = isAuthenticated && currentUser?.role !== 'GUEST';
 
   // Post
@@ -135,167 +133,155 @@ export default function PostDetailPage() {
   };
 
   if (postLoading) return (
-    <div className="min-h-screen bg-[#0d0e12] flex flex-col">
-      <Navbar />
-      <div className="flex-1 flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 text-[#d4af37] animate-spin" />
-      </div>
+    <div className="flex-1 flex items-center justify-center py-20">
+      <RefreshCw className="w-8 h-8 text-[#d4af37] animate-spin" />
     </div>
   );
 
   if (postError || !post) return (
-    <div className="min-h-screen bg-[#0d0e12] flex flex-col">
-      <Navbar />
-      <div className="flex-1 flex flex-col items-center justify-center text-[#9ca3af] gap-4">
-        <p className="text-lg font-semibold text-[#f3f4f6]">Không tìm thấy bài viết</p>
-        <p className="text-sm">Bài viết không tồn tại hoặc chưa được phê duyệt.</p>
-        <Link to="/forum" className="text-[#d4af37] text-sm hover:underline">← Quay lại forum</Link>
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center text-[#9ca3af] gap-4 py-20">
+      <p className="text-lg font-semibold text-[#f3f4f6]">Không tìm thấy bài viết</p>
+      <p className="text-sm">Bài viết không tồn tại hoặc chưa được phê duyệt.</p>
+      <Link to="/forum" className="text-[#d4af37] text-sm hover:underline">← Quay lại forum</Link>
     </div>
   );
 
   const badge = STATUS_BADGE[post.status];
 
   return (
-    <div className="min-h-screen bg-[#0d0e12] flex flex-col">
-      <Navbar />
+    <main className="w-full max-w-3xl mx-auto px-4 py-10">
+      {/* Back */}
+      <Link
+        to="/forum"
+        className="inline-flex items-center gap-2 text-sm text-[#9ca3af] hover:text-[#f3f4f6] mb-6 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Forum
+      </Link>
 
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-10">
-        {/* Back */}
-        <Link
-          to="/forum"
-          className="inline-flex items-center gap-2 text-sm text-[#9ca3af] hover:text-[#f3f4f6] mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Forum
-        </Link>
-
-        {/* Article */}
-        <article id={`post-detail-${id}`} className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-6 md:p-8 mb-8">
-          {/* Status + meta */}
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            {badge && (
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${badge.cls}`}>
-                {badge.label}
-              </span>
-            )}
-            <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
-              <Calendar className="w-3.5 h-3.5" />
-              {post.createdAt ? fmtDate(post.createdAt) : ''}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
-              <Eye className="w-3.5 h-3.5" />
-              {post.viewCount ?? 0} lượt xem
-            </div>
+      {/* Article */}
+      <article id={`post-detail-${id}`} className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-6 md:p-8 mb-8">
+        {/* Status + meta */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          {badge && (
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${badge.cls}`}>
+              {badge.label}
+            </span>
+          )}
+          <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
+            <Calendar className="w-3.5 h-3.5" />
+            {post.createdAt ? fmtDate(post.createdAt) : ''}
           </div>
-
-          {/* Title */}
-          <h1 className="font-playfair text-2xl md:text-3xl font-bold text-[#f3f4f6] mb-4 leading-tight">
-            {post.title}
-          </h1>
-
-          {/* Author */}
-          <div className="flex items-center gap-2.5 pb-6 border-b border-[#2d323f] mb-6">
-            <div className="w-9 h-9 rounded-full border border-[#d4af37]/30 bg-[#0d0e12] flex items-center justify-center overflow-hidden shrink-0">
-              {post.author?.avatarUrl
-                ? <img src={post.author.avatarUrl} alt={post.author.username} className="w-full h-full object-cover" />
-                : <User className="w-4 h-4 text-[#d4af37]" />}
-            </div>
-            <span className="text-sm font-semibold text-[#f3f4f6]">{post.author?.username ?? 'Ẩn danh'}</span>
+          <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
+            <Eye className="w-3.5 h-3.5" />
+            {post.viewCount ?? 0} lượt xem
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="mb-6">
-            <TiptapRender content={post.content} />
+        {/* Title */}
+        <h1 className="font-playfair text-2xl md:text-3xl font-bold text-[#f3f4f6] mb-4 leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Author */}
+        <div className="flex items-center gap-2.5 pb-6 border-b border-[#2d323f] mb-6">
+          <div className="w-9 h-9 rounded-full border border-[#d4af37]/30 bg-[#0d0e12] flex items-center justify-center overflow-hidden shrink-0">
+            {post.author?.avatarUrl
+              ? <img src={post.author.avatarUrl} alt={post.author.username} className="w-full h-full object-cover" />
+              : <User className="w-4 h-4 text-[#d4af37]" />}
           </div>
+          <span className="text-sm font-semibold text-[#f3f4f6]">{post.author?.username ?? 'Ẩn danh'}</span>
+        </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-4 pt-4 border-t border-[#2d323f]">
-            {canInteract ? (
-              <LikeButton
-                liked={liked}
-                count={likeCount}
-                onClick={handleLikePost}
-                size="md"
-              />
-            ) : (
-              <span className="flex items-center gap-1.5 text-sm text-[#9ca3af]">
-                <LikeButton liked={liked} count={likeCount} disabled size="md" />
-              </span>
-            )}
-          </div>
-        </article>
+        {/* Content */}
+        <div className="mb-6">
+          <TiptapRender content={post.content} />
+        </div>
 
-        {/* Comments section */}
-        <section id="comments-section">
-          <h2 className="font-playfair text-xl font-bold text-[#f3f4f6] mb-5">
-            Bình luận {post.commentCount ? `(${post.commentCount})` : ''}
-          </h2>
-
-          {/* Comment form */}
+        {/* Actions */}
+        <div className="flex items-center gap-4 pt-4 border-t border-[#2d323f]">
           {canInteract ? (
-            <div className="mb-6">
-              <CommentForm postId={id} onSubmit={handleAddComment} />
-            </div>
+            <LikeButton
+              liked={liked}
+              count={likeCount}
+              onClick={handleLikePost}
+              size="md"
+            />
           ) : (
-            <div className="mb-6 flex items-center gap-2 px-4 py-3 rounded-xl border border-[#2d323f] bg-[#1a1d24] text-sm text-[#9ca3af]">
-              <Lock className="w-4 h-4 shrink-0" />
-              <span>
-                {isAuthenticated
-                  ? 'Tài khoản GUEST không thể bình luận.'
-                  : <><Link to="/login" className="text-[#d4af37] hover:underline">Đăng nhập</Link> để bình luận.</>}
-              </span>
-            </div>
+            <span className="flex items-center gap-1.5 text-sm text-[#9ca3af]">
+              <LikeButton liked={liked} count={likeCount} disabled size="md" />
+            </span>
           )}
+        </div>
+      </article>
 
-          {/* Comments list */}
-          {commentsLoading ? (
-            <div className="space-y-4">
-              {[1,2,3].map(i => (
-                <div key={i} className="flex gap-3 animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-[#2d323f] shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3 w-24 bg-[#2d323f] rounded" />
-                    <div className="h-3 w-full bg-[#2d323f] rounded" />
-                    <div className="h-3 w-3/4 bg-[#2d323f] rounded" />
-                  </div>
+      {/* Comments section */}
+      <section id="comments-section">
+        <h2 className="font-playfair text-xl font-bold text-[#f3f4f6] mb-5">
+          Bình luận {post.commentCount ? `(${post.commentCount})` : ''}
+        </h2>
+
+        {/* Comment form */}
+        {canInteract ? (
+          <div className="mb-6">
+            <CommentForm postId={id} onSubmit={handleAddComment} />
+          </div>
+        ) : (
+          <div className="mb-6 flex items-center gap-2 px-4 py-3 rounded-xl border border-[#2d323f] bg-[#1a1d24] text-sm text-[#9ca3af]">
+            <Lock className="w-4 h-4 shrink-0" />
+            <span>
+              {isAuthenticated
+                ? 'Tài khoản GUEST không thể bình luận.'
+                : <><Link to="/login" className="text-[#d4af37] hover:underline">Đăng nhập</Link> để bình luận.</>}
+            </span>
+          </div>
+        )}
+
+        {/* Comments list */}
+        {commentsLoading ? (
+          <div className="space-y-4">
+            {[1,2,3].map(i => (
+              <div key={i} className="flex gap-3 animate-pulse">
+                <div className="w-8 h-8 rounded-full bg-[#2d323f] shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-24 bg-[#2d323f] rounded" />
+                  <div className="h-3 w-full bg-[#2d323f] rounded" />
+                  <div className="h-3 w-3/4 bg-[#2d323f] rounded" />
                 </div>
-              ))}
-            </div>
-          ) : allComments.length === 0 ? (
-            <p className="text-sm text-[#9ca3af] text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-          ) : (
-            <div className="divide-y divide-[#2d323f]">
-              {allComments.map(comment => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  postId={id}
-                  isAuth={canInteract}
-                  onAddComment={handleAddComment}
-                />
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        ) : allComments.length === 0 ? (
+          <p className="text-sm text-[#9ca3af] text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+        ) : (
+          <div className="divide-y divide-[#2d323f]">
+            {allComments.map(comment => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                postId={id}
+                isAuth={canInteract}
+                onAddComment={handleAddComment}
+              />
+            ))}
+          </div>
+        )}
 
-          {hasMoreComments && (
-            <div className="flex justify-center mt-6">
-              <button
-                id="load-more-comments"
-                onClick={() => fetchMoreComments()}
-                disabled={loadingMoreComments}
-                className="flex items-center gap-2 px-5 py-2 border border-[#2d323f] rounded-xl text-sm text-[#9ca3af] hover:border-[#d4af37]/40 hover:text-[#d4af37] transition-all disabled:opacity-60"
-              >
-                {loadingMoreComments
-                  ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Đang tải...</>
-                  : 'Xem thêm bình luận'}
-              </button>
-            </div>
-          )}
-        </section>
-      </main>
-
-      <Footer />
-    </div>
+        {hasMoreComments && (
+          <div className="flex justify-center mt-6">
+            <button
+              id="load-more-comments"
+              onClick={() => fetchMoreComments()}
+              disabled={loadingMoreComments}
+              className="flex items-center gap-2 px-5 py-2 border border-[#2d323f] rounded-xl text-sm text-[#9ca3af] hover:border-[#d4af37]/40 hover:text-[#d4af37] transition-all disabled:opacity-60"
+            >
+              {loadingMoreComments
+                ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Đang tải...</>
+                : 'Xem thêm bình luận'}
+            </button>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

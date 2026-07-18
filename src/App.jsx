@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
+import PublicLayout from './layouts/PublicLayout';
 import GuestLayout from './layouts/GuestLayout';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -31,27 +32,29 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <Routes>
-              {/* Guest Only Routes */}
+              {/* Public Routes (Accessible to Guest & User with Navbar + Footer) */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/forum" element={<ForumListPage />} />
+                <Route path="/forum/posts/:id" element={<PostDetailPage />} />
+              </Route>
+
+              {/* Guest Only / Auth Routes (Login, Register) */}
               <Route element={<GuestLayout />}>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
               </Route>
 
-              {/* Public Forum Routes */}
-              <Route path="/forum" element={<ForumListPage />} />
-              <Route path="/forum/posts/:id" element={<PostDetailPage />} />
-
-              {/* Authenticated Only Routes */}
+              {/* Registered User Only Routes */}
               <Route element={<ProtectedLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/forum/create" element={<ForumCreatePage />} />
               </Route>
 
-              {/* Redirects */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              {/* Catch-all Redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </NotificationProvider>
         </AuthProvider>

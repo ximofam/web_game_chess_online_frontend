@@ -3,6 +3,7 @@ import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
 import { profileService } from '../../profile/services/profileService';
+import GuestChoiceModal from '../components/GuestChoiceModal';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+
+  // Computed helper flags
+  const isGuest = Boolean(currentUser?.isGuest || currentUser?.role === 'ROLE_GUEST');
+  const isRegisteredUser = Boolean(isAuthenticated && !isGuest);
 
   // Show a toast message for 4 seconds
   const showToast = (message, type = 'success') => {
@@ -38,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-      showToast('Logged out successfully. Draw your pieces next time!', 'success');
+      showToast('Đã đăng xuất thành công.', 'success');
     } catch (err) {
       console.warn('Logout request failed or timed out', err);
     } finally {
@@ -46,7 +52,46 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login handler
+  // Login as Guest handler
+  const loginGuest = async () => {
+    try {
+      await authService.registerGuest();
+    } catch (e) {
+      // Safe to ignore if already registered
+    }
+
+    try {
+      const data = await authService.loginGuest();
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+      const guestObj = data?.user || {
+        id: 'guest_' + Math.floor(Math.random() * 1000),
+        username: 'Guest Player',
+        role: 'ROLE_GUEST',
+        isGuest: true
+      };
+      setCurrentUser(guestObj);
+      setIsAuthenticated(true);
+      setIsGuestModalOpen(false);
+      return guestObj;
+    } catch (err) {
+      console.error('Failed guest login', err);
+      // Fallback guest user object for offline / demo
+      const fallbackGuest = {
+        id: 'guest_local',
+        username: 'Guest Player',
+        role: 'ROLE_GUEST',
+        isGuest: true
+      };
+      setCurrentUser(fallbackGuest);
+      setIsAuthenticated(true);
+      setIsGuestModalOpen(false);
+      return fallbackGuest;
+    }
+  };
+
+  // Regular user login handler
   const login = async (usernameOrEmail, password) => {
     const data = await authService.login(usernameOrEmail, password);
     setAccessToken(data.accessToken);
@@ -54,16 +99,19 @@ export const AuthProvider = ({ children }) => {
     // Fetch detailed profile immediately
     try {
       const userProfile = await profileService.getCurrentUser();
-      setCurrentUser(userProfile);
+      const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
+      setCurrentUser(userObj);
       setIsAuthenticated(true);
-      showToast(`Welcome back, ${userProfile.username}! Your battlefield is ready.`, 'success');
-      return userProfile;
+      setIsGuestModalOpen(false);
+      showToast(`Welcome back, ${userObj.username}!`, 'success');
+      return userObj;
     } catch (err) {
-      // In case getCurrentUser fails, fallback to user field if available
-      setCurrentUser(data.user);
+      const fallbackUser = { ...data.user, role: data.user?.role || 'ROLE_USER', isGuest: false };
+      setCurrentUser(fallbackUser);
       setIsAuthenticated(true);
-      showToast(`Welcome back, ${data.user?.username || 'player'}!`, 'success');
-      return data.user;
+      setIsGuestModalOpen(false);
+      showToast(`Welcome back, ${fallbackUser.username || 'player'}!`, 'success');
+      return fallbackUser;
     }
   };
 
@@ -74,7 +122,8 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(data.accessToken);
 
       const userProfile = await profileService.getCurrentUser();
-      setCurrentUser(userProfile);
+      const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
+      setCurrentUser(userObj);
       setIsAuthenticated(true);
       return data.accessToken;
     } catch (err) {
@@ -87,18 +136,28 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(updatedUser);
   };
 
+  const openGuestModal = () => {
+    setIsGuestModalOpen(true);
+  };
+
+  const closeGuestModal = () => {
+    setIsGuestModalOpen(false);
+  };
+
   // Setup callbacks on mount
   useEffect(() => {
     registerOnLogout(() => {
       logoutLocal();
-      showToast('Session expired. Please log in again.', 'error');
+      showToast('Phiên đăng nhập đã hết hạn.', 'error');
     });
 
     const initAuth = async () => {
       try {
+        // First check for active registered user session
         await refreshToken();
       } catch (err) {
-        // No session
+        // No user session -> initialize guest session automatically so guest is treated as system user
+        await loginGuest();
       } finally {
         setIsLoading(false);
       }
@@ -109,13 +168,19 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     isAuthenticated,
+    isGuest,
+    isRegisteredUser,
     currentUser,
     isLoading,
     login,
+    loginGuest,
     logout,
     refreshToken,
     showToast,
-    updateCurrentUser
+    updateCurrentUser,
+    isGuestModalOpen,
+    openGuestModal,
+    closeGuestModal
   };
 
   return (
@@ -135,7 +200,10 @@ export const AuthProvider = ({ children }) => {
         <>
           {children}
 
-          {/* Chess-themed Toast Notification */}
+          {/* Guest Choice Selection Modal */}
+          <GuestChoiceModal isOpen={isGuestModalOpen} onClose={closeGuestModal} />
+
+          {/* Global Toast Notification */}
           {toast && (
             <div
               id="global-toast"

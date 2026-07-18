@@ -3,14 +3,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../features/auth/context/AuthContext';
 
 /**
- * Layout wrapping routes only accessible to unauthenticated players (e.g. Login, Register).
- * Redirects logged-in users to the main dashboard lobby.
+ * Layout wrapping routes only accessible to unauthenticated or guest players (e.g. Login, Register).
+ * Redirects logged-in registered users to the main home lobby.
  */
 export const GuestLayout = () => {
-  const { isAuthenticated } = useAuth();
+  const { isRegisteredUser } = useAuth();
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  if (isRegisteredUser) {
+    return <Navigate to="/" replace />;
   }
 
   return (

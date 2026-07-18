@@ -181,6 +181,51 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await delay(600);
 
+    if (url.includes('/api/auth/register/guest')) {
+      return {
+        data: null,
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/auth/login/guest')) {
+      mockHasCookie = true;
+      const guestId = Math.floor(1000 + Math.random() * 9000);
+      const guestUser = {
+        id: `guest_${guestId}`,
+        username: `Guest_${guestId}`,
+        email: null,
+        avatarUrl: null,
+        role: 'ROLE_GUEST',
+        isGuest: true,
+        profile: { fullName: `Khách ${guestId}`, gender: 'SECRET', dateOfBirth: '' }
+      };
+      return {
+        data: {
+          accessToken: `mock_jwt_guest_access_${Date.now()}`,
+          refreshToken: `mock_jwt_guest_refresh_${Date.now()}`,
+          user: guestUser
+        },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/auth/refresh/guest-token')) {
+      return {
+        data: null,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
     if (url.includes('/api/auth/login')) {
       const { usernameOrEmail, password } = JSON.parse(config.data);
 
