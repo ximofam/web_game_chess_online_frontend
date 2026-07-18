@@ -44,7 +44,8 @@ export const NotificationsPage = () => {
         setExtraItems((prev) => [...prev, ...data.content]);
         setPage(nextPage);
         // If it's the last page or returns fewer items than size, hasMore becomes false
-        setHasMore(!data.last && data.content.length === 20);
+        const { number, totalPages } = data.page ?? {};
+        setHasMore(number < totalPages - 1);
       } else {
         setHasMore(false);
       }
