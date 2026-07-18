@@ -10,6 +10,9 @@ import RegisterPage from './features/auth/pages/RegisterPage';
 import Dashboard from './features/home/Dashboard';
 import ProfilePage from './features/profile/pages/ProfilePage';
 import NotificationsPage from './features/notifications/pages/NotificationsPage';
+import ForumListPage from './features/forum/pages/ForumListPage';
+import ForumCreatePage from './features/forum/pages/ForumCreatePage';
+import PostDetailPage from './features/forum/pages/PostDetailPage';
 
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
@@ -34,11 +37,16 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
               </Route>
 
+              {/* Public Forum Routes */}
+              <Route path="/forum" element={<ForumListPage />} />
+              <Route path="/forum/posts/:id" element={<PostDetailPage />} />
+
               {/* Authenticated Only Routes */}
               <Route element={<ProtectedLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/forum/create" element={<ForumCreatePage />} />
               </Route>
 
               {/* Redirects */}
