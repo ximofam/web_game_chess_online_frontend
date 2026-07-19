@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
 
   // Computed helper flags
-  const isGuest = Boolean(currentUser?.isGuest || currentUser?.role === 'ROLE_GUEST');
+  const isGuest = Boolean(currentUser?.isGuest || currentUser?.role === 'GUEST');
   const isRegisteredUser = Boolean(isAuthenticated && !isGuest);
 
   // Show a toast message for 4 seconds
@@ -52,50 +52,52 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login as Guest handler
+  // Login as Guest handler (tries loginGuest -> fallback registerGuest -> retry loginGuest)
   const loginGuest = async () => {
+    let data;
     try {
-      await authService.registerGuest();
-    } catch (e) {
-      // Safe to ignore if already registered
+      // Step 1: Attempt loginGuest first
+      data = await authService.loginGuest();
+    } catch (loginErr) {
+      // Step 2: If loginGuest fails (no guest account yet), call registerGuest
+      try {
+        await authService.registerGuest();
+        // Step 3: Retry loginGuest after successful guest registration
+        data = await authService.loginGuest();
+      } catch (regErr) {
+        console.error('Failed guest registration/login flow', regErr);
+        data = {
+          accessToken: 'mock_guest_token',
+          user: {
+            id: 'guest_local',
+            username: 'Guest Player',
+            role: 'ROLE_GUEST',
+            isGuest: true
+          }
+        };
+      }
     }
 
-    try {
-      const data = await authService.loginGuest();
-      if (data?.accessToken) {
-        setAccessToken(data.accessToken);
-      }
-      const guestObj = data?.user || {
-        id: 'guest_' + Math.floor(Math.random() * 1000),
-        username: 'Guest Player',
-        role: 'ROLE_GUEST',
-        isGuest: true
-      };
-      setCurrentUser(guestObj);
-      setIsAuthenticated(true);
-      setIsGuestModalOpen(false);
-      return guestObj;
-    } catch (err) {
-      console.error('Failed guest login', err);
-      // Fallback guest user object for offline / demo
-      const fallbackGuest = {
-        id: 'guest_local',
-        username: 'Guest Player',
-        role: 'ROLE_GUEST',
-        isGuest: true
-      };
-      setCurrentUser(fallbackGuest);
-      setIsAuthenticated(true);
-      setIsGuestModalOpen(false);
-      return fallbackGuest;
+    if (data?.accessToken) {
+      setAccessToken(data.accessToken);
     }
+    const guestObj = data?.user || {
+      id: 'guest_' + Math.floor(Math.random() * 1000),
+      username: 'Guest Player',
+      role: 'ROLE_GUEST',
+      isGuest: true
+    };
+    setCurrentUser(guestObj);
+    setIsAuthenticated(true);
+    setIsGuestModalOpen(false);
+    return guestObj;
   };
 
   // Regular user login handler
   const login = async (usernameOrEmail, password) => {
     const data = await authService.login(usernameOrEmail, password);
     setAccessToken(data.accessToken);
-    
+
     // Fetch detailed profile immediately
     try {
       const userProfile = await profileService.getCurrentUser();
@@ -115,17 +117,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Refresh token helper
+  // Refresh token helper (renews guestToken if current account is guest)
   const refreshToken = async () => {
     try {
+      // If currently logged in user is guest, also call refresh/guest-token to renew guest cookie
+      if (isGuest) {
+        try {
+          await authService.refreshGuestToken();
+        } catch (e) {
+          console.warn('Failed to refresh guest token cookie', e);
+        }
+      }
+
       const data = await authService.refresh();
       setAccessToken(data.accessToken);
 
-      const userProfile = await profileService.getCurrentUser();
-      const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
-      setCurrentUser(userObj);
-      setIsAuthenticated(true);
-      return data.accessToken;
+      if (isGuest) {
+        setIsAuthenticated(true);
+        return data.accessToken;
+      }
+
+      try {
+        const userProfile = await profileService.getCurrentUser();
+        const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
+        setCurrentUser(userObj);
+        setIsAuthenticated(true);
+        return data.accessToken;
+      } catch (profileErr) {
+        setIsAuthenticated(true);
+        return data.accessToken;
+      }
     } catch (err) {
       logoutLocal();
       throw err;
@@ -148,6 +169,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     registerOnLogout(() => {
       logoutLocal();
+      setIsGuestModalOpen(true);
       showToast('Phiên đăng nhập đã hết hạn.', 'error');
     });
 
@@ -156,8 +178,8 @@ export const AuthProvider = ({ children }) => {
         // First check for active registered user session
         await refreshToken();
       } catch (err) {
-        // No user session -> initialize guest session automatically so guest is treated as system user
-        await loginGuest();
+        // Refresh returned 401 -> prompt modal with "Tiếp tục với tư cách guest" and "Login"
+        setIsGuestModalOpen(true);
       } finally {
         setIsLoading(false);
       }
@@ -210,8 +232,8 @@ export const AuthProvider = ({ children }) => {
               role="alert"
               aria-live="assertive"
               className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-lg shadow-lg border backdrop-blur-md animate-fade-in-up max-w-sm ${toast.type === 'error'
-                  ? 'bg-red-950/80 border-red-500/50 text-red-200'
-                  : 'bg-[#1a1d24]/90 border-[#d4af37]/50 text-gray-100'
+                ? 'bg-red-950/80 border-red-500/50 text-red-200'
+                : 'bg-[#1a1d24]/90 border-[#d4af37]/50 text-gray-100'
                 }`}
             >
               {toast.type === 'error' ? (

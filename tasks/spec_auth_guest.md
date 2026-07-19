@@ -1,12 +1,22 @@
-# Spec: Guest Authentication & Navigation System
+# Spec: Guest & User Authentication Flow & Elimination of GuestLayout
 
 ## Objective
-Hỗ trợ xác thực khách ẩn danh (Guest Token / Guest Session) theo đúng API Spec, cho phép người dùng xem guest cũng như user hệ thống để truy cập các trang công cộng (Home, Forum) mà không bắt buộc đăng nhập. Cung cấp tùy chọn khi vào hệ thống: "Tiếp tục với tư cách Guest" hoặc "Đăng nhập", đồng thời cập nhật Navigation Bar bao gồm các mục Nav (Home, Forum, Status Guest/User, Login button).
+Theo Đặc tả API Authentication (Auth API Specification):
+1. **Loại bỏ GuestLayout**:
+   - Vì Guest cũng là **User** của hệ thống (có ID/username sinh ngẫu nhiên và `accessToken`/`refreshToken` của riêng mình), nên Guest hoàn toàn là một User bình thường.
+   - Không cần dùng `GuestLayout` để chặn/chuyển hướng người dùng khỏi các trang `/login` và `/register`. Các route `/login` và `/register` được truy cập trực tiếp.
+2. **Luồng Khởi Tạo / Đăng Nhập Guest (Fallback Registration Flow)**:
+   - Khi thực hiện đăng nhập Guest (`loginGuest`), hệ thống thử gọi `POST /api/auth/login/guest`.
+   - Nếu `loginGuest` thất bại (chưa có tài khoản guest / cookie `guestToken` chưa hợp lệ): gọi `POST /api/auth/register/guest` để khởi tạo tài khoản guest. Khi đăng ký thành công, tự động gọi lại `POST /api/auth/login/guest` để nhận cặp token.
+3. **Gia Hạn Token Guest (`refreshGuestToken`)**:
+   - Khi tài khoản hiện tại là **Guest** và hệ thống thực hiện `refreshToken()` (`POST /api/auth/refresh`), hệ thống sẽ đồng thời gọi `POST /api/auth/refresh/guest-token` để gia hạn thời gian tồn tại của `guestToken` cookie.
+4. **Liên Kết Tài Khoản ở AvatarDropdown**:
+   - Ở `AvatarDropdown`, nếu tài khoản hiện tại là **Guest** (`isGuest` / `ROLE_GUEST`), hiển thị nút/liên kết **"Liên kết tài khoản"** (Link Account) cho phép Guest đăng ký/liên kết với tài khoản chính thức (chuyển hướng sang `/register`).
 
 ## Tech Stack & Dependencies
 - Framework: React 19, Vite, React Router v7
-- State & API: TanStack Query, Axios, Context API
-- Icons & Styling: Lucide React, Tailwind CSS
+- HTTP & State: Axios (`authClient`), Context API (`AuthContext`)
+- Styling & Icons: Tailwind CSS, Lucide React (`UserPlus`, `Link2`, `ShieldAlert`, `UserCheck`)
 
 ## Commands
 ```bash
@@ -20,37 +30,41 @@ Lint: npm run lint
 src/
 ├── features/
 │   ├── auth/
-│   │   ├── api/authClient.js          # Extended mock interceptors for guest endpoints
-│   │   ├── context/AuthContext.jsx     # Handles guest & user auth state, auto guest init / modal prompt
-│   │   ├── services/authService.js     # registerGuest, loginGuest, refreshGuestToken endpoints
+│   │   ├── api/authClient.js            # Interceptor & Mock Endpoints theo API Spec
+│   │   ├── services/authService.js       # Mapping API (login, register, loginGuest, registerGuest, refreshGuestToken, refresh)
+│   │   ├── context/AuthContext.jsx       # Xử lý fallback loginGuest, refreshGuestToken khi user là Guest, & 401 prompt
+    │   ├── pages/LoginPage.jsx          # Login Page (Direct access)
+    │   ├── pages/RegisterPage.jsx       # Register Page (Direct access)
 │   │   └── components/
-│   │       └── GuestChoiceModal.jsx   # Modal choosing "Continue as Guest" or "Login"
-│   ├── home/
-│   │   ├── Dashboard.jsx               # Home Page accessible to both Guest & User
-│   │   └── components/Navbar.jsx       # Unified Header Nav (Home, Forum, Auth actions)
-│   └── forum/                          # Forum pages (Public read for Guest/User)
-├── layouts/
-│   ├── PublicLayout.jsx                # Layout with Navbar & Footer for Home & Forum (Guest/User)
-│   ├── ProtectedLayout.jsx             # Restricts to authenticated ROLE_USER (Profile, Notifications, Create Post)
-│   └── GuestLayout.jsx                 # Auth pages layout (Login, Register)
+│   │       └── GuestChoiceModal.jsx     # UI Modal với nút Guest & Login
+│   └── profile/
+│       └── components/
+│           └── AvatarDropdown.jsx       # Hiển thị nút "Liên kết tài khoản" cho Guest user
+└── layouts/
+    ├── PublicLayout.jsx                # Layout công cộng (Header + Footer)
+    └── ProtectedLayout.jsx             # Layout yêu cầu xác thực
 ```
 
-## API Endpoints Specs Covered
-- `POST /api/auth/register/guest` -> Cookie `guestToken`
-- `POST /api/auth/login/guest` -> Header `Authorization: Bearer <accessToken>` + Cookie `refreshToken`
-- `POST /api/auth/refresh/guest-token` -> Refreshes `guestToken` cookie
-- `POST /api/auth/login` -> User login
-- `POST /api/auth/register` -> User registration
-- `POST /api/auth/refresh` -> Token rotation
-- `POST /api/auth/logout` -> Clears session
+## Code Style & Implementation Snippets
+```jsx
+// Direct routes without GuestLayout guard in App.jsx
+<Route path="/login" element={<LoginPage />} />
+<Route path="/register" element={<RegisterPage />} />
+```
 
 ## Boundaries
-- Always do: Allow Guests to read Home and Forum content without forcing redirect to `/login`.
-- Ask first: Changing routing hierarchy or database schema expectations.
-- Never do: Block guest users from visiting public pages.
+- **Always do:**
+  - Loại bỏ `GuestLayout` và cho phép truy cập trực tiếp các route auth.
+  - Thực hiện đúng trình tự `loginGuest` -> fail -> `registerGuest` -> `loginGuest`.
+  - Gọi `refreshGuestToken` khi refresh token cho tài khoản Guest.
+  - Hiển thị tùy chọn "Liên kết tài khoản" trong `AvatarDropdown` dành cho Guest.
+- **Ask first:** Thay đổi schema backend hoặc các tham số endpoint.
+- **Never do:** Dùng `GuestLayout` chặn Guest hoặc User đăng nhập/đăng ký.
 
 ## Success Criteria
-1. Guest access without requiring login for public services (Home, Forum, Post Detail).
-2. When landing unauthenticated: user can choose "Continue as Guest" or "Login" (or smoothly auto-register guest session while offering Login switch).
-3. Header Navbar features links to `Home` and `Forum`, plus user profile or Guest indicator + "Login" button for guests.
-4. Mock interceptor in `authClient.js` fully supports guest endpoints for complete offline/dev testing.
+- [ ] `GuestLayout` được loại bỏ hoàn toàn khỏi `App.jsx`.
+- [ ] Các trang `/login` và `/register` có thể được truy cập trực tiếp bởi bất kỳ User nào (kể cả Guest).
+- [ ] `loginGuest` thử đăng nhập trước, nếu không được thì tự động đăng ký guest rồi đăng nhập lại.
+- [ ] Khi tài khoản là Guest, lệnh `refreshToken` tự động gia hạn `guestToken` qua `refreshGuestToken`.
+- [ ] `AvatarDropdown` hiển thị nút "Liên kết tài khoản" dẫn tới `/register` khi user là Guest.
+- [ ] Build thành công không có lỗi syntax/type.

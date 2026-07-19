@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Settings, LogOut, Shield, FileText } from 'lucide-react';
+import { User, Settings, LogOut, Shield, FileText, UserPlus } from 'lucide-react';
 
 /**
  * AvatarDropdown displays profile information and options.
@@ -33,8 +33,9 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
     };
   }, [onClose]);
 
-  const initial = user?.username ? user.username.charAt(0).toUpperCase() : 'P';
-  const roleText = user?.role || 'USER';
+  const isGuestUser = Boolean(user?.isGuest || user?.role === 'ROLE_GUEST');
+  const initial = user?.username ? user.username.charAt(0).toUpperCase() : 'G';
+  const roleText = isGuestUser ? 'GUEST' : (user?.role || 'USER');
 
   return (
     <div
@@ -61,7 +62,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
             {user?.username}
           </p>
           <p className="text-xs text-[#9ca3af] truncate mb-1">
-            {user?.email}
+            {user?.email || (isGuestUser ? 'Tài khoản ẩn danh' : '')}
           </p>
           <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider bg-[#d4af37]/10 text-[#d4af37] px-2 py-0.5 rounded-full font-semibold border border-[#d4af37]/30">
             <Shield className="w-2.5 h-2.5" />
@@ -72,6 +73,18 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
 
       {/* Menu Items */}
       <div className="py-1">
+        {isGuestUser && (
+          <Link
+            to="/register"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 mx-2 my-1 text-sm font-semibold text-[#0d0e12] bg-[#d4af37] hover:bg-[#b59226] rounded-lg transition-all shadow-md cursor-pointer"
+            role="menuitem"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Liên kết tài khoản</span>
+          </Link>
+        )}
+
         <Link
           to="/profile"
           onClick={onClose}

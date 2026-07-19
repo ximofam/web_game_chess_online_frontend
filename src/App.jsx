@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
 import PublicLayout from './layouts/PublicLayout';
-import GuestLayout from './layouts/GuestLayout';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
@@ -32,18 +31,16 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <Routes>
+              {/* Auth Routes (Login, Register - Directly Accessible) */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
               {/* Public Routes (Accessible to Guest & User with Navbar + Footer) */}
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/forum" element={<ForumListPage />} />
                 <Route path="/forum/posts/:id" element={<PostDetailPage />} />
-              </Route>
-
-              {/* Guest Only / Auth Routes (Login, Register) */}
-              <Route element={<GuestLayout />}>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
               </Route>
 
               {/* Registered User Only Routes */}
