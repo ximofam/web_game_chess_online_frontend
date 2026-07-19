@@ -78,16 +78,30 @@ export const AuthProvider = ({ children }) => {
     }
 
     setAccessToken(data.accessToken);
-    const guestObj = data.user || {
-      id: 'guest_' + Math.floor(Math.random() * 1000),
-      username: 'Guest Player',
-      role: 'GUEST',
-      isGuest: true
-    };
-    setCurrentUser(guestObj);
-    setIsAuthenticated(true);
-    setIsGuestModalOpen(false);
-    return guestObj;
+
+    try {
+      const userProfile = await profileService.getCurrentUser();
+      const guestObj = {
+        ...userProfile,
+        role: userProfile.role || 'GUEST',
+        isGuest: true
+      };
+      setCurrentUser(guestObj);
+      setIsAuthenticated(true);
+      setIsGuestModalOpen(false);
+      return guestObj;
+    } catch (profileErr) {
+      const guestObj = data.user || {
+        id: 'guest_' + Math.floor(Math.random() * 1000),
+        username: 'Guest Player',
+        role: 'GUEST',
+        isGuest: true
+      };
+      setCurrentUser(guestObj);
+      setIsAuthenticated(true);
+      setIsGuestModalOpen(false);
+      return guestObj;
+    }
   };
 
   // Regular user login handler
@@ -129,18 +143,28 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.refresh();
       setAccessToken(data.accessToken);
 
-      if (isGuest) {
-        setIsAuthenticated(true);
-        return data.accessToken;
-      }
-
+      // Treat Guest as a system User: always fetch /api/users/me profile details
       try {
         const userProfile = await profileService.getCurrentUser();
-        const userObj = { ...userProfile, role: userProfile.role || 'USER', isGuest: false };
+        const userRole = userProfile.role || (isGuest ? 'GUEST' : 'USER');
+        const userObj = {
+          ...userProfile,
+          role: userRole,
+          isGuest: userRole === 'GUEST' || Boolean(userProfile.isGuest)
+        };
         setCurrentUser(userObj);
         setIsAuthenticated(true);
         return data.accessToken;
       } catch (profileErr) {
+        if (data.user) {
+          const userRole = data.user.role || (isGuest ? 'GUEST' : 'USER');
+          const fallbackUser = {
+            ...data.user,
+            role: userRole,
+            isGuest: userRole === 'GUEST' || Boolean(data.user.isGuest)
+          };
+          setCurrentUser(fallbackUser);
+        }
         setIsAuthenticated(true);
         return data.accessToken;
       }
