@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Settings, LogOut, Shield } from 'lucide-react';
+import { User, Settings, LogOut, Shield, FileText } from 'lucide-react';
 
 /**
  * AvatarDropdown displays profile information and options.
@@ -80,6 +80,15 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
         >
           <User className="w-4 h-4 text-[#d4af37]" />
           <span>My Profile</span>
+        </Link>
+        <Link
+          to="/forum/my-posts"
+          onClick={onClose}
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-[#f3f4f6] hover:bg-[#2d323f]/50 hover:text-[#d4af37] transition-colors"
+          role="menuitem"
+        >
+          <FileText className="w-4 h-4 text-[#d4af37]" />
+          <span>Quản lý bài viết</span>
         </Link>
         <Link
           to="/profile?edit=true"

@@ -6,15 +6,27 @@ import { authClient } from '../../auth/api/authClient';
 export const forumService = {
   // ── Posts ────────────────────────────────────────────────────────────────
 
-  getPosts: (page = 0, size = 20) =>
-    authClient.get('/api/posts', { params: { page, size, sort: 'createdAt,desc' } })
-      .then(r => r.data),
+  getPosts: ({ page = 0, size = 20, search = '', sortBy = 'newest', mine = false, status = null } = {}) => {
+    const params = { page, size, sortBy };
+    if (search && search.trim() !== '') params.search = search.trim();
+    if (mine) {
+      params.mine = true;
+      if (status && status !== 'ALL') params.status = status;
+    }
+    return authClient.get('/api/posts', { params }).then(r => r.data);
+  },
 
   getPost: (postId) =>
     authClient.get(`/api/posts/${postId}`).then(r => r.data),
 
+  getMyPost: (postId) =>
+    authClient.get(`/api/posts/${postId}/my`).then(r => r.data),
+
   createPost: (body) =>
     authClient.post('/api/posts', body).then(r => r.data),
+
+  deletePost: (postId) =>
+    authClient.delete(`/api/posts/${postId}`).then(r => r.data),
 
   likePost: (postId, isLike) =>
     authClient.post(`/api/posts/${postId}/likes`, null, { params: { isLike } }).then(r => r.data),

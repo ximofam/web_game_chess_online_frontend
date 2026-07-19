@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './features/auth/context/AuthContext';
@@ -14,6 +13,7 @@ import NotificationsPage from './features/notifications/pages/NotificationsPage'
 import ForumListPage from './features/forum/pages/ForumListPage';
 import ForumCreatePage from './features/forum/pages/ForumCreatePage';
 import PostDetailPage from './features/forum/pages/PostDetailPage';
+import MyPostsPage from './features/forum/pages/MyPostsPage';
 
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
@@ -51,6 +51,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/forum/create" element={<ForumCreatePage />} />
+                <Route path="/forum/my-posts" element={<MyPostsPage />} />
               </Route>
 
               {/* Catch-all Redirect */}
