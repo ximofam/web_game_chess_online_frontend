@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
@@ -13,6 +13,10 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+
+  // Single-flight & mounting guards to prevent duplicate token rotation requests
+  const refreshPromiseRef = useRef(null);
+  const initAuthStartedRef = useRef(false);
 
   // Computed helper flags
   const isGuest = Boolean(currentUser?.isGuest || currentUser?.role === 'GUEST');
@@ -128,50 +132,60 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Refresh token helper (renews guestToken if current account is guest)
+  // Refresh token helper (Single-Flight guarded to prevent Token Rotation 401 race conditions)
   const refreshToken = async () => {
-    try {
-      // If currently logged in user is guest, also call refresh/guest-token to renew guest cookie
-      if (isGuest) {
-        try {
-          await authService.refreshGuestToken();
-        } catch (e) {
-          console.warn('Failed to refresh guest token cookie', e);
-        }
-      }
-
-      const data = await authService.refresh();
-      setAccessToken(data.accessToken);
-
-      // Treat Guest as a system User: always fetch /api/users/me profile details
-      try {
-        const userProfile = await profileService.getCurrentUser();
-        const userRole = userProfile.role || (isGuest ? 'GUEST' : 'USER');
-        const userObj = {
-          ...userProfile,
-          role: userRole,
-          isGuest: userRole === 'GUEST' || Boolean(userProfile.isGuest)
-        };
-        setCurrentUser(userObj);
-        setIsAuthenticated(true);
-        return data.accessToken;
-      } catch (profileErr) {
-        if (data.user) {
-          const userRole = data.user.role || (isGuest ? 'GUEST' : 'USER');
-          const fallbackUser = {
-            ...data.user,
-            role: userRole,
-            isGuest: userRole === 'GUEST' || Boolean(data.user.isGuest)
-          };
-          setCurrentUser(fallbackUser);
-        }
-        setIsAuthenticated(true);
-        return data.accessToken;
-      }
-    } catch (err) {
-      logoutLocal();
-      throw err;
+    if (refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
     }
+
+    refreshPromiseRef.current = (async () => {
+      try {
+        // If currently logged in user is guest, also call refresh/guest-token to renew guest cookie
+        if (isGuest) {
+          try {
+            await authService.refreshGuestToken();
+          } catch (e) {
+            console.warn('Failed to refresh guest token cookie', e);
+          }
+        }
+
+        const data = await authService.refresh();
+        setAccessToken(data.accessToken);
+
+        // Treat Guest as a system User: always fetch /api/users/me profile details
+        try {
+          const userProfile = await profileService.getCurrentUser();
+          const userRole = userProfile.role || (isGuest ? 'GUEST' : 'USER');
+          const userObj = {
+            ...userProfile,
+            role: userRole,
+            isGuest: userRole === 'GUEST' || Boolean(userProfile.isGuest)
+          };
+          setCurrentUser(userObj);
+          setIsAuthenticated(true);
+          return data.accessToken;
+        } catch (profileErr) {
+          if (data.user) {
+            const userRole = data.user.role || (isGuest ? 'GUEST' : 'USER');
+            const fallbackUser = {
+              ...data.user,
+              role: userRole,
+              isGuest: userRole === 'GUEST' || Boolean(data.user.isGuest)
+            };
+            setCurrentUser(fallbackUser);
+          }
+          setIsAuthenticated(true);
+          return data.accessToken;
+        }
+      } catch (err) {
+        logoutLocal();
+        throw err;
+      } finally {
+        refreshPromiseRef.current = null;
+      }
+    })();
+
+    return refreshPromiseRef.current;
   };
 
   const updateCurrentUser = (updatedUser) => {
@@ -193,6 +207,11 @@ export const AuthProvider = ({ children }) => {
       setIsGuestModalOpen(true);
       showToast('Phiên đăng nhập đã hết hạn.', 'error');
     });
+
+    if (initAuthStartedRef.current) {
+      return;
+    }
+    initAuthStartedRef.current = true;
 
     const initAuth = async () => {
       try {
