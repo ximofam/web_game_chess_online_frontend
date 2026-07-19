@@ -66,25 +66,22 @@ export const AuthProvider = ({ children }) => {
         data = await authService.loginGuest();
       } catch (regErr) {
         console.error('Failed guest registration/login flow', regErr);
-        data = {
-          accessToken: 'mock_guest_token',
-          user: {
-            id: 'guest_local',
-            username: 'Guest Player',
-            role: 'ROLE_GUEST',
-            isGuest: true
-          }
-        };
+        showToast('Không thể khởi tạo tài khoản Khách (Guest).', 'error');
+        throw regErr;
       }
     }
 
-    if (data?.accessToken) {
-      setAccessToken(data.accessToken);
+    if (!data?.accessToken) {
+      const err = new Error('No access token received for guest account');
+      showToast('Đăng nhập Khách (Guest) không thành công.', 'error');
+      throw err;
     }
-    const guestObj = data?.user || {
+
+    setAccessToken(data.accessToken);
+    const guestObj = data.user || {
       id: 'guest_' + Math.floor(Math.random() * 1000),
       username: 'Guest Player',
-      role: 'ROLE_GUEST',
+      role: 'GUEST',
       isGuest: true
     };
     setCurrentUser(guestObj);
@@ -101,14 +98,14 @@ export const AuthProvider = ({ children }) => {
     // Fetch detailed profile immediately
     try {
       const userProfile = await profileService.getCurrentUser();
-      const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
+      const userObj = { ...userProfile, role: userProfile.role || 'USER', isGuest: false };
       setCurrentUser(userObj);
       setIsAuthenticated(true);
       setIsGuestModalOpen(false);
       showToast(`Welcome back, ${userObj.username}!`, 'success');
       return userObj;
     } catch (err) {
-      const fallbackUser = { ...data.user, role: data.user?.role || 'ROLE_USER', isGuest: false };
+      const fallbackUser = { ...data.user, role: data.user?.role || 'USER', isGuest: false };
       setCurrentUser(fallbackUser);
       setIsAuthenticated(true);
       setIsGuestModalOpen(false);
@@ -139,7 +136,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const userProfile = await profileService.getCurrentUser();
-        const userObj = { ...userProfile, role: userProfile.role || 'ROLE_USER', isGuest: false };
+        const userObj = { ...userProfile, role: userProfile.role || 'USER', isGuest: false };
         setCurrentUser(userObj);
         setIsAuthenticated(true);
         return data.accessToken;

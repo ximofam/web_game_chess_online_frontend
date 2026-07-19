@@ -26,7 +26,7 @@ export default function Dashboard() {
   const handleSimulateTokenExpiry = async () => {
     setAccessToken(null);
     showToast('Đã xóa Access Token trong bộ nhớ. Giả lập hết hạn token...', 'success');
-    
+
     setIsLoadingProfile(true);
     try {
       const data = await authService.getProfile();
@@ -71,7 +71,7 @@ export default function Dashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          
+
           {/* PROFILE SUMMARY */}
           <div className="md:col-span-5 bg-[#1a1d24] border border-[#2d323f] p-6 rounded-2xl flex flex-col justify-between shadow-md">
             <div className="flex flex-col items-center text-center">
@@ -88,7 +88,7 @@ export default function Dashboard() {
               <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6]">{currentUser?.username || 'Guest Player'}</h2>
               <p className="text-xs text-[#9ca3af] tracking-wider uppercase mb-1">{currentUser?.email || 'Hệ thống Khách Ẩn Danh'}</p>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] mt-2">
-                <CheckCircle className="w-3.5 h-3.5" /> {currentUser?.role || 'ROLE_GUEST'}
+                <CheckCircle className="w-3.5 h-3.5" /> {currentUser?.role || 'GUEST'}
               </span>
             </div>
 

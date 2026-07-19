@@ -199,7 +199,7 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
         username: `Guest_${guestId}`,
         email: null,
         avatarUrl: null,
-        role: 'ROLE_GUEST',
+        role: 'GUEST',
         isGuest: true,
         profile: { fullName: `Khách ${guestId}`, gender: 'SECRET', dateOfBirth: '' }
       };

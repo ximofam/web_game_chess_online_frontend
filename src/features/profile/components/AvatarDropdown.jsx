@@ -33,7 +33,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
     };
   }, [onClose]);
 
-  const isGuestUser = Boolean(user?.isGuest || user?.role === 'ROLE_GUEST');
+  const isGuestUser = Boolean(user?.isGuest || user?.role === 'GUEST');
   const initial = user?.username ? user.username.charAt(0).toUpperCase() : 'G';
   const roleText = isGuestUser ? 'GUEST' : (user?.role || 'USER');
 

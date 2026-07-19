@@ -70,7 +70,7 @@ export const Navbar = () => {
                 {currentUser?.username}
               </span>
               <span className="text-[10px] uppercase tracking-wider text-[#d4af37] font-semibold mt-0.5">
-                {currentUser?.role || 'ROLE_USER'}
+                {currentUser?.role || 'USER'}
               </span>
             </div>
 
