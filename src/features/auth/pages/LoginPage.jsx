@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ShieldAlert, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { loginSchema } from '../validation/authSchemas';
 import AuthInput from '../components/AuthInput';
 
 export default function LoginPage() {
+  const { t } = useTranslation(['auth', 'common', 'nav']);
   const { login, showToast } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  // Custom zod resolver to avoid extra @hookform/resolvers dependency
   const resolver = async (values) => {
     const result = loginSchema.safeParse(values);
     if (result.success) {
@@ -41,7 +42,6 @@ export default function LoginPage() {
     mode: 'onTouched',
   });
 
-  // TanStack Query mutation for login request
   const { mutate: performLogin, isPending, error: serverError } = useMutation({
     mutationFn: async ({ usernameOrEmail, password }) => {
       return login(usernameOrEmail, password);
@@ -50,7 +50,7 @@ export default function LoginPage() {
       navigate('/dashboard');
     },
     onError: (err) => {
-      const errMsg = err.response?.data?.message || 'Login failed. Please check your network or credentials.';
+      const errMsg = err.response?.data?.message || t('auth:login_failed_toast');
       showToast(errMsg, 'error');
     },
   });
@@ -70,13 +70,13 @@ export default function LoginPage() {
         <div className="w-full flex items-center gap-2.5 z-10">
           <Award className="w-7 h-7 text-chess-gold" />
           <h1 className="font-playfair text-xl font-bold tracking-widest text-chess-text m-0!">
-            CHESS ARENA
+            {t('nav:brand')}
           </h1>
         </div>
 
         {/* Hero visual */}
         <div className="flex flex-col items-center justify-center text-center z-10 my-auto">
-          {/* Glowing float Chess Queen piece SVG */}
+          {/* Glowing float Chess piece SVG */}
           <div className="w-48 h-48 mb-8 relative flex items-center justify-center animate-pulse duration-[3500ms]">
             <div className="absolute inset-0 bg-chess-gold/10 rounded-full blur-3xl" />
             <svg viewBox="0 0 24 24" className="w-36 h-36 fill-chess-gold/90 drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">
@@ -85,7 +85,7 @@ export default function LoginPage() {
           </div>
 
           <blockquote className="font-playfair italic text-2xl text-chess-text max-w-md mb-2 leading-relaxed">
-            "Play the opening like a book, the middlegame like a magician, and the endgame like a machine."
+            &quot;Play the opening like a book, the middlegame like a magician, and the endgame like a machine.&quot;
           </blockquote>
           <cite className="text-xs uppercase tracking-widest text-chess-muted not-italic font-semibold">
             — Spielmann
@@ -107,17 +107,17 @@ export default function LoginPage() {
           <div className="flex lg:hidden items-center justify-center gap-2 mb-6">
             <Award className="w-6 h-6 text-chess-gold" />
             <span className="font-playfair text-lg font-bold tracking-widest text-chess-text">
-              CHESS ARENA
+              {t('nav:brand')}
             </span>
           </div>
 
           {/* Form Header */}
           <div className="text-center md:text-left mb-6">
             <h2 className="font-playfair text-3xl font-semibold text-chess-text mb-1">
-              Sign In
+              {t('auth:login_title')}
             </h2>
             <p className="text-sm text-chess-muted font-inter">
-              Enter your credentials to enter the arena.
+              {t('auth:login_subtitle')}
             </p>
           </div>
 
@@ -128,14 +128,14 @@ export default function LoginPage() {
               role="alert"
             >
               <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{serverError.response?.data?.message || 'Unauthorized entry.'}</span>
+              <span>{serverError.response?.data?.message || t('auth:unauthorized_entry')}</span>
             </div>
           )}
 
           {/* Form Content */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <AuthInput
-              label="Username or Email"
+              label={t('auth:username_or_email')}
               id="login-username"
               type="text"
               placeholder="Kasparov_01 or you@domain.com"
@@ -145,7 +145,7 @@ export default function LoginPage() {
             />
 
             <AuthInput
-              label="Password"
+              label={t('auth:password')}
               id="login-password"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
@@ -177,22 +177,22 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span>SIGNING IN...</span>
+                  <span>{t('auth:signing_in')}</span>
                 </>
               ) : (
-                <span>LOG IN TO BATTLE</span>
+                <span>{t('auth:login_submit')}</span>
               )}
             </button>
           </form>
 
           {/* Footer Navigation */}
           <div className="text-center mt-6 text-xs text-chess-muted">
-            New player?{' '}
+            {t('auth:new_player')}{' '}
             <Link
               to="/register"
               className="text-chess-gold font-semibold hover:underline hover:text-chess-gold-hover focus:outline-none focus:underline"
             >
-              Register Chess ID
+              {t('auth:register_id')}
             </Link>
           </div>
         </div>

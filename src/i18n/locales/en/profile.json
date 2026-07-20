@@ -1,0 +1,15 @@
+{
+  "profile_title": "Account Profile",
+  "profile_subtitle": "Manage your personal credentials and game preferences.",
+  "avatar_upload": "Upload Avatar",
+  "bio": "Bio / Personal Quote",
+  "bio_placeholder": "Share your favorite opening or chess quote...",
+  "gender": "Gender",
+  "gender_male": "Male",
+  "gender_female": "Female",
+  "gender_other": "Other",
+  "birth_date": "Date of Birth",
+  "role": "Account Role",
+  "update_success": "Profile updated successfully!",
+  "update_failed": "Failed to update profile. Please try again."
+}

@@ -1,0 +1,21 @@
+{
+  "forum_title": "Chess Community Forum",
+  "forum_subtitle": "Discuss tactics, openings, grandmaster games, and strategy.",
+  "create_post": "Create Post",
+  "search_posts": "Search posts...",
+  "filter_category": "Filter by Category",
+  "category_all": "All Categories",
+  "no_posts_found": "No posts found",
+  "no_posts_desc": "Be the first to share your chess analysis with the community!",
+  "post_title": "Post Title",
+  "post_category": "Category",
+  "post_content": "Content",
+  "submit_post": "Publish Post",
+  "publishing": "Publishing...",
+  "comments_title_one": "{{count}} Comment",
+  "comments_title_other": "{{count}} Comments",
+  "add_comment": "Add a comment...",
+  "submit_comment": "Post Comment",
+  "my_posts_title": "My Published Posts",
+  "my_posts_subtitle": "Manage and track your published articles."
+}

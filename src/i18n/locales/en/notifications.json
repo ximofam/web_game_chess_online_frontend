@@ -1,0 +1,9 @@
+{
+  "notifications_title": "Notifications Center",
+  "notifications_subtitle": "Stay updated on game challenges, forum replies, and updates.",
+  "mark_all_read": "Mark All as Read",
+  "no_notifications": "No notifications yet",
+  "no_notifications_desc": "You're all caught up!",
+  "unread_count_one": "{{count}} unread notification",
+  "unread_count_other": "{{count}} unread notifications"
+}

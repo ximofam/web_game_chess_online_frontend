@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Trophy, Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck, WifiOff } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNotifications } from '../../notifications/context/NotificationContext';
@@ -18,6 +19,7 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
  * Features Navigation links (Home, Forum, Learn) and displays User Profile Dropdown or Guest Status & Auth CTAs.
  */
 export const Navbar = () => {
+  const { t } = useTranslation(['nav', 'auth']);
   const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
   const { connectionStatus, reconnect } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -31,10 +33,10 @@ export const Navbar = () => {
   const handlePlayAsGuest = async () => {
     try {
       await loginGuest();
-      showToast('Chào mừng bạn trải nghiệm với tư cách Khách (Guest)!', 'success');
+      showToast(t('auth:guest_welcome_toast'), 'success');
       navigate('/dashboard');
-    } catch (err) {
-      showToast('Không thể khởi tạo phiên Khách. Vui lòng thử lại.', 'error');
+    } catch {
+      showToast(t('auth:guest_failed_toast'), 'error');
     }
   };
 
@@ -49,7 +51,7 @@ export const Navbar = () => {
         >
           <Trophy className="w-6 h-6 text-[#d4af37]" />
           <span className="font-playfair text-lg font-bold tracking-widest text-[#f3f4f6] hidden sm:inline">
-            CHESS ARENA
+            {t('nav:brand')}
           </span>
         </Link>
 
@@ -63,7 +65,7 @@ export const Navbar = () => {
               }`}
           >
             <Home className="w-4 h-4" />
-            <span>Trang chủ</span>
+            <span>{t('nav:home')}</span>
           </Link>
 
           <Link
@@ -74,7 +76,7 @@ export const Navbar = () => {
               }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>Học cờ</span>
+            <span>{t('nav:learn')}</span>
           </Link>
 
           <Link
@@ -85,7 +87,7 @@ export const Navbar = () => {
               }`}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Diễn đàn</span>
+            <span>{t('nav:forum')}</span>
           </Link>
         </nav>
       </div>
@@ -106,10 +108,10 @@ export const Navbar = () => {
                 }`}
               title={
                 connectionStatus === 'CONNECTED'
-                  ? 'Kết nối máy chủ realtime đang hoạt động'
+                  ? t('nav:ws_connected_tooltip')
                   : connectionStatus === 'CONNECTING'
-                    ? 'Đang kết nối tới máy chủ realtime...'
-                    : 'Mất kết nối máy chủ realtime. Nhấp để kết nối lại!'
+                    ? t('nav:ws_connecting_tooltip')
+                    : t('nav:ws_disconnected_tooltip')
               }
             >
               {connectionStatus === 'DISCONNECTED' ? (
@@ -124,10 +126,10 @@ export const Navbar = () => {
               )}
               <span className="hidden md:inline text-[10px] uppercase tracking-wider">
                 {connectionStatus === 'CONNECTED'
-                  ? 'LIVE WS'
+                  ? t('nav:live_ws')
                   : connectionStatus === 'CONNECTING'
-                    ? 'CONNECTING'
-                    : 'OFFLINE (RETRY)'}
+                    ? t('nav:connecting')
+                    : t('nav:offline')}
               </span>
             </button>
 
@@ -167,7 +169,7 @@ export const Navbar = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] transition-all"
-              title="View GitHub Repository"
+              title={t('nav:github_repo')}
               aria-label="GitHub Repository"
             >
               <GithubIcon className="w-5 h-5" />
@@ -179,7 +181,7 @@ export const Navbar = () => {
               className="hidden sm:flex items-center gap-1.5 bg-[#d4af37] text-[#0d0e12] hover:bg-[#f3cd57] font-bold text-xs px-3 py-2 rounded-lg transition-all shadow cursor-pointer"
             >
               <UserCheck className="w-4 h-4" />
-              <span>PLAY AS GUEST</span>
+              <span>{t('nav:play_as_guest')}</span>
             </button>
 
             {/* Login Link */}
@@ -188,7 +190,7 @@ export const Navbar = () => {
               className="flex items-center gap-1.5 bg-[#242834] border border-[#373d4e] hover:bg-[#2d3242] text-[#f3f4f6] font-semibold text-xs px-3 py-2 rounded-lg transition-all cursor-pointer"
             >
               <LogIn className="w-4 h-4 text-[#d4af37]" />
-              <span>Đăng nhập</span>
+              <span>{t('nav:login')}</span>
             </Link>
 
             {/* Register Link */}
@@ -197,7 +199,7 @@ export const Navbar = () => {
               className="hidden md:flex items-center gap-1.5 bg-[#1a1d24] border border-[#2d323f] hover:border-[#d4af37]/50 text-[#f3f4f6] font-semibold text-xs px-3 py-2 rounded-lg transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4 text-[#d4af37]" />
-              <span>Đăng ký</span>
+              <span>{t('nav:register')}</span>
             </Link>
           </div>
         )}

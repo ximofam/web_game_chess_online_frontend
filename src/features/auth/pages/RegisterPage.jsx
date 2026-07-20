@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ShieldAlert, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
@@ -9,12 +10,12 @@ import { registerSchema } from '../validation/authSchemas';
 import AuthInput from '../components/AuthInput';
 
 export default function RegisterPage() {
+  const { t } = useTranslation(['auth', 'common', 'nav']);
   const { showToast } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Custom zod resolver to avoid extra @hookform/resolvers dependency
   const resolver = async (values) => {
     const result = registerSchema.safeParse(values);
     if (result.success) {
@@ -45,17 +46,16 @@ export default function RegisterPage() {
     mode: 'onTouched',
   });
 
-  // TanStack Query mutation for register request
   const { mutate: registerUser, isPending, error: serverError } = useMutation({
     mutationFn: async ({ username, email, password }) => {
       return authService.register(username, email, password);
     },
     onSuccess: (data) => {
-      showToast(data.message || 'Account registered! Login to begin.', 'success');
+      showToast(data.message || t('auth:account_registered_toast'), 'success');
       navigate('/login');
     },
     onError: (err) => {
-      const errMsg = err.response?.data?.message || 'Server error. Registration failed.';
+      const errMsg = err.response?.data?.message || t('common:something_went_wrong');
       showToast(errMsg, 'error');
     },
   });
@@ -75,7 +75,7 @@ export default function RegisterPage() {
         <div className="w-full flex items-center gap-2.5 z-10">
           <Award className="w-7 h-7 text-chess-gold" />
           <h1 className="font-playfair text-xl font-bold tracking-widest text-chess-text m-0!">
-            CHESS ARENA
+            {t('nav:brand')}
           </h1>
         </div>
 
@@ -90,7 +90,7 @@ export default function RegisterPage() {
           </div>
 
           <blockquote className="font-playfair italic text-2xl text-chess-text max-w-md mb-2 leading-relaxed">
-            "Every chess master was once a beginner."
+            &quot;Every chess master was once a beginner.&quot;
           </blockquote>
           <cite className="text-xs uppercase tracking-widest text-chess-muted not-italic font-semibold">
             — Chernev
@@ -112,17 +112,17 @@ export default function RegisterPage() {
           <div className="flex lg:hidden items-center justify-center gap-2 mb-6">
             <Award className="w-6 h-6 text-chess-gold" />
             <span className="font-playfair text-lg font-bold tracking-widest text-chess-text">
-              CHESS ARENA
+              {t('nav:brand')}
             </span>
           </div>
 
           {/* Form Header */}
           <div className="text-center md:text-left mb-6">
             <h2 className="font-playfair text-3xl font-semibold text-chess-text mb-1">
-              Create Chess ID
+              {t('auth:register_title')}
             </h2>
             <p className="text-sm text-chess-muted font-inter">
-              Register your credentials to claim your rank.
+              {t('auth:register_subtitle')}
             </p>
           </div>
 
@@ -133,14 +133,14 @@ export default function RegisterPage() {
               role="alert"
             >
               <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{serverError.response?.data?.message || 'Server connection issue. Please retry.'}</span>
+              <span>{serverError.response?.data?.message || t('common:something_went_wrong')}</span>
             </div>
           )}
 
           {/* Form Content */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <AuthInput
-              label="Username"
+              label={t('auth:username')}
               id="register-username"
               type="text"
               placeholder="e.g. Kasparov_01"
@@ -150,7 +150,7 @@ export default function RegisterPage() {
             />
 
             <AuthInput
-              label="Email Address"
+              label={t('auth:email')}
               id="register-email"
               type="email"
               placeholder="you@domain.com"
@@ -160,7 +160,7 @@ export default function RegisterPage() {
             />
 
             <AuthInput
-              label="Password"
+              label={t('auth:password')}
               id="register-password"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
@@ -180,7 +180,7 @@ export default function RegisterPage() {
             />
 
             <AuthInput
-              label="Confirm Password"
+              label={t('auth:confirm_password')}
               id="register-confirm-password"
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="text-chess-muted hover:text-chess-text focus:outline-none p-1 rounded"
+                  className="text-chess-muted hover:text-[#f3f4f6] focus:outline-none p-1 rounded"
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -212,22 +212,22 @@ export default function RegisterPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span>REGISTERING...</span>
+                  <span>{t('auth:creating_account')}</span>
                 </>
               ) : (
-                <span>REGISTER CHESS ID</span>
+                <span>{t('auth:register_submit')}</span>
               )}
             </button>
           </form>
 
           {/* Footer Navigation */}
           <div className="text-center mt-6 text-xs text-chess-muted">
-            Already have a Chess ID?{' '}
+            {t('auth:already_have_account')}{' '}
             <Link
               to="/login"
               className="text-chess-gold font-semibold hover:underline hover:text-chess-gold-hover focus:outline-none focus:underline"
             >
-              Log In here
+              {t('auth:sign_in_here')}
             </Link>
           </div>
         </div>
