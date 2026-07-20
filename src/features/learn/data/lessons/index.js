@@ -1,7 +1,7 @@
-import { pieceMovementLessons } from './pieceMovement';
-import { captureLessons } from './capture';
-import { checkAndCheckmateLessons } from './checkAndCheckmate';
-import { specialMovesLessons } from './specialMoves';
+import { pieceMovementLessons } from './pieceMovement.js';
+import { captureLessons } from './capture.js';
+import { checkAndCheckmateLessons } from './checkAndCheckmate.js';
+import { specialMovesLessons } from './specialMoves.js';
 
 export const ALL_LESSONS = [
   ...pieceMovementLessons,

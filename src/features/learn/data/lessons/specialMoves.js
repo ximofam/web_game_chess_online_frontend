@@ -19,7 +19,7 @@ export const specialMovesLessons = [
         hint: {
           text: 'Drag King from e1 to g1 to castle Kingside.',
           highlightSquares: ['e1', 'g1'],
-          arrows: [['e1', 'g1', 'rgba(212, 175, 55, 0.9)']],
+          arrows: [{ startSquare: 'e1', endSquare: 'g1', color: 'rgba(212, 175, 55, 0.9)' }],
         },
         successMessage: 'Kingside castling complete! Your King is tucked into safety.',
       },
@@ -45,7 +45,7 @@ export const specialMovesLessons = [
         hint: {
           text: 'Move your pawn on e5 diagonally to d6.',
           highlightSquares: ['e5', 'd6'],
-          arrows: [['e5', 'd6', 'rgba(239, 68, 68, 0.9)']],
+          arrows: [{ startSquare: 'e5', endSquare: 'd6', color: 'rgba(239, 68, 68, 0.9)' }],
         },
         successMessage: 'En Passant! You captured the pawn as it tried to bypass your guard.',
       },

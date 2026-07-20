@@ -14,7 +14,7 @@ const LessonBoard = memo(
   }) => {
     const [selectedSquare, setSelectedSquare] = useState(null);
 
-    const customSquareStyles = useMemo(() => {
+    const squareStyles = useMemo(() => {
       return AnnotationBuilder.buildSquareStyles({
         highlightSquares,
         selectedSquare,
@@ -22,22 +22,22 @@ const LessonBoard = memo(
       });
     }, [highlightSquares, selectedSquare, lastMove]);
 
-    const customArrows = useMemo(() => {
+    const formattedArrows = useMemo(() => {
       return AnnotationBuilder.buildArrows(arrows);
     }, [arrows]);
 
     const handlePieceDrop = useCallback(
-      (sourceSquare, targetSquare) => {
+      ({ sourceSquare, targetSquare }) => {
         setSelectedSquare(null);
-        if (!onMove) return false;
+        if (!onMove || !targetSquare) return false;
         return onMove({ from: sourceSquare, to: targetSquare, promotion: 'q' });
       },
       [onMove]
     );
 
     const handleSquareClick = useCallback(
-      (square) => {
-        if (!arePiecesDraggable) return;
+      ({ square }) => {
+        if (!arePiecesDraggable || !square) return;
 
         if (selectedSquare) {
           if (selectedSquare !== square) {
@@ -51,24 +51,37 @@ const LessonBoard = memo(
       [selectedSquare, onMove, arePiecesDraggable]
     );
 
+    const boardOptions = useMemo(
+      () => ({
+        position: fen || 'start',
+        boardOrientation: orientation,
+        onPieceDrop: handlePieceDrop,
+        onSquareClick: handleSquareClick,
+        squareStyles,
+        arrows: formattedArrows,
+        allowDragging: arePiecesDraggable,
+        animationDurationInMs: 250,
+        boardStyle: {
+          borderRadius: '0.5rem',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+        },
+        darkSquareStyle: { backgroundColor: '#2d3748' },
+        lightSquareStyle: { backgroundColor: '#cbd5e1' },
+      }),
+      [
+        fen,
+        orientation,
+        handlePieceDrop,
+        handleSquareClick,
+        squareStyles,
+        formattedArrows,
+        arePiecesDraggable,
+      ]
+    );
+
     return (
       <div className="relative w-full max-w-[560px] aspect-square mx-auto rounded-xl overflow-hidden shadow-2xl border border-gold-500/20 bg-slate-900/60 p-2">
-        <Chessboard
-          position={fen}
-          boardOrientation={orientation}
-          onPieceDrop={handlePieceDrop}
-          onSquareClick={handleSquareClick}
-          customSquareStyles={customSquareStyles}
-          customArrows={customArrows}
-          arePiecesDraggable={arePiecesDraggable}
-          animationDuration={250}
-          customBoardStyle={{
-            borderRadius: '0.5rem',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
-          }}
-          customDarkSquareStyle={{ backgroundColor: '#2d3748' }}
-          customLightSquareStyle={{ backgroundColor: '#cbd5e1' }}
-        />
+        <Chessboard options={boardOptions} />
       </div>
     );
   }

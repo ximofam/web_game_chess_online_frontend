@@ -1,9 +1,9 @@
 /**
- * Utility to generate react-chessboard annotation props (customSquareStyles and customArrows).
+ * Utility to generate react-chessboard annotation props (squareStyles and arrows).
  */
 export class AnnotationBuilder {
   /**
-   * Builds customSquareStyles object for react-chessboard
+   * Builds squareStyles object for react-chessboard
    * @param {Object} options
    * @param {string[]} [options.highlightSquares] - List of square coordinates (e.g. ['e4', 'd4'])
    * @param {Object} [options.squareStyles] - Custom key-value map of square styles
@@ -64,9 +64,9 @@ export class AnnotationBuilder {
   }
 
   /**
-   * Builds customArrows array for react-chessboard
-   * @param {Array} arrows - Array of arrow configs ([from, to, color] or { from, to, color })
-   * @returns {Array<[string, string, string]>} Array of tuple arrows
+   * Builds arrows array for react-chessboard v5 ({ startSquare, endSquare, color })
+   * @param {Array} arrows - Array of arrow configs
+   * @returns {Array<{ startSquare: string, endSquare: string, color: string }>} Array of Arrow objects
    */
   static buildArrows(arrows = []) {
     if (!Array.isArray(arrows)) return [];
@@ -74,10 +74,18 @@ export class AnnotationBuilder {
     return arrows
       .map((arrow) => {
         if (Array.isArray(arrow) && arrow.length >= 2) {
-          return [arrow[0], arrow[1], arrow[2] || 'rgb(212, 175, 55)'];
+          return {
+            startSquare: arrow[0],
+            endSquare: arrow[1],
+            color: arrow[2] || 'rgb(212, 175, 55)',
+          };
         }
-        if (arrow && typeof arrow === 'object' && arrow.from && arrow.to) {
-          return [arrow.from, arrow.to, arrow.color || 'rgb(212, 175, 55)'];
+        if (arrow && typeof arrow === 'object' && (arrow.from || arrow.startSquare) && (arrow.to || arrow.endSquare)) {
+          return {
+            startSquare: arrow.from || arrow.startSquare,
+            endSquare: arrow.to || arrow.endSquare,
+            color: arrow.color || 'rgb(212, 175, 55)',
+          };
         }
         return null;
       })

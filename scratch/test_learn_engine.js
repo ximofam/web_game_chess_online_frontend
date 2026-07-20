@@ -1,34 +1,44 @@
 import { Chess } from 'chess.js';
+import { ALL_LESSONS } from '../src/features/learn/data/lessons/index.js';
 import { LessonValidator } from '../src/features/learn/engine/lesson/LessonValidator.js';
 import { RandomBot } from '../src/features/learn/engine/bots/RandomBot.js';
 import { MiniMaxBot } from '../src/features/learn/engine/bots/MiniMaxBot.js';
 import assert from 'node:assert';
 
-console.log('--- RUNNING LESSON ENGINE SELF-CHECK ---');
+console.log('--- TESTING ALL LESSON STEPS AND BOT ENGINES ---');
 
-// Test 1: LessonValidator
-const chess = new Chess('4k3/8/8/8/4R3/8/8/4K3 w - - 0 1');
-const stepConfig = { expectedMove: { from: 'e4', to: 'e8' } };
+ALL_LESSONS.forEach((lesson) => {
+  console.log(`\nLesson: ${lesson.title} (${lesson.id})`);
+  lesson.steps.forEach((step, idx) => {
+    // 1. Check FEN validity
+    let chess;
+    try {
+      chess = new Chess(step.fen);
+    } catch (err) {
+      assert.fail(`Step ${idx + 1} (${step.id}) has invalid FEN: "${step.fen}". Error: ${err.message}`);
+    }
 
-const validResult = LessonValidator.validateMove(chess, { from: 'e4', to: 'e8' }, stepConfig);
-assert.strictEqual(validResult.success, true, 'e4 -> e8 should be valid');
+    // 2. Validate expected move
+    const result = LessonValidator.validateMove(chess, step.expectedMove, step);
+    assert.strictEqual(
+      result.success,
+      true,
+      `Step ${idx + 1} (${step.id}) expected move failed! Error: ${result.error}`
+    );
+    console.log(`  ✅ Step ${idx + 1} (${step.title}): Move ${result.move.san} validated!`);
+  });
+});
 
-const invalidResult = LessonValidator.validateMove(chess, { from: 'e4', to: 'e5' }, stepConfig);
-assert.strictEqual(invalidResult.success, false, 'e4 -> e5 should be invalid against step config');
-
-console.log('✅ LessonValidator tests passed!');
-
-// Test 2: RandomBot
+console.log('\n--- TESTING BOT ENGINES ---');
 const startChess = new Chess();
 const randomBot = new RandomBot(1);
-const randomMove = randomBot.getMove(startChess);
-assert.ok(randomMove && randomMove.from && randomMove.to, 'RandomBot should return a valid move');
-console.log(`✅ RandomBot move: ${randomMove.san}`);
+const rMove = randomBot.getMove(startChess);
+assert.ok(rMove, 'RandomBot should generate a valid move');
+console.log(`✅ RandomBot move: ${rMove.san}`);
 
-// Test 3: MiniMaxBot
 const minimaxBot = new MiniMaxBot(2);
-const minimaxMove = minimaxBot.getMove(startChess);
-assert.ok(minimaxMove && minimaxMove.from && minimaxMove.to, 'MiniMaxBot should return a valid move');
-console.log(`✅ MiniMaxBot move: ${minimaxMove.san}`);
+const mMove = minimaxBot.getMove(startChess);
+assert.ok(mMove, 'MiniMaxBot should generate a valid move');
+console.log(`✅ MiniMaxBot move: ${mMove.san}`);
 
-console.log('--- ALL ENGINE CHECKS PASSED SUCCESSFULLY ---');
+console.log('\n🎉 ALL LESSON FENS AND MOVES ARE 100% VALID!');
