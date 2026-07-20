@@ -159,7 +159,10 @@ export const NotificationProvider = ({ children }) => {
 
     // 2. LIVE SPRING STOMP SOCKJS CONNECTION
     setConnectionStatus('CONNECTING');
-    const wsUrl = `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
+    const apiBase = import.meta.env.VITE_API_URL;
+    const wsUrl = apiBase
+      ? `${apiBase.replace(/\/$/, '')}/ws`
+      : `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
 
     const token = getAccessToken();
     const client = new Client({
