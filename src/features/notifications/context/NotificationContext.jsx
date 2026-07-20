@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useAuth } from '../../auth/context/AuthContext';
-import { getAccessToken } from '../../auth/api/authClient';
+import { getAccessToken, API_BASE_URL } from '../../auth/api/authClient';
 import { notificationService } from '../services/notificationService';
 
 const NotificationContext = createContext(null);
@@ -159,9 +159,8 @@ export const NotificationProvider = ({ children }) => {
 
     // 2. LIVE SPRING STOMP SOCKJS CONNECTION
     setConnectionStatus('CONNECTING');
-    const apiBase = import.meta.env.VITE_API_URL;
-    const wsUrl = apiBase
-      ? `${apiBase.replace(/\/$/, '')}/ws`
+    const wsUrl = API_BASE_URL
+      ? `${API_BASE_URL.replace(/\/$/, '')}/ws`
       : `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
 
     const token = getAccessToken();

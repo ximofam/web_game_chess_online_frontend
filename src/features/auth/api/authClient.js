@@ -20,9 +20,17 @@ export const registerOnLogout = (callback) => {
   onLogoutCallback = callback;
 };
 
+const rawApiUrl = import.meta.env.VITE_API_URL || '';
+const formatApiUrl = (url) => {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  return url.startsWith('localhost') || url.startsWith('127.0.0.1') ? `http://${url}` : `https://${url}`;
+};
+export const API_BASE_URL = formatApiUrl(rawApiUrl);
+
 // Create standard axios instance
 export const authClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
