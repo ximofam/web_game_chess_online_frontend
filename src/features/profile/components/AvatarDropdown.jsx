@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { User, Settings, LogOut, Shield, FileText, UserPlus } from 'lucide-react';
 
 /**
@@ -7,6 +8,7 @@ import { User, Settings, LogOut, Shield, FileText, UserPlus } from 'lucide-react
  * It listens for clicks outside and Escape keystrokes to close.
  */
 export const AvatarDropdown = ({ user, onClose, onLogout }) => {
+  const { t } = useTranslation(['nav', 'profile', 'auth', 'common']);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
             {user?.username}
           </p>
           <p className="text-xs text-[#9ca3af] truncate mb-1">
-            {user?.email || (isGuestUser ? 'Tài khoản ẩn danh' : '')}
+            {user?.email || (isGuestUser ? t('profile:anonymous_account') : '')}
           </p>
           <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider bg-[#d4af37]/10 text-[#d4af37] px-2 py-0.5 rounded-full font-semibold border border-[#d4af37]/30">
             <Shield className="w-2.5 h-2.5" />
@@ -81,7 +83,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
             role="menuitem"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Liên kết tài khoản</span>
+            <span>{t('auth:link_account')}</span>
           </Link>
         )}
 
@@ -92,7 +94,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
           role="menuitem"
         >
           <User className="w-4 h-4 text-[#d4af37]" />
-          <span>My Profile</span>
+          <span>{t('nav:profile')}</span>
         </Link>
         <Link
           to="/forum/my-posts"
@@ -101,7 +103,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
           role="menuitem"
         >
           <FileText className="w-4 h-4 text-[#d4af37]" />
-          <span>Quản lý bài viết</span>
+          <span>{t('profile:manage_posts')}</span>
         </Link>
         <Link
           to="/profile?edit=true"
@@ -110,7 +112,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
           role="menuitem"
         >
           <Settings className="w-4 h-4 text-[#d4af37]" />
-          <span>Edit Profile</span>
+          <span>{t('profile:edit_profile')}</span>
         </Link>
       </div>
 
@@ -125,7 +127,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
           role="menuitem"
         >
           <LogOut className="w-4 h-4 text-red-400" />
-          <span>Logout</span>
+          <span>{t('nav:logout')}</span>
         </button>
       </div>
     </div>

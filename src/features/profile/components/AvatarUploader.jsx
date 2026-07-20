@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Camera, RefreshCw } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -8,6 +9,7 @@ import { useAuth } from '../../auth/context/AuthContext';
  * to replace the player profile image.
  */
 export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) => {
+  const { t } = useTranslation(['profile', 'common']);
   const { showToast } = useAuth();
   const [uploadProgress, setUploadProgress] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -29,14 +31,14 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
     // Validation 1: Allowed formats
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      showToast('Invalid image. Supported formats are JPG, JPEG, PNG, and WEBP.', 'error');
+      showToast(t('profile:invalid_image_type'), 'error');
       return;
     }
 
     // Validation 2: File size < 2MB
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
-      showToast('Image is too large. Limit file size to under 2MB.', 'error');
+      showToast(t('profile:image_too_large'), 'error');
       return;
     }
 
@@ -51,12 +53,12 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
         setUploadProgress(percent);
       });
       
-      showToast('Avatar updated successfully!', 'success');
+      showToast(t('profile:avatar_updated'), 'success');
       if (onUploadSuccess) {
         onUploadSuccess(response.avatarUrl);
       }
     } catch (err) {
-      const errMsg = err.response?.data?.message || 'Avatar upload failed. Please try again.';
+      const errMsg = err.response?.data?.message || t('profile:avatar_upload_failed');
       showToast(errMsg, 'error');
       setPreviewUrl(null); // Revert preview on failure
     } finally {
@@ -66,7 +68,9 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
       if (objectUrl) {
         try {
           URL.revokeObjectURL(objectUrl);
-        } catch (e) {}
+        } catch {
+          // Ignore revocation errors
+        }
       }
     }
   };
@@ -96,7 +100,9 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
         {!isUploading && (
           <div className="absolute inset-0 bg-[#0d0e12]/75 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition-opacity duration-300">
             <Camera className="w-5 h-5 text-[#d4af37] animate-pulse" />
-            <span className="text-[10px] text-[#f3f4f6] font-semibold tracking-wider">CHANGE PHOTO</span>
+            <span className="text-[10px] text-[#f3f4f6] font-semibold tracking-wider">
+              {t('profile:change_photo')}
+            </span>
           </div>
         )}
 
@@ -105,7 +111,7 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
           <div className="absolute inset-0 bg-[#0d0e12]/80 flex flex-col items-center justify-center gap-1.5">
             <RefreshCw className="w-5 h-5 text-[#d4af37] animate-spin" />
             <span className="text-[9px] text-[#d4af37] font-semibold tracking-wider">
-              {uploadProgress !== null ? `${uploadProgress}%` : 'UPLOADING...'}
+              {uploadProgress !== null ? `${uploadProgress}%` : t('profile:uploading')}
             </span>
           </div>
         )}
@@ -132,7 +138,7 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
       )}
 
       <p className="text-[10px] text-[#9ca3af] uppercase tracking-wider">
-        Supports JPG, PNG, WEBP (Max 2MB)
+        {t('profile:supported_formats')}
       </p>
     </div>
   );
