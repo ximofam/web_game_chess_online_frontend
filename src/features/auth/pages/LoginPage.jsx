@@ -80,7 +80,7 @@ export default function LoginPage() {
           <div className="w-48 h-48 mb-8 relative flex items-center justify-center animate-pulse duration-[3500ms]">
             <div className="absolute inset-0 bg-chess-gold/10 rounded-full blur-3xl" />
             <svg viewBox="0 0 24 24" className="w-36 h-36 fill-chess-gold/90 drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">
-              <path d="M18 22H6v-2h12v2M12 2a1.5 1.5 0 0 1 1.5 1.5c0 .38-.14.73-.38 1L18 8.5v2.5H6V8.5l4.88-4c-.24-.27-.38-.62-.38-1A1.5 1.5 0 0 1 12 2M6 13h12v2H6v-2m0 4h12v1H6v-1z" />
+              <path d="M19 22H5v-2h14v2M17 18H7v-2h10v2m1-4h-9.5l-2.2-2.2c-.5-.5-.8-1.2-.8-1.9V8c0-1.1.9-2 2-2h1.5l1-3.5c.3-.9 1.1-1.5 2-1.5s1.7.6 2 1.5l.5 1.7 2.5 2c1 .8 1.5 2 1.5 3.3V14c0 1.1-.9 2-2 2z" />
             </svg>
           </div>
 

@@ -75,7 +75,7 @@ export const LandingPage = () => {
               viewBox="0 0 24 24"
               className="w-32 h-32 md:w-36 md:h-36 fill-[#d4af37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-bounce duration-[3000ms]"
             >
-              <path d="M18 22H6v-2h12v2M12 2a1.5 1.5 0 0 1 1.5 1.5c0 .38-.14.73-.38 1L18 8.5v2.5H6V8.5l4.88-4c-.24-.27-.38-.62-.38-1A1.5 1.5 0 0 1 12 2M6 13h12v2H6v-2m0 4h12v1H6v-1z" />
+              <path d="M19 22H5v-2h14v2M17 18H7v-2h10v2M13 2h-2v2H9v2h2v2h2V6h2V4h-2V2m-1 7c2.2 0 4 1.8 4 4v1H8v-1c0-2.2 1.8-4 4-4z" />
             </svg>
           </div>
         </div>
