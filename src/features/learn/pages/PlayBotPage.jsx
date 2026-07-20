@@ -128,23 +128,12 @@ const PlayBotPage = () => {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Learn Overview
           </Link>
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
-            <Bot className="w-4 h-4" /> Frontend Strategy Engine
-          </div>
         </div>
 
         {/* Main Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Board & Status */}
           <div className="lg:col-span-7 flex flex-col items-center justify-center space-y-4">
-            <LessonBoard
-              fen={boardFen}
-              orientation={playerColor}
-              onMove={handleMove}
-              lastMove={lastMove}
-              arePiecesDraggable={chess.turn() === (playerColor === 'white' ? 'w' : 'b') && !chess.isGameOver()}
-            />
-
             {/* Game Status Banner */}
             <div className="w-full max-w-[560px] flex items-center justify-between p-4 bg-slate-900/90 border border-slate-800 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
@@ -160,6 +149,14 @@ const PlayBotPage = () => {
                 <RotateCcw className="w-3.5 h-3.5" /> Restart Game
               </button>
             </div>
+
+            <LessonBoard
+              fen={boardFen}
+              orientation={playerColor}
+              onMove={handleMove}
+              lastMove={lastMove}
+              arePiecesDraggable={chess.turn() === (playerColor === 'white' ? 'w' : 'b') && !chess.isGameOver()}
+            />
           </div>
 
           {/* Right: Bot Selector Panel */}
@@ -173,15 +170,6 @@ const PlayBotPage = () => {
               onSelectColor={handlePlayerColorChange}
               disabled={isBotThinking}
             />
-
-            <div className="p-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl space-y-2 text-xs text-slate-400">
-              <h4 className="font-bold text-slate-200 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" /> Pure Client-Side Strategy Pattern
-              </h4>
-              <p>
-                This AI engine runs entirely inside your browser using JavaScript & Stockfish WebWorker algorithms. No server calls required!
-              </p>
-            </div>
           </div>
         </div>
       </div>
