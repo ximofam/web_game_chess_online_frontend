@@ -81,11 +81,6 @@ export default function ForumListPage() {
     <main className="w-full max-w-4xl mx-auto px-4 py-10">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-        <div>
-          <h1 className="font-playfair text-3xl font-bold text-[#f3f4f6] mb-1">Forum</h1>
-          <p className="text-sm text-[#9ca3af]">Thảo luận về cờ vua, chiến thuật, và hơn thế nữa</p>
-        </div>
-
         {canPost && (
           <div className="flex items-center gap-3">
             <Link
