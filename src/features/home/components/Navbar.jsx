@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Trophy, Home, MessageSquare, LogIn, UserPlus, UserCheck, WifiOff } from 'lucide-react';
+import { Trophy, Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck, WifiOff } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNotifications } from '../../notifications/context/NotificationContext';
 import NavbarAvatar from '../../profile/components/NavbarAvatar';
@@ -15,7 +15,7 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
 
 /**
  * Global Navigation Header.
- * Features Navigation links (Home, Forum) and displays User Profile Dropdown or Guest Status & Auth CTAs.
+ * Features Navigation links (Home, Forum, Learn) and displays User Profile Dropdown or Guest Status & Auth CTAs.
  */
 export const Navbar = () => {
   const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
@@ -26,6 +26,7 @@ export const Navbar = () => {
 
   const isHomeActive = location.pathname === '/' || location.pathname === '/dashboard';
   const isForumActive = location.pathname.startsWith('/forum');
+  const isLearnActive = location.pathname.startsWith('/learn');
 
   const handlePlayAsGuest = async () => {
     try {
@@ -52,7 +53,7 @@ export const Navbar = () => {
           </span>
         </Link>
 
-        {/* Primary Nav Links (Home, Forum) */}
+        {/* Primary Nav Links (Home, Forum, Learn) */}
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             to="/"
@@ -63,6 +64,17 @@ export const Navbar = () => {
           >
             <Home className="w-4 h-4" />
             <span>Trang chủ</span>
+          </Link>
+
+          <Link
+            to="/learn"
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isLearnActive
+                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
+                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
+              }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>Học cờ</span>
           </Link>
 
           <Link

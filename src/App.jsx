@@ -14,6 +14,9 @@ import ForumListPage from './features/forum/pages/ForumListPage';
 import ForumCreatePage from './features/forum/pages/ForumCreatePage';
 import PostDetailPage from './features/forum/pages/PostDetailPage';
 import MyPostsPage from './features/forum/pages/MyPostsPage';
+import LearnOverviewPage from './features/learn/pages/LearnOverviewPage';
+import LessonDetailPage from './features/learn/pages/LessonDetailPage';
+import PlayBotPage from './features/learn/pages/PlayBotPage';
 
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
@@ -49,6 +52,9 @@ function App() {
                 <Route path="/" element={<HomeIndex />} />
                 <Route path="/landing" element={<LandingPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/learn" element={<LearnOverviewPage />} />
+                <Route path="/learn/play-bot" element={<PlayBotPage />} />
+                <Route path="/learn/:lessonId" element={<LessonDetailPage />} />
                 <Route path="/forum" element={<ForumListPage />} />
                 <Route path="/forum/posts/:id" element={<PostDetailPage />} />
               </Route>
