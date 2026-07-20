@@ -6,12 +6,13 @@ import BotSelector from '../components/BotSelector';
 import { RandomBot } from '../engine/bots/RandomBot';
 import { MiniMaxBot } from '../engine/bots/MiniMaxBot';
 import { StockfishBot } from '../engine/bots/StockfishBot';
-import { ArrowLeft, RotateCcw, Bot, Sparkles } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Eye } from 'lucide-react';
 
 const PlayBotPage = () => {
   const [strategyType, setStrategyType] = useState('random');
   const [difficulty, setDifficulty] = useState(1);
   const [playerColor, setPlayerColor] = useState('white');
+  const [showLegalMoves, setShowLegalMoves] = useState(true);
 
   const [chess, setChess] = useState(() => new Chess());
   const [boardFen, setBoardFen] = useState(chess.fen());
@@ -58,6 +59,21 @@ const PlayBotPage = () => {
     setPlayerColor(color);
     resetGame();
   };
+
+  const getLegalMoves = useCallback(
+    (square) => {
+      try {
+        const moves = chess.moves({ square, verbose: true });
+        return moves.map((m) => ({
+          to: m.to,
+          isCapture: Boolean(m.captured || m.flags.includes('c') || m.flags.includes('e')),
+        }));
+      } catch {
+        return [];
+      }
+    },
+    [chess]
+  );
 
   // Bot Turn Trigger Effect
   useEffect(() => {
@@ -134,20 +150,38 @@ const PlayBotPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Board & Status */}
           <div className="lg:col-span-7 flex flex-col items-center justify-center space-y-4">
-            {/* Game Status Banner */}
-            <div className="w-full max-w-[560px] flex items-center justify-between p-4 bg-slate-900/90 border border-slate-800 rounded-xl shadow-lg">
+            {/* Game Status Banner & Controls */}
+            <div className="w-full max-w-[560px] flex flex-wrap items-center justify-between gap-3 p-4 bg-slate-900/90 border border-slate-800 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${isBotThinking ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
                 <span className="text-sm font-semibold text-slate-200">
                   {isBotThinking ? `${botInstance.name} is thinking...` : gameStatus}
                 </span>
               </div>
-              <button
-                onClick={resetGame}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700"
-              >
-                <RotateCcw className="w-3.5 h-3.5" /> Restart Game
-              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Toggle Show Legal Moves Button */}
+                <button
+                  onClick={() => setShowLegalMoves((prev) => !prev)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all border cursor-pointer ${
+                    showLegalMoves
+                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
+                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
+                  }`}
+                  title={showLegalMoves ? 'Hide legal moves' : 'Show legal moves'}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>{showLegalMoves ? 'Legal Moves: ON' : 'Legal Moves: OFF'}</span>
+                </button>
+
+                {/* Restart Game Button */}
+                <button
+                  onClick={resetGame}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" /> Restart Game
+                </button>
+              </div>
             </div>
 
             <LessonBoard
@@ -156,6 +190,8 @@ const PlayBotPage = () => {
               onMove={handleMove}
               lastMove={lastMove}
               arePiecesDraggable={chess.turn() === (playerColor === 'white' ? 'w' : 'b') && !chess.isGameOver()}
+              showLegalMoves={showLegalMoves}
+              getLegalMoves={getLegalMoves}
             />
           </div>
 

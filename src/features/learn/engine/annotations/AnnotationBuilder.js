@@ -5,7 +5,7 @@ export class AnnotationBuilder {
   /**
    * Builds squareStyles object for react-chessboard
    * @param {Object} options
-   * @param {string[]} [options.highlightSquares] - List of square coordinates (e.g. ['e4', 'd4'])
+   * @param {Array<string|Object>} [options.highlightSquares] - List of square coordinates or config objects
    * @param {Object} [options.squareStyles] - Custom key-value map of square styles
    * @param {string} [options.selectedSquare] - Selected square string
    * @param {{ from: string, to: string }} [options.lastMove] - Last move squares
@@ -43,18 +43,20 @@ export class AnnotationBuilder {
       };
     }
 
-    // Add step highlight squares
+    // Add step / legal move highlight squares (small centered dot for moves, ring for captures)
     highlightSquares.forEach((sq) => {
       if (typeof sq === 'string') {
         styles[sq] = {
-          backgroundColor: 'rgba(34, 197, 94, 0.4)',
-          borderRadius: '50%',
-          boxShadow: 'inset 0 0 8px rgba(34, 197, 94, 0.8)',
+          background: 'radial-gradient(circle, rgba(34, 197, 94, 0.75) 18%, transparent 19%)',
           ...styles[sq],
         };
       } else if (sq && typeof sq === 'object' && sq.square) {
         styles[sq.square] = {
-          backgroundColor: sq.color || 'rgba(34, 197, 94, 0.4)',
+          background:
+            sq.background ||
+            (sq.isCapture
+              ? 'radial-gradient(circle, transparent 52%, rgba(239, 68, 68, 0.7) 53%, rgba(239, 68, 68, 0.7) 67%, transparent 68%)'
+              : 'radial-gradient(circle, rgba(34, 197, 94, 0.75) 18%, transparent 19%)'),
           ...styles[sq.square],
         };
       }

@@ -11,16 +11,38 @@ const LessonBoard = memo(
     arrows = [],
     lastMove = null,
     arePiecesDraggable = true,
+    showLegalMoves = false,
+    getLegalMoves = null,
   }) => {
     const [selectedSquare, setSelectedSquare] = useState(null);
 
+    // Compute legal move highlights when legal moves feature is active
+    const legalMoveSquares = useMemo(() => {
+      if (!showLegalMoves || !selectedSquare || !getLegalMoves) return [];
+      return getLegalMoves(selectedSquare) || [];
+    }, [showLegalMoves, selectedSquare, getLegalMoves]);
+
+    const combinedHighlightSquares = useMemo(() => {
+      if (!legalMoveSquares.length) return highlightSquares;
+      const legalHighlights = legalMoveSquares.map((item) => {
+        if (typeof item === 'string') {
+          return { square: item, isCapture: false };
+        }
+        return {
+          square: item.to || item.square,
+          isCapture: Boolean(item.isCapture),
+        };
+      });
+      return [...highlightSquares, ...legalHighlights];
+    }, [highlightSquares, legalMoveSquares]);
+
     const squareStyles = useMemo(() => {
       return AnnotationBuilder.buildSquareStyles({
-        highlightSquares,
+        highlightSquares: combinedHighlightSquares,
         selectedSquare,
         lastMove,
       });
-    }, [highlightSquares, selectedSquare, lastMove]);
+    }, [combinedHighlightSquares, selectedSquare, lastMove]);
 
     const formattedArrows = useMemo(() => {
       return AnnotationBuilder.buildArrows(arrows);
@@ -33,6 +55,33 @@ const LessonBoard = memo(
         return onMove({ from: sourceSquare, to: targetSquare, promotion: 'q' });
       },
       [onMove]
+    );
+
+    const handlePieceDrag = useCallback(
+      ({ square }) => {
+        if (arePiecesDraggable && square) {
+          setSelectedSquare(square);
+        }
+      },
+      [arePiecesDraggable]
+    );
+
+    const handleSquareMouseDown = useCallback(
+      ({ square }) => {
+        if (arePiecesDraggable && square) {
+          setSelectedSquare(square);
+        }
+      },
+      [arePiecesDraggable]
+    );
+
+    const handlePieceClick = useCallback(
+      ({ square }) => {
+        if (arePiecesDraggable && square) {
+          setSelectedSquare((prev) => (prev === square ? null : square));
+        }
+      },
+      [arePiecesDraggable]
     );
 
     const handleSquareClick = useCallback(
@@ -56,6 +105,9 @@ const LessonBoard = memo(
         position: fen || 'start',
         boardOrientation: orientation,
         onPieceDrop: handlePieceDrop,
+        onPieceDrag: handlePieceDrag,
+        onSquareMouseDown: handleSquareMouseDown,
+        onPieceClick: handlePieceClick,
         onSquareClick: handleSquareClick,
         squareStyles,
         arrows: formattedArrows,
@@ -72,6 +124,9 @@ const LessonBoard = memo(
         fen,
         orientation,
         handlePieceDrop,
+        handlePieceDrag,
+        handleSquareMouseDown,
+        handlePieceClick,
         handleSquareClick,
         squareStyles,
         formattedArrows,
