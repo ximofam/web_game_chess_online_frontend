@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
@@ -8,6 +9,7 @@ import GuestChoiceModal from '../components/GuestChoiceModal';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  // Perform logout by hitting the backend API and clearing local state
+  // Perform logout by hitting the backend API and clearing local state & redirecting to landing page
   const logout = async () => {
     try {
       await authService.logout();
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }) => {
       console.warn('Logout request failed or timed out', err);
     } finally {
       logoutLocal();
+      navigate('/', { replace: true });
     }
   };
 
@@ -205,6 +208,7 @@ export const AuthProvider = ({ children }) => {
     registerOnLogout(() => {
       logoutLocal();
       showToast('Phiên đăng nhập đã hết hạn.', 'error');
+      navigate('/', { replace: true });
     });
 
     if (initAuthStartedRef.current) {
