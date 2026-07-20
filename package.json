@@ -26,6 +26,7 @@
     "react-hook-form": "^7.81.0",
     "react-router-dom": "^7.18.1",
     "sockjs-client": "^1.6.1",
+    "stockfish.js": "^10.0.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

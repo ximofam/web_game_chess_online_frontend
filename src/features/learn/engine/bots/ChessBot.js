@@ -8,11 +8,25 @@ export class ChessBot {
   }
 
   /**
-   * Calculate next move for given chess position.
-   * @param {import('chess.js').Chess} chessInstance - Active chess.js game
-   * @returns {import('chess.js').Move|null} Valid move object or null if game over
+   * Synchronous getMove calculation
+   * @param {import('chess.js').Chess} chessInstance
+   * @returns {import('chess.js').Move|null}
    */
   getMove() {
     throw new Error('getMove must be implemented by concrete bot strategies');
   }
+
+  /**
+   * Asynchronous getMove calculation (supports Web Workers & async engines)
+   * @param {import('chess.js').Chess} chessInstance
+   * @returns {Promise<import('chess.js').Move|null>}
+   */
+  async getMoveAsync(chessInstance) {
+    return this.getMove(chessInstance);
+  }
+
+  /**
+   * Optional cleanup hook when strategy is unmounted / switched
+   */
+  destroy() {}
 }

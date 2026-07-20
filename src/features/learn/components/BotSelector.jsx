@@ -1,4 +1,4 @@
-import { Bot, Sparkles, ShieldAlert } from 'lucide-react';
+import { Bot, Sparkles, ShieldAlert, Cpu } from 'lucide-react';
 
 const BotSelector = ({
   selectedStrategy,
@@ -26,30 +26,47 @@ const BotSelector = ({
         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
           AI Engine Strategy
         </label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
             disabled={disabled}
             onClick={() => onSelectStrategy('random')}
-            className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
+            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
               selectedStrategy === 'random'
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-md'
                 : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
             }`}
           >
-            <Sparkles className="w-4 h-4" /> Random Strategy
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span>Random</span>
           </button>
+
           <button
             type="button"
             disabled={disabled}
             onClick={() => onSelectStrategy('minimax')}
-            className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
+            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
               selectedStrategy === 'minimax'
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-md'
                 : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
             }`}
           >
-            <ShieldAlert className="w-4 h-4" /> MiniMax Strategy
+            <ShieldAlert className="w-4 h-4 text-amber-400" />
+            <span>MiniMax</span>
+          </button>
+
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onSelectStrategy('stockfish')}
+            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border text-xs font-semibold transition-all ${
+              selectedStrategy === 'stockfish'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-md'
+                : 'bg-slate-800/60 text-slate-400 border-slate-700 hover:text-slate-200'
+            }`}
+          >
+            <Cpu className="w-4 h-4 text-amber-400" />
+            <span>Stockfish</span>
           </button>
         </div>
       </div>

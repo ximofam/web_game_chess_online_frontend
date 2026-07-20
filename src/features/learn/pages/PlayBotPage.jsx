@@ -5,6 +5,7 @@ import LessonBoard from '../components/LessonBoard';
 import BotSelector from '../components/BotSelector';
 import { RandomBot } from '../engine/bots/RandomBot';
 import { MiniMaxBot } from '../engine/bots/MiniMaxBot';
+import { StockfishBot } from '../engine/bots/StockfishBot';
 import { ArrowLeft, RotateCcw, Bot, Sparkles } from 'lucide-react';
 
 const PlayBotPage = () => {
@@ -20,8 +21,17 @@ const PlayBotPage = () => {
 
   // Create Bot Strategy instance
   const botInstance = useMemo(() => {
-    return strategyType === 'minimax' ? new MiniMaxBot(difficulty) : new RandomBot(difficulty);
+    if (strategyType === 'stockfish') return new StockfishBot(difficulty);
+    if (strategyType === 'minimax') return new MiniMaxBot(difficulty);
+    return new RandomBot(difficulty);
   }, [strategyType, difficulty]);
+
+  // Clean up engine worker on strategy switch or unmount
+  useEffect(() => {
+    return () => {
+      botInstance?.destroy?.();
+    };
+  }, [botInstance]);
 
   const updateGameStatus = (currentChess) => {
     if (currentChess.isCheckmate()) {
@@ -54,19 +64,36 @@ const PlayBotPage = () => {
     const botTurnColor = playerColor === 'white' ? 'b' : 'w';
 
     if (chess.turn() === botTurnColor && !chess.isGameOver()) {
-      const timer = setTimeout(() => {
-        setIsBotThinking(true);
-        const move = botInstance.getMove(chess);
-        if (move) {
-          chess.move(move);
-          setBoardFen(chess.fen());
-          setLastMove({ from: move.from, to: move.to });
-          updateGameStatus(chess);
-        }
-        setIsBotThinking(false);
-      }, 400);
+      let isSubscribed = true;
 
-      return () => clearTimeout(timer);
+      const runBotMove = async () => {
+        setIsBotThinking(true);
+        const move = await botInstance.getMoveAsync(chess);
+        if (isSubscribed && move) {
+          try {
+            const executed = chess.move(move);
+            if (executed) {
+              setBoardFen(chess.fen());
+              setLastMove({ from: executed.from, to: executed.to });
+              updateGameStatus(chess);
+            }
+          } catch {
+            // Ignore move error
+          }
+        }
+        if (isSubscribed) {
+          setIsBotThinking(false);
+        }
+      };
+
+      const timer = setTimeout(() => {
+        runBotMove();
+      }, 50);
+
+      return () => {
+        isSubscribed = false;
+        clearTimeout(timer);
+      };
     }
   }, [chess, boardFen, playerColor, botInstance]);
 
@@ -152,7 +179,7 @@ const PlayBotPage = () => {
                 <Sparkles className="w-4 h-4 text-amber-400" /> Pure Client-Side Strategy Pattern
               </h4>
               <p>
-                This AI engine runs entirely inside your browser using JavaScript algorithms (Random legal move selector and Alpha-Beta pruned MiniMax trees). No server calls required!
+                This AI engine runs entirely inside your browser using JavaScript & Stockfish WebWorker algorithms. No server calls required!
               </p>
             </div>
           </div>
