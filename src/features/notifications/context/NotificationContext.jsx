@@ -8,11 +8,20 @@ import { notificationService } from '../services/notificationService';
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
-  const { isAuthenticated, showToast } = useAuth();
+  const { isAuthenticated, currentUser, showToast } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState('DISCONNECTED');
+  const [reconnectCount, setReconnectCount] = useState(0);
   const stompClientRef = useRef(null);
+  const wasConnectedRef = useRef(false);
+
+  const reconnect = () => {
+    if (!isAuthenticated) return;
+    showToast('Đang thử kết nối lại máy chủ realtime...', 'info');
+    wasConnectedRef.current = false;
+    setReconnectCount((c) => c + 1);
+  };
 
   // Load initial notifications and unread count from REST endpoints
   const loadNotificationsData = async () => {
@@ -79,6 +88,11 @@ export const NotificationProvider = ({ children }) => {
   // WebSocket connection management loop
   useEffect(() => {
     if (!isAuthenticated) {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+        stompClientRef.current = null;
+      }
+      wasConnectedRef.current = false;
       setNotifications([]);
       setUnreadCount(0);
       setConnectionStatus('DISCONNECTED');
@@ -91,6 +105,7 @@ export const NotificationProvider = ({ children }) => {
     // 1. DEVELOPMENT MOCK WEB SOCKET
     if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       setConnectionStatus('CONNECTED');
+      wasConnectedRef.current = true;
       console.log('[Mock Socket] WebSocket connection established.');
 
       const interval = setInterval(() => {
@@ -137,26 +152,34 @@ export const NotificationProvider = ({ children }) => {
 
       return () => {
         clearInterval(interval);
+        wasConnectedRef.current = false;
         setConnectionStatus('DISCONNECTED');
       };
     }
 
     // 2. LIVE SPRING STOMP SOCKJS CONNECTION
     setConnectionStatus('CONNECTING');
-    const token = getAccessToken();
     const wsUrl = `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
 
+    const token = getAccessToken();
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
+      connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
+      beforeConnect: () => {
+        const freshToken = getAccessToken();
+        client.connectHeaders = freshToken ? { Authorization: `Bearer ${freshToken}` } : {};
       },
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
       reconnectDelay: 5000,
       onConnect: () => {
+        if (stompClientRef.current !== client) return;
         setConnectionStatus('CONNECTED');
         console.log('[STOMP] Connected to live WS endpoints.');
+        if (!wasConnectedRef.current) {
+          showToast('Đã kết nối máy chủ realtime.', 'success');
+        }
+        wasConnectedRef.current = true;
 
         // Subscribe to destination
         client.subscribe('/user/queue/notifications', (message) => {
@@ -173,32 +196,45 @@ export const NotificationProvider = ({ children }) => {
         });
       },
       onDisconnect: () => {
+        if (stompClientRef.current !== client) return;
         setConnectionStatus('DISCONNECTED');
         console.log('[STOMP] Disconnected.');
       },
       onStompError: (frame) => {
+        if (stompClientRef.current !== client) return;
         console.error('STOMP Protocol error', frame);
         setConnectionStatus('DISCONNECTED');
+        if (wasConnectedRef.current) {
+          wasConnectedRef.current = false;
+          showToast('Lỗi giao thức kết nối realtime (STOMP error).', 'error');
+        }
       },
       onWebSocketClose: () => {
+        if (stompClientRef.current !== client) return;
         setConnectionStatus('DISCONNECTED');
+        if (wasConnectedRef.current) {
+          wasConnectedRef.current = false;
+          showToast('Mất kết nối WebSocket với máy chủ realtime.', 'error');
+        }
       }
     });
 
-    client.activate();
     stompClientRef.current = client;
+    client.activate();
 
     return () => {
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate();
+      if (stompClientRef.current === client) {
+        stompClientRef.current = null;
       }
+      client.deactivate();
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentUser?.id, reconnectCount, showToast]);
 
   const value = {
     notifications,
     unreadCount,
     connectionStatus,
+    reconnect,
     markAsRead,
     markAllAsRead,
     deleteItem,

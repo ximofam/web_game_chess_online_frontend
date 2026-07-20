@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Trophy, Home, MessageSquare, LogIn, UserPlus, UserCheck } from 'lucide-react';
+import { Trophy, Home, MessageSquare, LogIn, UserPlus, UserCheck, WifiOff } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useNotifications } from '../../notifications/context/NotificationContext';
 import NavbarAvatar from '../../profile/components/NavbarAvatar';
 import AvatarDropdown from '../../profile/components/AvatarDropdown';
 import NotificationBell from '../../notifications/components/NotificationBell';
@@ -11,7 +12,8 @@ import NotificationBell from '../../notifications/components/NotificationBell';
  * Features Navigation links (Home, Forum) and displays User Profile Dropdown or Guest Status & Auth CTAs.
  */
 export const Navbar = () => {
-  const { currentUser, isGuest, isRegisteredUser, logout, openGuestModal } = useAuth();
+  const { currentUser, isRegisteredUser, logout } = useAuth();
+  const { connectionStatus, reconnect } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
 
@@ -65,6 +67,45 @@ export const Navbar = () => {
       <div className="flex items-center gap-3">
         {isRegisteredUser ? (
           <div className="flex items-center gap-3 md:gap-4">
+            {/* Realtime WebSocket Connection Indicator Badge */}
+            <button
+              onClick={connectionStatus === 'DISCONNECTED' ? reconnect : undefined}
+              disabled={connectionStatus !== 'DISCONNECTED'}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all select-none ${
+                connectionStatus === 'CONNECTED'
+                  ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400 cursor-default'
+                  : connectionStatus === 'CONNECTING'
+                  ? 'bg-amber-950/40 border-amber-500/30 text-amber-400 cursor-default'
+                  : 'bg-red-950/50 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer animate-pulse'
+              }`}
+              title={
+                connectionStatus === 'CONNECTED'
+                  ? 'Kết nối máy chủ realtime đang hoạt động'
+                  : connectionStatus === 'CONNECTING'
+                  ? 'Đang kết nối tới máy chủ realtime...'
+                  : 'Mất kết nối máy chủ realtime. Nhấp để kết nối lại!'
+              }
+            >
+              {connectionStatus === 'DISCONNECTED' ? (
+                <WifiOff className="w-3 h-3 text-red-400" />
+              ) : (
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    connectionStatus === 'CONNECTED'
+                      ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
+                      : 'bg-amber-400 animate-ping'
+                  }`}
+                />
+              )}
+              <span className="hidden md:inline text-[10px] uppercase tracking-wider">
+                {connectionStatus === 'CONNECTED'
+                  ? 'LIVE WS'
+                  : connectionStatus === 'CONNECTING'
+                  ? 'CONNECTING'
+                  : 'OFFLINE (RETRY)'}
+              </span>
+            </button>
+
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-semibold text-[#f3f4f6] leading-tight">
                 {currentUser?.username}

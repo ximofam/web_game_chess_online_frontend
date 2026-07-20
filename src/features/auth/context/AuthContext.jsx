@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
@@ -23,9 +23,9 @@ export const AuthProvider = ({ children }) => {
   const isRegisteredUser = Boolean(isAuthenticated && !isGuest);
 
   // Show a toast message for 4 seconds
-  const showToast = (message, type = 'success') => {
+  const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
-  };
+  }, []);
 
   // Auto-dismiss toast
   useEffect(() => {
