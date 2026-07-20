@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Trophy, Home, MessageSquare, LogIn, UserPlus, UserCheck, WifiOff } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNotifications } from '../../notifications/context/NotificationContext';
@@ -7,23 +7,40 @@ import NavbarAvatar from '../../profile/components/NavbarAvatar';
 import AvatarDropdown from '../../profile/components/AvatarDropdown';
 import NotificationBell from '../../notifications/components/NotificationBell';
 
+const GithubIcon = ({ className = "w-5 h-5" }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+  </svg>
+);
+
 /**
  * Global Navigation Header.
  * Features Navigation links (Home, Forum) and displays User Profile Dropdown or Guest Status & Auth CTAs.
  */
 export const Navbar = () => {
-  const { currentUser, isRegisteredUser, logout } = useAuth();
+  const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
   const { connectionStatus, reconnect } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isHomeActive = location.pathname === '/' || location.pathname === '/dashboard';
   const isForumActive = location.pathname.startsWith('/forum');
 
+  const handlePlayAsGuest = async () => {
+    try {
+      await loginGuest();
+      showToast('Chào mừng bạn trải nghiệm với tư cách Khách (Guest)!', 'success');
+      navigate('/dashboard');
+    } catch (err) {
+      showToast('Không thể khởi tạo phiên Khách. Vui lòng thử lại.', 'error');
+    }
+  };
+
   return (
     <header className="w-full border-b border-[#2d323f] bg-[#13161c] px-4 md:px-8 py-3.5 flex items-center justify-between relative z-40 select-none shadow-md">
       {/* Brand Logo & Navigation Links */}
-      <div className="flex items-center gap-6 md:gap-8">
+      <div className="flex items-center gap-4 md:gap-8">
         <Link
           to="/"
           className="flex items-center gap-2.5 hover:opacity-90 transition-opacity focus:outline-none focus:ring-1 focus:ring-[#d4af37] rounded"
@@ -39,11 +56,10 @@ export const Navbar = () => {
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             to="/"
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-              isHomeActive
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isHomeActive
                 ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
                 : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
-            }`}
+              }`}
           >
             <Home className="w-4 h-4" />
             <span>Trang chủ</span>
@@ -51,11 +67,10 @@ export const Navbar = () => {
 
           <Link
             to="/forum"
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-              isForumActive
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isForumActive
                 ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
                 : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
-            }`}
+              }`}
           >
             <MessageSquare className="w-4 h-4" />
             <span>Diễn đàn</span>
@@ -64,45 +79,43 @@ export const Navbar = () => {
       </div>
 
       {/* User Actions & Auth Status */}
-      <div className="flex items-center gap-3">
-        {isRegisteredUser ? (
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        {isAuthenticated ? (
           <div className="flex items-center gap-3 md:gap-4">
             {/* Realtime WebSocket Connection Indicator Badge */}
             <button
               onClick={connectionStatus === 'DISCONNECTED' ? reconnect : undefined}
               disabled={connectionStatus !== 'DISCONNECTED'}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all select-none ${
-                connectionStatus === 'CONNECTED'
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all select-none ${connectionStatus === 'CONNECTED'
                   ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400 cursor-default'
                   : connectionStatus === 'CONNECTING'
-                  ? 'bg-amber-950/40 border-amber-500/30 text-amber-400 cursor-default'
-                  : 'bg-red-950/50 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer animate-pulse'
-              }`}
+                    ? 'bg-amber-950/40 border-amber-500/30 text-amber-400 cursor-default'
+                    : 'bg-red-950/50 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer animate-pulse'
+                }`}
               title={
                 connectionStatus === 'CONNECTED'
                   ? 'Kết nối máy chủ realtime đang hoạt động'
                   : connectionStatus === 'CONNECTING'
-                  ? 'Đang kết nối tới máy chủ realtime...'
-                  : 'Mất kết nối máy chủ realtime. Nhấp để kết nối lại!'
+                    ? 'Đang kết nối tới máy chủ realtime...'
+                    : 'Mất kết nối máy chủ realtime. Nhấp để kết nối lại!'
               }
             >
               {connectionStatus === 'DISCONNECTED' ? (
                 <WifiOff className="w-3 h-3 text-red-400" />
               ) : (
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    connectionStatus === 'CONNECTED'
+                  className={`w-2 h-2 rounded-full ${connectionStatus === 'CONNECTED'
                       ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
                       : 'bg-amber-400 animate-ping'
-                  }`}
+                    }`}
                 />
               )}
               <span className="hidden md:inline text-[10px] uppercase tracking-wider">
                 {connectionStatus === 'CONNECTED'
                   ? 'LIVE WS'
                   : connectionStatus === 'CONNECTING'
-                  ? 'CONNECTING'
-                  : 'OFFLINE (RETRY)'}
+                    ? 'CONNECTING'
+                    : 'OFFLINE (RETRY)'}
               </span>
             </button>
 
@@ -134,24 +147,42 @@ export const Navbar = () => {
             </div>
           </div>
         ) : (
-          /* Guest or Unauthenticated Status */
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#242834] border border-[#373d4e] text-[#9ca3af]">
-              <UserCheck className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>{currentUser?.username || 'Khách (Guest)'}</span>
-            </span>
+          /* Unauthenticated Visitor Options */
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* GitHub Repo Link Button */}
+            <a
+              href="https://github.com/ximofam/web_game_chess_online_frontend"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] transition-all"
+              title="View GitHub Repository"
+              aria-label="GitHub Repository"
+            >
+              <GithubIcon className="w-5 h-5" />
+            </a>
 
+            {/* Play as Guest Quick Trigger */}
+            <button
+              onClick={handlePlayAsGuest}
+              className="hidden sm:flex items-center gap-1.5 bg-[#d4af37] text-[#0d0e12] hover:bg-[#f3cd57] font-bold text-xs px-3 py-2 rounded-lg transition-all shadow cursor-pointer"
+            >
+              <UserCheck className="w-4 h-4" />
+              <span>PLAY AS GUEST</span>
+            </button>
+
+            {/* Login Link */}
             <Link
               to="/login"
-              className="flex items-center gap-1.5 bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-semibold text-xs md:text-sm px-3.5 py-1.5 rounded-lg transition-all shadow cursor-pointer"
+              className="flex items-center gap-1.5 bg-[#242834] border border-[#373d4e] hover:bg-[#2d3242] text-[#f3f4f6] font-semibold text-xs px-3 py-2 rounded-lg transition-all cursor-pointer"
             >
-              <LogIn className="w-4 h-4" />
+              <LogIn className="w-4 h-4 text-[#d4af37]" />
               <span>Đăng nhập</span>
             </Link>
 
+            {/* Register Link */}
             <Link
               to="/register"
-              className="hidden md:flex items-center gap-1.5 bg-[#242834] border border-[#373d4e] hover:bg-[#2d3242] text-[#f3f4f6] font-semibold text-sm px-3.5 py-1.5 rounded-lg transition-all cursor-pointer"
+              className="hidden md:flex items-center gap-1.5 bg-[#1a1d24] border border-[#2d323f] hover:border-[#d4af37]/50 text-[#f3f4f6] font-semibold text-xs px-3 py-2 rounded-lg transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4 text-[#d4af37]" />
               <span>Đăng ký</span>

@@ -204,7 +204,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     registerOnLogout(() => {
       logoutLocal();
-      setIsGuestModalOpen(true);
       showToast('Phiên đăng nhập đã hết hạn.', 'error');
     });
 
@@ -218,8 +217,7 @@ export const AuthProvider = ({ children }) => {
         // First check for active registered user session
         await refreshToken();
       } catch (err) {
-        // Refresh returned 401 -> prompt modal with "Tiếp tục với tư cách guest" and "Login"
-        setIsGuestModalOpen(true);
+        // Refresh returned 401 -> non-authenticated visitor lands on Landing Page
       } finally {
         setIsLoading(false);
       }
