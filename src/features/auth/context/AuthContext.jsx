@@ -24,9 +24,10 @@ export const AuthProvider = ({ children }) => {
   const isGuest = Boolean(currentUser?.isGuest || currentUser?.role === 'GUEST');
   const isRegisteredUser = Boolean(isAuthenticated && !isGuest);
 
-  // Show a toast message for 4 seconds
-  const showToast = useCallback((message, type = 'success') => {
-    setToast({ message, type });
+  // Show a toast message for specified duration (default 4000ms)
+  const showToast = useCallback((message, type = 'success', duration = 4000) => {
+    const id = Date.now();
+    setToast({ id, message, type, duration });
   }, []);
 
   // Auto-dismiss toast
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     if (toast) {
       const timer = setTimeout(() => {
         setToast(null);
-      }, 4000);
+      }, toast.duration || 4000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
@@ -270,13 +271,15 @@ export const AuthProvider = ({ children }) => {
           {/* Global Toast Notification */}
           {toast && (
             <div
+              key={toast.id || 'toast'}
               id="global-toast"
               role="alert"
               aria-live="assertive"
-              className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-lg shadow-lg border backdrop-blur-md animate-fade-in-up max-w-sm ${toast.type === 'error'
-                ? 'bg-red-950/80 border-red-500/50 text-red-200'
-                : 'bg-[#1a1d24]/90 border-[#d4af37]/50 text-gray-100'
-                }`}
+              className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-lg shadow-xl border backdrop-blur-md overflow-hidden max-w-sm ${
+                toast.type === 'error'
+                  ? 'bg-red-950/90 border-red-500/60 text-red-200 shadow-red-950/50'
+                  : 'bg-[#1a1d24]/95 border-[#d4af37]/60 text-gray-100 shadow-black/50'
+              }`}
             >
               {toast.type === 'error' ? (
                 <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
@@ -291,6 +294,16 @@ export const AuthProvider = ({ children }) => {
               >
                 <X className="w-4 h-4" />
               </button>
+
+              {/* Real-time Progress Bar */}
+              <div
+                className={`absolute bottom-0 left-0 h-1 transition-all ${
+                  toast.type === 'error' ? 'bg-red-500' : 'bg-[#d4af37]'
+                }`}
+                style={{
+                  animation: `toastProgress ${toast.duration || 4000}ms linear forwards`,
+                }}
+              />
             </div>
           )}
         </>

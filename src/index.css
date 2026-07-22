@@ -121,3 +121,12 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
