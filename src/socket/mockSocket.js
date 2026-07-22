@@ -51,6 +51,14 @@ class MockSocketManager {
   subscribe(destination, callback) {
     const subId = `mock-sub-${++this.subIdCounter}`;
     this.subscriptions.set(subId, { destination, callback });
+
+    // Instantly return mock online count if subscribing to presence count
+    if (destination === '/app/presence.online-count' || destination === '/topic/presence.online-count') {
+      setTimeout(() => {
+        callback({ body: JSON.stringify(42) });
+      }, 50);
+    }
+
     return subId;
   }
 
