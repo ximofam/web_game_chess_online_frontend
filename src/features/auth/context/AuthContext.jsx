@@ -66,6 +66,11 @@ export const AuthProvider = ({ children }) => {
     try {
       // Step 1: Attempt loginGuest first
       data = await authService.loginGuest();
+      try {
+        await authService.refreshGuestToken();
+      } catch (e) {
+        console.warn('Failed to refresh guest token cookie', e);
+      }
     } catch (loginErr) {
       // Step 2: If loginGuest fails (no guest account yet), call registerGuest
       try {
@@ -144,15 +149,6 @@ export const AuthProvider = ({ children }) => {
 
     refreshPromiseRef.current = (async () => {
       try {
-        // If currently logged in user is guest, also call refresh/guest-token to renew guest cookie
-        if (isGuest) {
-          try {
-            await authService.refreshGuestToken();
-          } catch (e) {
-            console.warn('Failed to refresh guest token cookie', e);
-          }
-        }
-
         const data = await authService.refresh();
         setAccessToken(data.accessToken);
 
@@ -160,10 +156,18 @@ export const AuthProvider = ({ children }) => {
         try {
           const userProfile = await profileService.getCurrentUser();
           const userRole = userProfile.role || (isGuest ? 'GUEST' : 'USER');
+          const isGuest = userRole === 'GUEST' || Boolean(userProfile.isGuest)
+          if (isGuest) {
+            try {
+              await authService.refreshGuestToken();
+            } catch (e) {
+              console.warn('Failed to refresh guest token cookie', e);
+            }
+          }
           const userObj = {
             ...userProfile,
             role: userRole,
-            isGuest: userRole === 'GUEST' || Boolean(userProfile.isGuest)
+            isGuest: isGuest
           };
           setCurrentUser(userObj);
           setIsAuthenticated(true);
@@ -275,11 +279,10 @@ export const AuthProvider = ({ children }) => {
               id="global-toast"
               role="alert"
               aria-live="assertive"
-              className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-lg shadow-xl border backdrop-blur-md overflow-hidden max-w-sm ${
-                toast.type === 'error'
-                  ? 'bg-red-950/90 border-red-500/60 text-red-200 shadow-red-950/50'
-                  : 'bg-[#1a1d24]/95 border-[#d4af37]/60 text-gray-100 shadow-black/50'
-              }`}
+              className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-lg shadow-xl border backdrop-blur-md overflow-hidden max-w-sm ${toast.type === 'error'
+                ? 'bg-red-950/90 border-red-500/60 text-red-200 shadow-red-950/50'
+                : 'bg-[#1a1d24]/95 border-[#d4af37]/60 text-gray-100 shadow-black/50'
+                }`}
             >
               {toast.type === 'error' ? (
                 <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
@@ -297,9 +300,8 @@ export const AuthProvider = ({ children }) => {
 
               {/* Real-time Progress Bar */}
               <div
-                className={`absolute bottom-0 left-0 h-1 transition-all ${
-                  toast.type === 'error' ? 'bg-red-500' : 'bg-[#d4af37]'
-                }`}
+                className={`absolute bottom-0 left-0 h-1 transition-all ${toast.type === 'error' ? 'bg-red-500' : 'bg-[#d4af37]'
+                  }`}
                 style={{
                   animation: `toastProgress ${toast.duration || 4000}ms linear forwards`,
                 }}
