@@ -22,7 +22,7 @@ export const registerOnLogout = (callback) => {
 
 const rawApiUrl = import.meta.env.VITE_API_URL || '';
 const formatApiUrl = (url) => {
-  if (!url) return '';
+  if (!url || url.trim() === '' || url.trim() === '/') return '';
   if (/^https?:\/\//i.test(url)) return url;
   return url.startsWith('localhost') || url.startsWith('127.0.0.1') ? `http://${url}` : `https://${url}`;
 };
@@ -370,7 +370,7 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
           }
         };
       }
-      
+
       let mockUrl = 'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=200&h=200&fit=crop';
       if (config.data && typeof config.data.get === 'function') {
         const file = config.data.get('file');
@@ -387,7 +387,7 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       if (userProfile) {
         userProfile.avatarUrl = mockUrl;
       }
-      
+
       return {
         data: { avatarUrl: mockUrl },
         status: 200,
@@ -569,13 +569,13 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       const params = new URLSearchParams(url.split('?')[1] || '');
       const page = parseInt(params.get('page') || '0', 10);
       const size = parseInt(params.get('size') || '20', 10);
-      
+
       const list = window.mockNotificationsDb || [];
       const sorted = [...list].sort((a, b) => b.id - a.id);
       const startIdx = page * size;
       const endIdx = startIdx + size;
       const paginatedItems = sorted.slice(startIdx, endIdx);
-      
+
       return {
         data: {
           content: paginatedItems,
