@@ -71,6 +71,30 @@ export const SocketProvider = ({ children }) => {
     };
   }, [isAuthenticated, reconnectCount, connect, disconnect]);
 
+  // Global automatic presence heartbeat interval
+  useEffect(() => {
+    if (!isAuthenticated || connectionStatus !== 'CONNECTED') {
+      return;
+    }
+
+    const envVal = import.meta.env.VITE_HEARTBEAT_INTERVAL_MS || import.meta.env.VITE_HEARTBEAT_INTERVAL_SECONDS;
+    const parsedVal = Number(envVal);
+    // If set in env as seconds (< 1000), convert to ms. Fallback to 10000ms (10s)
+    const intervalMs = (!isNaN(parsedVal) && parsedVal > 0)
+      ? (parsedVal < 1000 ? parsedVal * 1000 : parsedVal)
+      : 10000;
+
+    activeManager.send('/app/presence.heartbeat');
+
+    const intervalId = setInterval(() => {
+      activeManager.send('/app/presence.heartbeat');
+    }, intervalMs);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isAuthenticated, connectionStatus]);
+
   const subscribe = useCallback((destination, callback, headers) => {
     return activeManager.subscribe(destination, callback, headers);
   }, []);

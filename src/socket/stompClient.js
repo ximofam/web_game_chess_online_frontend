@@ -130,16 +130,17 @@ class StompClientManager {
     }
   }
 
-  send(destination, body = {}, headers = {}) {
+  send(destination, body = '', headers = {}) {
     if (!this.client || this.status !== 'CONNECTED') {
       console.warn(`[STOMP Manager] Cannot send frame to ${destination}: client not connected.`);
       return false;
     }
 
     try {
+      const formattedBody = typeof body === 'string' ? body : (body ? JSON.stringify(body) : '');
       this.client.publish({
         destination,
-        body: typeof body === 'string' ? body : JSON.stringify(body),
+        body: formattedBody,
         headers,
       });
       return true;

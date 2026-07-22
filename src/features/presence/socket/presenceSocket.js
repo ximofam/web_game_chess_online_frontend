@@ -10,7 +10,7 @@ export const PRESENCE_EVENTS = {
 
 export const subscribeToPresence = (socket, eventHandler) => {
   if (!socket || typeof socket.subscribe !== 'function') {
-    return () => { };
+    return () => {};
   }
 
   const destination = '/topic/presence';
@@ -31,7 +31,7 @@ export const subscribeToPresence = (socket, eventHandler) => {
   };
 };
 
-export const sendPresenceHeartbeat = (socket, userId) => {
+export const sendPresenceHeartbeat = (socket) => {
   if (!socket || typeof socket.send !== 'function') return false;
-  return socket.send('/app/presence/heartbeat', { userId, timestamp: Date.now() });
+  return socket.send('/app/presence.heartbeat');
 };
