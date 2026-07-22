@@ -108,43 +108,6 @@ export const Navbar = () => {
               <span className="hidden md:inline text-[10px] text-[#9ca3af] uppercase tracking-wider">online</span>
             </div>
 
-            {/* Realtime WebSocket Connection Indicator Badge */}
-            <button
-              onClick={connectionStatus === 'DISCONNECTED' ? reconnect : undefined}
-              disabled={connectionStatus !== 'DISCONNECTED'}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all select-none ${connectionStatus === 'CONNECTED'
-                  ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400 cursor-default'
-                  : connectionStatus === 'CONNECTING'
-                    ? 'bg-amber-950/40 border-amber-500/30 text-amber-400 cursor-default'
-                    : 'bg-red-950/50 border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer animate-pulse'
-                }`}
-              title={
-                connectionStatus === 'CONNECTED'
-                  ? t('nav:ws_connected_tooltip')
-                  : connectionStatus === 'CONNECTING'
-                    ? t('nav:ws_connecting_tooltip')
-                    : t('nav:ws_disconnected_tooltip')
-              }
-            >
-              {connectionStatus === 'DISCONNECTED' ? (
-                <WifiOff className="w-3 h-3 text-red-400" />
-              ) : (
-                <span
-                  className={`w-2 h-2 rounded-full ${connectionStatus === 'CONNECTED'
-                      ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]'
-                      : 'bg-amber-400 animate-ping'
-                    }`}
-                />
-              )}
-              <span className="hidden md:inline text-[10px] uppercase tracking-wider">
-                {connectionStatus === 'CONNECTED'
-                  ? t('nav:live_ws')
-                  : connectionStatus === 'CONNECTING'
-                    ? t('nav:connecting')
-                    : t('nav:offline')}
-              </span>
-            </button>
-
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-semibold text-[#f3f4f6] leading-tight">
                 {currentUser?.username}
@@ -160,6 +123,7 @@ export const Navbar = () => {
               <NavbarAvatar
                 src={currentUser?.avatarUrl}
                 username={currentUser?.username}
+                isOnline={connectionStatus === 'CONNECTED'}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               />
 

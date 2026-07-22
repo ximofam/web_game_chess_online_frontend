@@ -14,32 +14,30 @@ export const SocketProvider = ({ children }) => {
   const [reconnectCount, setReconnectCount] = useState(0);
   const wasConnectedRef = useRef(false);
 
-  // Status listener synchronization
+  // Status listener synchronization & Toast alerts
   useEffect(() => {
     const unsubscribeStatus = activeManager.onStatusChange((newStatus) => {
       setConnectionStatus(newStatus);
+
+      if (newStatus === 'DISCONNECTED') {
+        if (wasConnectedRef.current && showToast) {
+          showToast('Mất kết nối với máy chủ realtime.', 'error');
+        }
+        wasConnectedRef.current = false;
+      } else if (newStatus === 'CONNECTED') {
+        if (!wasConnectedRef.current && showToast) {
+          showToast('Đã kết nối máy chủ realtime thành công.', 'success');
+        }
+        wasConnectedRef.current = true;
+      }
     });
     return () => unsubscribeStatus();
-  }, []);
+  }, [showToast]);
 
   const connect = useCallback(() => {
     if (!isAuthenticated) return;
-
-    activeManager.connect(
-      () => {
-        if (!wasConnectedRef.current && showToast) {
-          showToast('Đã kết nối máy chủ realtime.', 'success');
-        }
-        wasConnectedRef.current = true;
-      },
-      (errorFrame) => {
-        if (wasConnectedRef.current && showToast) {
-          wasConnectedRef.current = false;
-          showToast('Lỗi kết nối máy chủ realtime.', 'error');
-        }
-      }
-    );
-  }, [isAuthenticated, showToast]);
+    activeManager.connect();
+  }, [isAuthenticated]);
 
   const disconnect = useCallback(() => {
     wasConnectedRef.current = false;
