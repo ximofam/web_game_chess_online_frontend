@@ -46,24 +46,24 @@ export const Navbar = () => {
     <header className="w-full border-b border-[#2d323f] bg-[#13161c] px-4 md:px-8 py-3.5 flex items-center justify-between relative z-40 select-none shadow-md">
       {/* Brand Logo & Navigation Links */}
       <div className="flex items-center gap-4 md:gap-8">
-        <Link
-          to="/"
-          className="flex items-center gap-2.5 hover:opacity-90 transition-opacity focus:outline-none focus:ring-1 focus:ring-[#d4af37] rounded"
-          aria-label="Navigate to Home"
+        <a
+          href="https://github.com/ximofam/web_game_chess_online_frontend"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2.5 text-[#f3f4f6] hover:text-[#d4af37] transition-colors focus:outline-none focus:ring-1 focus:ring-[#d4af37] rounded p-1"
+          aria-label="GitHub Repository"
+          title="GitHub Repository"
         >
-          <Trophy className="w-6 h-6 text-[#d4af37]" />
-          <span className="font-playfair text-lg font-bold tracking-widest text-[#f3f4f6] hidden sm:inline">
-            {t('nav:brand')}
-          </span>
-        </Link>
+          <GithubIcon className="w-6 h-6" />
+        </a>
 
         {/* Primary Nav Links (Home, Forum, Learn) */}
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             to="/"
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isHomeActive
-                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
-                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
+              ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
+              : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
               }`}
           >
             <Home className="w-4 h-4" />
@@ -73,8 +73,8 @@ export const Navbar = () => {
           <Link
             to="/learn"
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isLearnActive
-                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
-                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
+              ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
+              : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
               }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -84,8 +84,8 @@ export const Navbar = () => {
           <Link
             to="/forum"
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${isForumActive
-                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
-                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
+              ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
+              : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834]'
               }`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -139,18 +139,6 @@ export const Navbar = () => {
         ) : (
           /* Unauthenticated Visitor Options */
           <div className="flex items-center gap-2 sm:gap-2.5">
-            {/* GitHub Repo Link Button */}
-            <a
-              href="https://github.com/ximofam/web_game_chess_online_frontend"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] transition-all"
-              title={t('nav:github_repo')}
-              aria-label="GitHub Repository"
-            >
-              <GithubIcon className="w-5 h-5" />
-            </a>
-
             {/* Play as Guest Quick Trigger */}
             <button
               onClick={handlePlayAsGuest}
