@@ -2,17 +2,17 @@
 
 ## 🌐 Deploy & Live Demo
 
-- **Truy cập ứng dụng trực tuyến:** [https://viechess.vercel.app/](https://viechess.vercel.app/)
+- **Truy cập ứng dụng trực tuyến:** <a href="https://viechess.vercel.app/" target="_blank" rel="noopener noreferrer">https://viechess.vercel.app/</a>
 
 ### Các Dịch Vụ Sử Dụng Để Deploy:
 
 | Thành phần | Dịch vụ Cloud / Platform | Mô tả |
 | :--- | :--- | :--- |
-| **Frontend** | [Vercel](https://vercel.com/) | Host ứng dụng Single Page Application (React + Vite) |
-| **Backend** | [Railway](https://railway.app/) | Host dịch vụ API & WebSocket server (Spring Boot) |
-| **PostgreSQL Database** | [NeonDB](https://neon.tech/) | Cơ sở dữ liệu quan hệ Serverless PostgreSQL |
-| **Redis Cache** | [Upstash](https://upstash.com/) | Serverless Redis quản lý Caching & Session |
-| **Message Broker (RabbitMQ)** | [CloudAMQP](https://www.cloudamqp.com/) | Quản lý Hàng đợi tin nhắn & Xử lý sự kiện Real-time |
+| **Frontend** | <a href="https://vercel.com/" target="_blank" rel="noopener noreferrer">Vercel</a> | Host ứng dụng Single Page Application (React + Vite) |
+| **Backend** | <a href="https://railway.app/" target="_blank" rel="noopener noreferrer">Railway</a> | Host dịch vụ API & WebSocket server (Spring Boot) |
+| **PostgreSQL Database** | <a href="https://neon.tech/" target="_blank" rel="noopener noreferrer">NeonDB</a> | Cơ sở dữ liệu quan hệ Serverless PostgreSQL |
+| **Redis Cache** | <a href="https://upstash.com/" target="_blank" rel="noopener noreferrer">Upstash</a> | Serverless Redis quản lý Caching & Session |
+| **Message Broker (RabbitMQ)** | <a href="https://www.cloudamqp.com/" target="_blank" rel="noopener noreferrer">CloudAMQP</a> | Quản lý Hàng đợi tin nhắn & Xử lý sự kiện Real-time |
 
 ---
 
@@ -35,7 +35,7 @@
 ## 🛠️ Công Nghệ Sử Dụng (Tech Stack)
 
 ### Frontend
-- **Framework & Build tool:** [React 19](https://react.dev/), [Vite](https://vitejs.dev/)
+- **Framework & Build tool:** <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">React 19</a>, <a href="https://vitejs.dev/" target="_blank" rel="noopener noreferrer">Vite</a>
 - **Styling:** Tailwind CSS v4, Lucide React Icons
 - **State & Data Fetching:** TanStack Query (React Query)
 - **Routing & Forms:** React Router v7, React Hook Form, Zod Validation
@@ -43,10 +43,10 @@
 
 ### Backend & Cloud Infrastructure
 - **Core API & WebSocket:** Java, Spring Boot, Spring Security, STOMP
-- **Database:** PostgreSQL ([NeonDB](https://neon.tech/))
-- **Caching & Memory:** Redis ([Upstash](https://upstash.com/))
-- **Message Queue:** RabbitMQ ([CloudAMQP](https://www.cloudamqp.com/))
-- **Deployment Platforms:** [Vercel](https://vercel.com/) (Frontend), [Railway](https://railway.app/) (Backend)
+- **Database:** PostgreSQL (<a href="https://neon.tech/" target="_blank" rel="noopener noreferrer">NeonDB</a>)
+- **Caching & Memory:** Redis (<a href="https://upstash.com/" target="_blank" rel="noopener noreferrer">Upstash</a>)
+- **Message Queue:** RabbitMQ (<a href="https://www.cloudamqp.com/" target="_blank" rel="noopener noreferrer">CloudAMQP</a>)
+- **Deployment Platforms:** <a href="https://vercel.com/" target="_blank" rel="noopener noreferrer">Vercel</a> (Frontend), <a href="https://railway.app/" target="_blank" rel="noopener noreferrer">Railway</a> (Backend)
 
 ---
 
