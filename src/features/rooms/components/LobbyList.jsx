@@ -14,7 +14,7 @@ export function LobbyList({ onCreateRoomClick }) {
     hasNextPage,
     isFetchingNextPage,
     connectionStatus,
-  } = useLobbyRooms(7);
+  } = useLobbyRooms(5);
   const { showToast } = useAuth();
   const containerRef = useRef(null);
 
@@ -36,6 +36,22 @@ export function LobbyList({ onCreateRoomClick }) {
       }
     }
   };
+
+  // Auto-fetch next page if current content height is too small to display a scrollbar
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const timer = setTimeout(() => {
+      if (container.scrollHeight <= container.clientHeight + 10) {
+        if (hasNextPage && !isFetchingNextPage && !isLoading) {
+          fetchNextPage();
+        }
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [rooms.length, hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
   // Filtered rooms calculation
   const filteredRooms = useMemo(() => {
