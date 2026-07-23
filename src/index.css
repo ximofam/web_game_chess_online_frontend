@@ -130,3 +130,21 @@ code {
     width: 0%;
   }
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #13161c;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d323f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+

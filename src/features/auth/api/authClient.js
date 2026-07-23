@@ -177,9 +177,44 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
     }
   ];
 
+  let mockRoomsDb = [
+    {
+      roomId: 'room-blitz-101',
+      name: 'Giao lưu Cờ Chớp Blitz 3m+2s',
+      host: { id: 2, username: 'magnus_c', avatarUrl: null },
+      createdAt: Date.now() - 300000,
+      settings: { timeMinutes: 3, incrementSeconds: 2, variant: 'STANDARD', rated: true, isPrivate: false },
+      white: { id: 2, username: 'magnus_c', avatarUrl: null },
+      black: null,
+      status: 'WAITING'
+    },
+    {
+      roomId: 'room-rapid-102',
+      name: 'Thách Đấu Cờ Nhanh 10m',
+      host: { id: 3, username: 'hikaru_n', avatarUrl: null },
+      createdAt: Date.now() - 600000,
+      settings: { timeMinutes: 10, incrementSeconds: 0, variant: 'STANDARD', rated: false, isPrivate: false },
+      white: { id: 3, username: 'hikaru_n', avatarUrl: null },
+      black: { id: 4, username: 'garry_k', avatarUrl: null },
+      status: 'IN_PROGRESS'
+    },
+    {
+      roomId: 'room-bullet-103',
+      name: 'Phòng luyện tập tân thủ',
+      host: { id: 5, username: 'chess_fan_99', avatarUrl: null },
+      createdAt: Date.now() - 120000,
+      settings: { timeMinutes: 5, incrementSeconds: 3, variant: 'STANDARD', rated: false, isPrivate: false },
+      white: { id: 5, username: 'chess_fan_99', avatarUrl: null },
+      black: null,
+      status: 'WAITING'
+    }
+  ];
+
   if (typeof window !== 'undefined') {
     window.mockNotificationsDb = mockNotificationsDb;
+    window.mockRoomsDb = mockRoomsDb;
   }
+
 
   authClient.interceptors.request.use(async (config) => {
     // Intercept API calls and simulate responses
@@ -590,7 +625,62 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       };
     }
 
+    // Mock endpoints for Rooms / Lobby
+    if (url.includes('/api/rooms') && config.method === 'post') {
+      const body = JSON.parse(config.data || '{}');
+      const roomId = `room-${Date.now().toString(36)}`;
+      const currentProfile = mockProfileDb[currentMockUsername] || { id: 1, username: 'player1' };
+      const newRoom = {
+        roomId,
+        name: body.name || 'Phòng cờ mới',
+        host: { id: currentProfile.id, username: currentProfile.username, avatarUrl: currentProfile.avatarUrl },
+        createdAt: Date.now(),
+        settings: {
+          timeMinutes: body.settings?.timeMinutes || 5,
+          incrementSeconds: body.settings?.incrementSeconds || 3,
+          variant: body.settings?.variant || 'STANDARD',
+          rated: !!body.settings?.rated,
+          isPrivate: !!body.settings?.isPrivate
+        },
+        white: { id: currentProfile.id, username: currentProfile.username, avatarUrl: currentProfile.avatarUrl },
+        black: null,
+        status: 'WAITING'
+      };
+
+      if (window.mockRoomsDb) {
+        window.mockRoomsDb.unshift(newRoom);
+      }
+
+      // Broadcast STOMP event to /topic/lobbies subscribers
+      if (window.mockSocketManager) {
+        window.mockSocketManager.broadcast('/topic/lobbies', JSON.stringify({
+          type: 'ROOM_CREATED',
+          data: newRoom
+        }));
+      }
+
+      return {
+        data: { roomId },
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config
+      };
+    }
+
+    if (url.includes('/api/rooms') && config.method === 'get') {
+      const rooms = window.mockRoomsDb || [];
+      return {
+        data: rooms,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config
+      };
+    }
+
     // Default: let other requests fall through (or mock simple protected data)
+
     if (url.includes('/api/protected/profile')) {
       if (!config.headers.Authorization) {
         throw {

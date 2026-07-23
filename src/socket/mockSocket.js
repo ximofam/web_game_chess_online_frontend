@@ -130,3 +130,7 @@ class MockSocketManager {
 }
 
 export const mockSocketManager = new MockSocketManager();
+if (typeof window !== 'undefined') {
+  window.mockSocketManager = mockSocketManager;
+}
+

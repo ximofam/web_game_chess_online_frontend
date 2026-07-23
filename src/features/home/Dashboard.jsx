@@ -1,176 +1,118 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/context/AuthContext';
-import { authService } from '../auth/services/authService';
-import { setAccessToken } from '../auth/api/authClient';
-import { RefreshCw, Shield, User, LogIn, Play, CheckCircle, Sparkles } from 'lucide-react';
+import { User, Shield, LogIn, Sparkles } from 'lucide-react';
+import { PlayModeCards } from '../rooms/components/PlayModeCards';
+import { CreateRoomModal } from '../rooms/components/CreateRoomModal';
+import { MatchmakingModal } from '../rooms/components/MatchmakingModal';
+import { LobbyList } from '../rooms/components/LobbyList';
 
 export default function Dashboard() {
-  const { currentUser, isGuest, refreshToken, showToast } = useAuth();
-  const [profileData, setProfileData] = useState(null);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const { currentUser, isGuest } = useAuth();
 
-  const handleTestProtectedApi = async () => {
-    setIsLoadingProfile(true);
-    try {
-      const data = await authService.getProfile();
-      setProfileData(data);
-      showToast('Lấy dữ liệu API thành công!', 'success');
-    } catch (err) {
-      showToast(err.response?.data?.message || 'Không thể lấy dữ liệu protected API.', 'error');
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
-
-  const handleSimulateTokenExpiry = async () => {
-    setAccessToken(null);
-    showToast('Đã xóa Access Token trong bộ nhớ. Giả lập hết hạn token...', 'success');
-
-    setIsLoadingProfile(true);
-    try {
-      const data = await authService.getProfile();
-      setProfileData(data);
-      showToast('Interceptor đã tự động xoay vòng refresh token và hoàn tất request!', 'success');
-    } catch (err) {
-      showToast('Tự động refresh token thất bại.', 'error');
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
+  // Modals state
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isMatchmakingModalOpen, setIsMatchmakingModalOpen] = useState(false);
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-10 select-none">
-      <div className="w-full max-w-4xl space-y-6">
+    <main className="flex-1 flex flex-col items-center justify-start p-3 sm:p-6 select-none">
+      <div className="w-full max-w-7xl space-y-5">
 
-        {/* GUEST BANNER IF VISITING AS GUEST */}
+        {/* GUEST BANNER (COMPACT) */}
         {isGuest && (
-          <div className="bg-gradient-to-r from-[#d4af37]/15 via-[#1a1d24] to-[#242834] border border-[#d4af37]/40 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg animate-fade-in">
-            <div className="flex items-center gap-3 text-center md:text-left">
-              <div className="w-10 h-10 rounded-full bg-[#d4af37]/20 border border-[#d4af37] flex items-center justify-center text-[#d4af37] shrink-0">
-                <Sparkles className="w-5 h-5" />
+          <div className="bg-gradient-to-r from-[#d4af37]/15 via-[#1a1d24] to-[#242834] border border-[#d4af37]/40 rounded-xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#d4af37]/20 border border-[#d4af37] flex items-center justify-center text-[#d4af37] shrink-0">
+                <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-playfair font-bold text-lg text-[#f3f4f6]">
-                  Bạn đang trải nghiệm với tư cách Khách (Guest)
-                </h3>
-                <p className="text-xs text-[#9ca3af]">
-                  Bạn có thể xem thông tin trang chủ và diễn đàn. Đăng nhập tài khoản để lưu thành tích thi đấu và bài viết!
-                </p>
+                <h3 className="font-bold text-sm text-[#f3f4f6]">Chế độ Khách (Guest)</h3>
+                <p className="text-xs text-[#9ca3af]">Đăng nhập để khởi tạo phòng chơi và lưu kết quả thi đấu.</p>
               </div>
             </div>
 
             <Link
               to="/login"
-              className="bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-bold text-sm px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shrink-0 cursor-pointer shadow-md"
+              className="bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Đăng nhập ngay</span>
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Đăng nhập</span>
             </Link>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* LICHESS-STYLE TWO COLUMN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* PROFILE SUMMARY */}
-          <div className="md:col-span-5 bg-[#1a1d24] border border-[#2d323f] p-6 rounded-2xl flex flex-col justify-between shadow-md">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full border-2 border-[#d4af37] flex items-center justify-center bg-[#13161c] text-[#d4af37] mb-4 relative overflow-hidden shadow-inner">
-                {currentUser?.avatarUrl ? (
-                  <img src={currentUser.avatarUrl} alt={currentUser.username} className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-10 h-10" />
-                )}
-                <span className="absolute bottom-0 right-0 bg-[#d4af37] text-[#0d0e12] rounded-full p-1 border border-[#1a1d24]">
-                  <Shield className="w-3 h-3" />
-                </span>
-              </div>
-              <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6]">{currentUser?.username || 'Guest Player'}</h2>
-              <p className="text-xs text-[#9ca3af] tracking-wider uppercase mb-1">{currentUser?.email || 'Hệ thống Khách Ẩn Danh'}</p>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] mt-2">
-                <CheckCircle className="w-3.5 h-3.5" /> {currentUser?.role || 'GUEST'}
-              </span>
-            </div>
-
-            <div className="border-t border-[#2d323f] mt-6 pt-6 grid grid-cols-3 gap-2 text-center">
-              <div className="bg-[#13161c]/60 py-2.5 rounded-lg border border-[#2d323f]">
-                <span className="block text-lg font-bold text-[#f3f4f6]">142</span>
-                <span className="text-[10px] text-[#9ca3af] uppercase">Wins</span>
-              </div>
-              <div className="bg-[#13161c]/60 py-2.5 rounded-lg border border-[#2d323f]">
-                <span className="block text-lg font-bold text-[#f3f4f6]">32</span>
-                <span className="text-[10px] text-[#9ca3af] uppercase">Draws</span>
-              </div>
-              <div className="bg-[#13161c]/60 py-2.5 rounded-lg border border-[#2d323f]">
-                <span className="block text-lg font-bold text-[#f3f4f6]">12</span>
-                <span className="text-[10px] text-[#9ca3af] uppercase">Losses</span>
-              </div>
-            </div>
+          {/* LEFT / MAIN COLUMN: REALTIME LOBBY TABLE (lg:col-span-8) */}
+          <div className="lg:col-span-8 h-full">
+            <LobbyList onCreateRoomClick={() => setIsCreateModalOpen(true)} />
           </div>
 
-          {/* PLAY AND ACTIONS */}
-          <div className="md:col-span-7 bg-[#1a1d24] border border-[#2d323f] p-6 rounded-2xl flex flex-col justify-between shadow-md">
-            <div>
-              <h3 className="font-playfair text-xl font-bold text-[#f3f4f6] mb-2">Đấu trường Cờ vua Online</h3>
-              <p className="text-sm text-[#9ca3af] mb-6 leading-relaxed">
-                Chào mừng bạn đến với hệ thống. Khách và người dùng có thể tham gia sảnh chờ, xem danh sách bài viết trên diễn đàn hoặc tìm trận đấu nhanh.
-              </p>
-
-              {/* ACTION BUTTONS */}
-              <div className="space-y-3">
-                <button
-                  onClick={handleTestProtectedApi}
-                  disabled={isLoadingProfile}
-                  className="w-full bg-[#13161c] hover:bg-[#242834] border border-[#2d323f] text-[#f3f4f6] font-semibold py-3 px-4 rounded-xl flex items-center justify-between text-sm transition-all focus:ring-1 focus:ring-[#d4af37] focus:outline-none cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#d4af37]" />
-                    Kiểm tra Protected Profile API
-                  </span>
-                  {isLoadingProfile ? (
-                    <RefreshCw className="w-4 h-4 text-[#d4af37] animate-spin" />
+          {/* RIGHT SIDEBAR: USER QUICK PROFILE & ACTION CARDS (lg:col-span-4) */}
+          <div className="lg:col-span-4 space-y-5">
+            {/* USER QUICK CARD */}
+            <div className="bg-[#1a1d24] border border-[#2d323f] p-4.5 rounded-2xl shadow-md">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-full border border-[#d4af37] flex items-center justify-center bg-[#13161c] text-[#d4af37] relative overflow-hidden shrink-0">
+                  {currentUser?.avatarUrl ? (
+                    <img src={currentUser.avatarUrl} alt={currentUser.username} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs text-[#d4af37] font-mono">GET /profile</span>
+                    <User className="w-6 h-6" />
                   )}
-                </button>
-
-                <button
-                  onClick={handleSimulateTokenExpiry}
-                  disabled={isLoadingProfile}
-                  className="w-full bg-[#13161c] hover:bg-[#242834] border border-[#2d323f] text-[#f3f4f6] font-semibold py-3 px-4 rounded-xl flex items-center justify-between text-sm transition-all focus:ring-1 focus:ring-[#d4af37] focus:outline-none cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-[#d4af37]" />
-                    Giả lập Token Rotation (Auto Refresh)
+                  <span className="absolute bottom-0 right-0 bg-[#d4af37] text-[#0d0e12] rounded-full p-0.5 border border-[#1a1d24]">
+                    <Shield className="w-2.5 h-2.5" />
                   </span>
-                  <span className="text-xs text-[#d4af37] font-mono">POST /refresh</span>
-                </button>
+                </div>
+                <div className="truncate">
+                  <h3 className="font-bold text-base text-[#f3f4f6] truncate">{currentUser?.username || 'Guest Player'}</h3>
+                  <span className="inline-block text-[11px] font-semibold text-[#d4af37] bg-[#d4af37]/10 px-2 py-0.5 rounded-md border border-[#d4af37]/30 mt-0.5">
+                    {currentUser?.role || 'GUEST'}
+                  </span>
+                </div>
               </div>
 
-              {/* API OUTPUT RENDER */}
-              {profileData && (
-                <div className="mt-4 p-4 rounded-xl bg-[#13161c] border border-[#2d323f] animate-fade-in text-left">
-                  <span className="text-[10px] text-[#d4af37] uppercase font-semibold tracking-wider block mb-1">
-                    API Response: /api/protected/profile
-                  </span>
-                  <pre className="text-xs font-mono text-[#f3f4f6] overflow-x-auto">
-                    {JSON.stringify(profileData, null, 2)}
-                  </pre>
+              {/* QUICK STATS */}
+              <div className="grid grid-cols-3 gap-2 text-center mt-4 pt-3.5 border-t border-[#2d323f]/80">
+                <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
+                  <span className="block text-sm font-bold text-[#10b981]">142</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">Thắng</span>
                 </div>
-              )}
+                <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
+                  <span className="block text-sm font-bold text-[#38bdf8]">32</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">Hòa</span>
+                </div>
+                <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
+                  <span className="block text-sm font-bold text-[#ef4444]">12</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">Thua</span>
+                </div>
+              </div>
             </div>
 
-            <button
-              onClick={() => showToast('Đang tìm kiếm trận đấu nhanh...', 'success')}
-              className="w-full bg-[#d4af37] text-[#0d0e12] font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#b59226] hover:shadow-[0_4px_12px_rgba(212,175,55,0.25)] transition-all cursor-pointer mt-6"
-            >
-              <Play className="w-4 h-4 fill-[#0d0e12]" />
-              <span>TÌM TRẬN ĐẤU NHANH (RATED)</span>
-            </button>
+            {/* 3 ACTION BUTTONS (PLAY MODE STACK) */}
+            <div className="bg-[#1a1d24] border border-[#2d323f] p-4.5 rounded-2xl shadow-md">
+              <h3 className="font-playfair text-base font-bold text-[#f3f4f6] mb-3">Chế Độ Thi Đấu</h3>
+              <PlayModeCards
+                onCreateRoomClick={() => setIsCreateModalOpen(true)}
+                onMatchmakingClick={() => setIsMatchmakingModalOpen(true)}
+              />
+            </div>
           </div>
 
         </div>
+
       </div>
+
+      {/* MODALS */}
+      <CreateRoomModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      <MatchmakingModal
+        isOpen={isMatchmakingModalOpen}
+        onClose={() => setIsMatchmakingModalOpen(false)}
+      />
     </main>
   );
 }
