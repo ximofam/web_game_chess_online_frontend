@@ -1,16 +1,43 @@
-import React, { useState, useMemo } from 'react';
-import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo, useRef } from 'react';
+import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2 } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { useAuth } from '../../auth/context/AuthContext';
 
 export function LobbyList({ onCreateRoomClick }) {
-  const { rooms, isLoading, isError, refetch, connectionStatus } = useLobbyRooms();
+  const {
+    rooms,
+    totalElements,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    connectionStatus,
+  } = useLobbyRooms(7);
   const { showToast } = useAuth();
+  const containerRef = useRef(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'WAITING' | 'IN_PROGRESS'
 
-  // Filtered rooms
+  // Scroll listener for Infinite Pagination
+  const handleScroll = (e) => {
+    const container = e?.currentTarget || containerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+
+    // Trigger next page load when distance to bottom is less than 100px
+    if (distanceToBottom < 100) {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }
+  };
+
+  // Filtered rooms calculation
   const filteredRooms = useMemo(() => {
     return rooms.filter((room) => {
       if (statusFilter === 'WAITING' && room.status !== 'WAITING') return false;
@@ -50,6 +77,9 @@ export function LobbyList({ onCreateRoomClick }) {
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
             <Radio className="w-3 h-3 animate-ping" /> Realtime
           </span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#d4af37] bg-[#d4af37]/10 px-2.5 py-0.5 rounded-full border border-[#d4af37]/30">
+            Tổng: {totalElements} phòng
+          </span>
         </div>
 
         {/* SEARCH & REFRESH */}
@@ -82,32 +112,32 @@ export function LobbyList({ onCreateRoomClick }) {
           <button
             type="button"
             onClick={() => setStatusFilter('ALL')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'ALL'
+            className={`px-3.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'ALL'
               ? 'bg-[#d4af37] text-[#0d0e12] shadow-sm'
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Tất cả ({rooms.length})
+            Tất cả
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('WAITING')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'WAITING'
+            className={`px-3.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'WAITING'
               ? 'bg-[#10b981] text-[#0d0e12] shadow-sm'
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Đang chờ ({rooms.filter((r) => r.status === 'WAITING').length})
+            Đang chờ
           </button>
           <button
             type="button"
             onClick={() => setStatusFilter('IN_PROGRESS')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'IN_PROGRESS'
+            className={`px-3.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${statusFilter === 'IN_PROGRESS'
               ? 'bg-[#38bdf8] text-[#0d0e12] shadow-sm'
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Đang đấu ({rooms.filter((r) => r.status === 'IN_PROGRESS').length})
+            Đang đấu
           </button>
         </div>
 
@@ -117,7 +147,7 @@ export function LobbyList({ onCreateRoomClick }) {
         </span>
       </div>
 
-      {/* LOBBY TABLE / LIST */}
+      {/* LOBBY TABLE WITH INFINITE SCROLL */}
       {isLoading ? (
         <div className="py-12 text-center text-[#9ca3af] space-y-2">
           <RefreshCw className="w-6 h-6 mx-auto animate-spin text-[#d4af37]" />
@@ -153,7 +183,11 @@ export function LobbyList({ onCreateRoomClick }) {
           )}
         </div>
       ) : (
-        <div className="overflow-y-auto max-h-[460px] pr-1 scrollbar-thin">
+        <div
+          ref={containerRef}
+          onScroll={handleScroll}
+          className="overflow-y-auto max-h-[460px] pr-1 scrollbar-thin"
+        >
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#1a1d24] shadow-md z-10">
               <tr className="border-b border-[#2d323f] text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wider">
@@ -255,6 +289,20 @@ export function LobbyList({ onCreateRoomClick }) {
               })}
             </tbody>
           </table>
+
+          {/* INFINITE SCROLL LOADING & END STATE INDICATORS */}
+          {isFetchingNextPage && (
+            <div className="py-3 text-center text-xs text-[#d4af37] flex items-center justify-center gap-2 bg-[#13161c]/50">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Đang tải thêm phòng...</span>
+            </div>
+          )}
+
+          {!hasNextPage && rooms.length > 0 && (
+            <div className="py-2.5 text-center text-[11px] text-[#6b7280] border-t border-[#2d323f]/40">
+              Đã hiển thị tất cả các phòng cờ
+            </div>
+          )}
         </div>
       )}
     </div>

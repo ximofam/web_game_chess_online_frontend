@@ -177,43 +177,49 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
     }
   ];
 
-  let mockRoomsDb = [
-    {
-      roomId: 'room-blitz-101',
-      name: 'Giao lưu Cờ Chớp Blitz 3m+2s',
-      host: { id: 2, username: 'magnus_c', avatarUrl: null },
-      createdAt: Date.now() - 300000,
-      settings: { timeMinutes: 3, incrementSeconds: 2, variant: 'STANDARD', rated: true, isPrivate: false },
-      white: { id: 2, username: 'magnus_c', avatarUrl: null },
-      black: null,
-      status: 'WAITING'
-    },
-    {
-      roomId: 'room-rapid-102',
-      name: 'Thách Đấu Cờ Nhanh 10m',
-      host: { id: 3, username: 'hikaru_n', avatarUrl: null },
-      createdAt: Date.now() - 600000,
-      settings: { timeMinutes: 10, incrementSeconds: 0, variant: 'STANDARD', rated: false, isPrivate: false },
-      white: { id: 3, username: 'hikaru_n', avatarUrl: null },
-      black: { id: 4, username: 'garry_k', avatarUrl: null },
-      status: 'IN_PROGRESS'
-    },
-    {
-      roomId: 'room-bullet-103',
-      name: 'Phòng luyện tập tân thủ',
-      host: { id: 5, username: 'chess_fan_99', avatarUrl: null },
-      createdAt: Date.now() - 120000,
-      settings: { timeMinutes: 5, incrementSeconds: 3, variant: 'STANDARD', rated: false, isPrivate: false },
-      white: { id: 5, username: 'chess_fan_99', avatarUrl: null },
-      black: null,
-      status: 'WAITING'
-    }
+  const mockSenders = [
+    { id: 2, username: 'magnus_c', avatarUrl: null },
+    { id: 3, username: 'hikaru_n', avatarUrl: null },
+    { id: 4, username: 'garry_k', avatarUrl: null },
+    { id: 5, username: 'ding_liren', avatarUrl: null },
+    { id: 6, username: 'alireza_f', avatarUrl: null },
+    { id: 7, username: 'fabiano_c', avatarUrl: null },
+    { id: 8, username: 'nodirbek_a', avatarUrl: null },
   ];
+
+  let mockRoomsDb = Array.from({ length: 35 }, (_, idx) => {
+    const host = mockSenders[idx % mockSenders.length];
+    const isEven = idx % 2 === 0;
+    const timeMins = [1, 3, 5, 10, 15][idx % 5];
+    const incSecs = [0, 2, 3, 5, 10][idx % 5];
+
+    return {
+      roomId: `room-chess-${100 + idx}`,
+      name: idx === 0
+        ? 'Giao lưu Cờ Chớp Blitz 3m+2s'
+        : idx === 1
+        ? 'Thách Đấu Cờ Nhanh 10m'
+        : `Phòng Cờ Giao Lưu #${100 + idx}`,
+      host,
+      createdAt: Date.now() - (idx * 120000),
+      settings: {
+        timeMinutes: timeMins,
+        incrementSeconds: incSecs,
+        variant: 'STANDARD',
+        rated: idx % 3 !== 0,
+        isPrivate: false
+      },
+      white: host,
+      black: isEven ? null : { id: 99, username: `opponent_${idx}`, avatarUrl: null },
+      status: isEven ? 'WAITING' : 'IN_PROGRESS'
+    };
+  });
 
   if (typeof window !== 'undefined') {
     window.mockNotificationsDb = mockNotificationsDb;
     window.mockRoomsDb = mockRoomsDb;
   }
+
 
 
   authClient.interceptors.request.use(async (config) => {
@@ -669,9 +675,27 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
     }
 
     if (url.includes('/api/rooms') && config.method === 'get') {
+      const params = new URLSearchParams(url.split('?')[1] || '');
+      const page = parseInt(params.get('page') || '0', 10);
+      const size = parseInt(params.get('size') || '20', 10);
+
       const rooms = window.mockRoomsDb || [];
+      const startIdx = page * size;
+      const endIdx = startIdx + size;
+      const paginatedItems = rooms.slice(startIdx, endIdx);
+      const totalElements = rooms.length;
+      const totalPages = Math.ceil(totalElements / size) || 1;
+
       return {
-        data: rooms,
+        data: {
+          content: paginatedItems,
+          page: {
+            size,
+            number: page,
+            totalElements,
+            totalPages,
+          }
+        },
         status: 200,
         statusText: 'OK',
         headers: {},
