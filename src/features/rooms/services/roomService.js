@@ -3,7 +3,7 @@ import { authClient } from '../../auth/api/authClient';
 /**
  * Service API cho Quản lý Phòng chơi (Rooms & Lobby)
  */
-export const roomsApi = {
+export const roomService = {
   /**
    * Lấy danh sách phòng chơi đang có ở sảnh (Lobby)
    * GET /api/rooms?page=0&size=20

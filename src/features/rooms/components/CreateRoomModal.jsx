@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Clock, Shield, Lock, Globe, Sparkles, Loader2, Play } from 'lucide-react';
-import { roomsApi } from '../api/roomsApi';
+import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../socket/useSocket';
 
@@ -42,7 +42,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
         },
       };
 
-      const result = await roomsApi.createRoom(payload);
+      const result = await roomService.createRoom(payload);
       showToast('Tạo phòng chơi thành công!', 'success');
       
       if (onCreated) {

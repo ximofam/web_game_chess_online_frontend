@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { roomsApi } from '../api/roomsApi';
+import { roomService } from '../services/roomService';
 import { useSocket } from '../../../socket/useSocket';
 
 /**
@@ -23,7 +23,7 @@ export function useLobbyRooms(size = 20) {
     refetch,
   } = useInfiniteQuery({
     queryKey: ['rooms', 'lobby', size],
-    queryFn: ({ pageParam = 0 }) => roomsApi.getRooms(pageParam, size),
+    queryFn: ({ pageParam = 0 }) => roomService.getRooms(pageParam, size),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage) return undefined;
