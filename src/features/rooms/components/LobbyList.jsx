@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2 } from 'lucide-react';
+import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useOnlineCount } from '../../presence/socket/presenceSocket';
 
 export function LobbyList({ onCreateRoomClick }) {
   const {
@@ -16,6 +17,7 @@ export function LobbyList({ onCreateRoomClick }) {
     connectionStatus,
   } = useLobbyRooms(5);
   const { showToast } = useAuth();
+  const onlineCount = useOnlineCount();
   const containerRef = useRef(null);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,13 +90,14 @@ export function LobbyList({ onCreateRoomClick }) {
     <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg flex flex-col h-full">
       {/* HEADER & TOP CONTROLS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#2d323f]">
-        <div className="flex items-center gap-3">
-          <h2 className="font-playfair text-xl font-bold text-[#f3f4f6]">Sảnh Chơi (Lobby)</h2>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30">
-            <Radio className="w-3 h-3 animate-ping" /> Realtime
-          </span>
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+          <h2 className="font-playfair text-xl font-bold text-[#f3f4f6]">Lobby</h2>
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#d4af37] bg-[#d4af37]/10 px-2.5 py-0.5 rounded-full border border-[#d4af37]/30">
             Tổng: {totalElements} phòng
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+            <Users className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{onlineCount} online</span>
           </span>
         </div>
 

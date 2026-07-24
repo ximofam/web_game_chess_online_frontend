@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck, WifiOff, Users } from 'lucide-react';
+import { Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNotifications } from '../../notifications/context/NotificationContext';
-import { useOnlineCount } from '../../presence/socket/presenceSocket';
 import NavbarAvatar from '../../profile/components/NavbarAvatar';
 import AvatarDropdown from '../../profile/components/AvatarDropdown';
 import NotificationBell from '../../notifications/components/NotificationBell';
@@ -22,8 +21,7 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
 export const Navbar = () => {
   const { t } = useTranslation(['nav', 'auth']);
   const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
-  const { connectionStatus, reconnect } = useNotifications();
-  const onlineCount = useOnlineCount();
+  const { connectionStatus } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -98,16 +96,6 @@ export const Navbar = () => {
       <div className="flex items-center gap-2.5 sm:gap-3">
         {isAuthenticated ? (
           <div className="flex items-center gap-3 md:gap-4">
-            {/* Realtime Online Users Badge */}
-            <div
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border border-[#373d4e] bg-[#1d222e] text-[#e5e7eb] select-none"
-              title="Số người dùng online"
-            >
-              <Users className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="font-bold text-xs">{onlineCount}</span>
-              <span className="hidden md:inline text-[10px] text-[#9ca3af] uppercase tracking-wider">online</span>
-            </div>
-
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-semibold text-[#f3f4f6] leading-tight">
                 {currentUser?.username}
