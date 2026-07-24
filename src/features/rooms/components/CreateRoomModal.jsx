@@ -5,10 +5,11 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../socket/useSocket';
 
 export function CreateRoomModal({ isOpen, onClose, onCreated }) {
-  const { showToast } = useAuth();
+  const { currentUser, showToast } = useAuth();
   const { connectionStatus } = useSocket();
 
-  const [name, setName] = useState('');
+  const defaultRoomName = currentUser?.username ? `${currentUser.username}'s room` : "Player's room";
+  const [name, setName] = useState(defaultRoomName);
   const [timeMinutes, setTimeMinutes] = useState(5);
   const [incrementSeconds, setIncrementSeconds] = useState(3);
   const [variant, setVariant] = useState('STANDARD');
@@ -16,10 +17,22 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  React.useEffect(() => {
+    if (isOpen) {
+      setName(currentUser?.username ? `${currentUser.username}'s room` : "Player's room");
+    }
+  }, [isOpen, currentUser]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      showToast('Tên phòng là bắt buộc!', 'error');
+      return;
+    }
 
     // Check if WebSocket is online as per API spec rule:
     // "Người dùng phải đang Online (có kết nối WebSocket) thì mới được phép gọi API này."
@@ -32,7 +45,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
 
     try {
       const payload = {
-        name: name.trim(),
+        name: trimmedName,
         settings: {
           timeMinutes: Number(timeMinutes),
           incrementSeconds: Number(incrementSeconds),
@@ -98,13 +111,14 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
           {/* TÊN PHÒNG */}
           <div>
             <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2">
-              Tên phòng chơi (Không bắt buộc)
+              Tên phòng chơi <span className="text-[#ef4444]">*</span>
             </label>
             <input
               type="text"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="VD: Giao lưu cờ chớp 3m, Thách đấu GM..."
+              placeholder="VD: Player's room"
               className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-sm rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all placeholder-[#4b5563]"
             />
           </div>
