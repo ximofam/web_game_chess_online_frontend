@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -9,7 +10,8 @@ import { useSocket } from '../../../socket/useSocket';
  * Có hỗ trợ Mock Fallback khi DEV / backend endpoint chưa sẵn sàng.
  */
 export function useRoomDetails(roomId) {
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
   const { subscribe, unsubscribe, connectionStatus } = useSocket();
 
@@ -71,7 +73,6 @@ export function useRoomDetails(roomId) {
           queryClient.setQueryData(['room', roomId], (oldRoom) => {
             if (!oldRoom) return oldRoom;
 
-            // Khán giả (spectator) -> thêm vào đầu mảng
             if (role === 'spectator') {
               const currentSpectators = oldRoom.spectators || [];
               const exists = currentSpectators.some((s) => s.id === user.id);
@@ -79,12 +80,34 @@ export function useRoomDetails(roomId) {
               return { ...oldRoom, spectators: [user, ...currentSpectators] };
             }
 
-            // Người chơi (white/black) -> Cập nhật ghế
-            return {
-              ...oldRoom,
-              [role]: user
-            };
+            return { ...oldRoom, [role]: user };
           });
+        }
+
+        if (event.type === 'PLAYER_LEFT') {
+          const { role, userId } = event.data || {};
+          if (!role || !userId) return;
+
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+
+            if (role === 'spectator') {
+              const updatedSpectators = (oldRoom.spectators || []).filter(
+                (s) => String(s.id) !== String(userId)
+              );
+              return { ...oldRoom, spectators: updatedSpectators };
+            }
+
+            return { ...oldRoom, [role]: null };
+          });
+        }
+
+        if (event.type === 'ROOM_DELETED') {
+          // Xoá cache phòng và redirect về sảnh
+          queryClient.removeQueries({ queryKey: ['room', roomId] });
+          queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+          showToast('Phòng chơi đã bị hủy do chủ phòng rời đi.', 'error');
+          navigate('/dashboard');
         }
       } catch (err) {
         console.error('[Room Socket] Failed to parse realtime event', err);
@@ -92,11 +115,9 @@ export function useRoomDetails(roomId) {
     });
 
     return () => {
-      if (subId) {
-        unsubscribe(subId);
-      }
+      if (subId) unsubscribe(subId);
     };
-  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient]);
+  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast]);
 
   return {
     room: query.data,
