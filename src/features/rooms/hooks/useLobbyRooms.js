@@ -133,11 +133,16 @@ export function useLobbyRooms(size = 20, searchTerm = '') {
             }
 
             if (event.type === 'ROOM_UPDATED') {
-              const updatedRoomData = event.data;
-              if (!updatedRoomData || !updatedRoomData.roomId) return pageData;
-              const updatedItems = currentItems.map((r) =>
-                r.roomId === updatedRoomData.roomId ? { ...r, ...updatedRoomData } : r
-              );
+              const { roomId, role, user } = event.data || {};
+              if (!roomId || !role) return pageData;
+
+              const updatedItems = currentItems.map((r) => {
+                if (r.roomId === roomId) {
+                  return { ...r, [role]: user };
+                }
+                return r;
+              });
+
               return Array.isArray(pageData) ? updatedItems : { ...pageData, content: updatedItems };
             }
 

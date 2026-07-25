@@ -26,11 +26,12 @@ export const roomService = {
   },
 
   /**
-   * Tham gia phòng chơi (Dự phòng)
+   * Tham gia phòng chơi
    * POST /api/rooms/:roomId/join
+   * Body: { role: "white" | "black" | "spectator" }
    */
-  joinRoom: async (roomId, side = 'ANY') => {
-    const response = await authClient.post(`/api/rooms/${roomId}/join`, { side });
+  joinRoom: async (roomId, role = 'black') => {
+    const response = await authClient.post(`/api/rooms/${roomId}/join`, { role });
     return response.data;
   },
 

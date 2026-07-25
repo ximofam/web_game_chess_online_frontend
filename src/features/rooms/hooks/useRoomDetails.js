@@ -1,6 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useSocket } from '../../../socket/useSocket';
 
 /**
  * Hook fetch thông tin phòng chơi từ GET /api/rooms/:roomId
@@ -8,6 +10,8 @@ import { useAuth } from '../../auth/context/AuthContext';
  */
 export function useRoomDetails(roomId) {
   const { currentUser } = useAuth();
+  const queryClient = useQueryClient();
+  const { subscribe, unsubscribe, connectionStatus } = useSocket();
 
   const query = useQuery({
     queryKey: ['room', roomId],
@@ -49,6 +53,50 @@ export function useRoomDetails(roomId) {
     enabled: Boolean(roomId),
     staleTime: 5000,
   });
+
+  // Đăng ký WebSocket lắng nghe sự kiện của phòng
+  useEffect(() => {
+    if (!roomId || connectionStatus !== 'CONNECTED') return;
+
+    const topic = `/topic/room/${roomId}`;
+    const subId = subscribe(topic, (message) => {
+      try {
+        const event = JSON.parse(message.body);
+        if (!event || !event.type) return;
+
+        if (event.type === 'PLAYER_JOINED') {
+          const { role, user } = event.data || {};
+          if (!role || !user) return;
+
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+
+            // Khán giả (spectator) -> thêm vào đầu mảng
+            if (role === 'spectator') {
+              const currentSpectators = oldRoom.spectators || [];
+              const exists = currentSpectators.some((s) => s.id === user.id);
+              if (exists) return oldRoom;
+              return { ...oldRoom, spectators: [user, ...currentSpectators] };
+            }
+
+            // Người chơi (white/black) -> Cập nhật ghế
+            return {
+              ...oldRoom,
+              [role]: user
+            };
+          });
+        }
+      } catch (err) {
+        console.error('[Room Socket] Failed to parse realtime event', err);
+      }
+    });
+
+    return () => {
+      if (subId) {
+        unsubscribe(subId);
+      }
+    };
+  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient]);
 
   return {
     room: query.data,

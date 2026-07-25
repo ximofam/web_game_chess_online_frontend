@@ -1,12 +1,16 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
+import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useOnlineCount } from '../../presence/socket/presenceSocket';
 
 export function LobbyList({ onCreateRoomClick }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [joiningRoomId, setJoiningRoomId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -73,13 +77,33 @@ export function LobbyList({ onCreateRoomClick }) {
     });
   }, [rooms, statusFilter]);
 
-  const handleAction = (room) => {
-    if (room.status === 'WAITING') {
+  const handleJoinPlay = async (room) => {
+    try {
+      setJoiningRoomId(room.roomId);
       showToast(`Đang tham gia phòng "${room.name || room.roomId}"...`, 'info');
-    } else {
-      showToast(`Đang vào xem trận đấu của ${room.host?.username || 'phòng'}...`, 'info');
+      const role = room.white ? 'black' : 'white';
+      const result = await roomService.joinRoom(room.roomId, role);
+      queryClient.setQueryData(['room', room.roomId], result);
+      navigate(`/room/${room.roomId}`);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Không thể tham gia phòng', 'error');
+    } finally {
+      setJoiningRoomId(null);
     }
-    navigate(`/room/${room.roomId}`);
+  };
+
+  const handleJoinSpectate = async (room) => {
+    try {
+      setJoiningRoomId(room.roomId);
+      showToast(`Đang vào xem trận đấu của ${room.host?.username || 'phòng'}...`, 'info');
+      const result = await roomService.joinRoom(room.roomId, 'spectator');
+      queryClient.setQueryData(['room', room.roomId], result);
+      navigate(`/room/${room.roomId}`);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Không thể xem phòng', 'error');
+    } finally {
+      setJoiningRoomId(null);
+    }
   };
 
   const getTimeCategory = (mins) => {
@@ -285,26 +309,40 @@ export function LobbyList({ onCreateRoomClick }) {
 
                     {/* ACTION */}
                     <td className="py-3 pr-2 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleAction(room)}
-                        className={`py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${isWaiting
-                          ? 'bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12]'
-                          : 'bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40'
-                          }`}
-                      >
-                        {isWaiting ? (
-                          <>
-                            <Play className="w-3 h-3 fill-[#0d0e12]" />
-                            <span>VÀO CHƠI</span>
-                          </>
-                        ) : (
-                          <>
+                      {isWaiting ? (
+                        <div className="flex items-center justify-end gap-2">
+                          {!(white && black) && (
+                            <button
+                              type="button"
+                              onClick={() => handleJoinPlay(room)}
+                              disabled={joiningRoomId === room.roomId}
+                              className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                            >
+                              <Play className="w-3 h-3 fill-[#0d0e12]" />
+                              <span>VÀO CHƠI</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleJoinSpectate(room)}
+                            disabled={joiningRoomId === room.roomId}
+                            className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                          >
                             <Eye className="w-3 h-3" />
                             <span>XEM</span>
-                          </>
-                        )}
-                      </button>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleJoinSpectate(room)}
+                          disabled={joiningRoomId === room.roomId}
+                          className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>XEM</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
