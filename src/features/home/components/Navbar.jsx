@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck } from 'lucide-react';
+import { Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNotifications } from '../../notifications/context/NotificationContext';
 import NavbarAvatar from '../../profile/components/NavbarAvatar';
@@ -23,6 +23,7 @@ export const Navbar = () => {
   const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
   const { connectionStatus } = useNotifications();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -31,12 +32,16 @@ export const Navbar = () => {
   const isLearnActive = location.pathname.startsWith('/learn');
 
   const handlePlayAsGuest = async () => {
+    if (isGuestLoading) return;
+    setIsGuestLoading(true);
     try {
       await loginGuest();
       showToast(t('auth:guest_welcome_toast'), 'success');
       navigate('/dashboard');
     } catch {
       showToast(t('auth:guest_failed_toast'), 'error');
+    } finally {
+      setIsGuestLoading(false);
     }
   };
 
@@ -130,9 +135,14 @@ export const Navbar = () => {
             {/* Play as Guest Quick Trigger */}
             <button
               onClick={handlePlayAsGuest}
-              className="hidden sm:flex items-center gap-1.5 bg-[#d4af37] text-[#0d0e12] hover:bg-[#f3cd57] font-bold text-xs px-3 py-2 rounded-lg transition-all shadow cursor-pointer"
+              disabled={isGuestLoading}
+              className="hidden sm:flex items-center gap-1.5 bg-[#d4af37] text-[#0d0e12] hover:bg-[#f3cd57] disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs px-3 py-2 rounded-lg transition-all shadow cursor-pointer"
             >
-              <UserCheck className="w-4 h-4" />
+              {isGuestLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <UserCheck className="w-4 h-4" />
+              )}
               <span>{t('nav:play_as_guest')}</span>
             </button>
 
