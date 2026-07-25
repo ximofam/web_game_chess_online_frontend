@@ -7,6 +7,16 @@ import { useOnlineCount } from '../../presence/socket/presenceSocket';
 
 export function LobbyList({ onCreateRoomClick }) {
   const navigate = useNavigate();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'WAITING' | 'IN_PROGRESS'
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearchTerm(searchTerm), 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const {
     rooms,
     totalElements,
@@ -17,13 +27,10 @@ export function LobbyList({ onCreateRoomClick }) {
     hasNextPage,
     isFetchingNextPage,
     connectionStatus,
-  } = useLobbyRooms(5);
+  } = useLobbyRooms(5, debouncedSearchTerm);
   const { showToast } = useAuth();
   const onlineCount = useOnlineCount();
   const containerRef = useRef(null);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'WAITING' | 'IN_PROGRESS'
 
   // Scroll listener for Infinite Pagination
   const handleScroll = (e) => {
@@ -62,16 +69,9 @@ export function LobbyList({ onCreateRoomClick }) {
     return rooms.filter((room) => {
       if (statusFilter === 'WAITING' && room.status !== 'WAITING') return false;
       if (statusFilter === 'IN_PROGRESS' && room.status !== 'IN_PROGRESS') return false;
-
-      if (searchTerm.trim() !== '') {
-        const term = searchTerm.toLowerCase();
-        const roomName = (room.name || '').toLowerCase();
-        const hostName = (room.host?.username || '').toLowerCase();
-        return roomName.includes(term) || hostName.includes(term);
-      }
       return true;
     });
-  }, [rooms, statusFilter, searchTerm]);
+  }, [rooms, statusFilter]);
 
   const handleAction = (room) => {
     if (room.status === 'WAITING') {

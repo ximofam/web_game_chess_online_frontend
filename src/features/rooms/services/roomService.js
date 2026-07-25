@@ -6,12 +6,12 @@ import { authClient } from '../../auth/api/authClient';
 export const roomService = {
   /**
    * Lấy danh sách phòng chơi đang có ở sảnh (Lobby)
-   * GET /api/rooms?page=0&size=20
+   * GET /api/rooms?page=0&size=20&q=...
    */
-  getRooms: async (page = 0, size = 20) => {
-    const response = await authClient.get('/api/rooms', {
-      params: { page, size },
-    });
+  getRooms: async (page = 0, size = 20, q = '') => {
+    const params = { page, size };
+    if (q) params.q = q;
+    const response = await authClient.get('/api/rooms', { params });
     return response.data;
   },
 

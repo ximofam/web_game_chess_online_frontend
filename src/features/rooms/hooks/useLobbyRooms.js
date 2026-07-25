@@ -7,7 +7,7 @@ import { useSocket } from '../../../socket/useSocket';
  * Custom Hook quản lý danh sách phòng chơi ở Sảnh (Lobby)
  * Hỗ trợ Phân trang cuộn vô tận (Infinite Scroll), Tổng số lượng phòng (totalElements) & Realtime STOMP Topic `/topic/lobbies`
  */
-export function useLobbyRooms(size = 20) {
+export function useLobbyRooms(size = 20, searchTerm = '') {
   const queryClient = useQueryClient();
   const { subscribe, unsubscribe, connectionStatus } = useSocket();
 
@@ -22,8 +22,8 @@ export function useLobbyRooms(size = 20) {
     error,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ['rooms', 'lobby', size],
-    queryFn: ({ pageParam = 0 }) => roomService.getRooms(pageParam, size),
+    queryKey: ['rooms', 'lobby', size, searchTerm],
+    queryFn: ({ pageParam = 0 }) => roomService.getRooms(pageParam, size, searchTerm),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage) return undefined;
@@ -80,7 +80,7 @@ export function useLobbyRooms(size = 20) {
         const event = JSON.parse(message.body);
         if (!event || !event.type) return;
 
-        queryClient.setQueryData(['rooms', 'lobby', size], (oldData) => {
+        queryClient.setQueryData(['rooms', 'lobby', size, searchTerm], (oldData) => {
           if (!oldData || !oldData.pages || oldData.pages.length === 0) return oldData;
 
           const newPages = oldData.pages.map((pageData, index) => {
@@ -159,7 +159,7 @@ export function useLobbyRooms(size = 20) {
         unsubscribe(subId);
       }
     };
-  }, [connectionStatus, subscribe, unsubscribe, queryClient, size]);
+  }, [connectionStatus, subscribe, unsubscribe, queryClient, size, searchTerm]);
 
   return {
     rooms,
