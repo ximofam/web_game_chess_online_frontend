@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Clock, Shield, Lock, Globe, Sparkles, Loader2, Play } from 'lucide-react';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../socket/useSocket';
 
 export function CreateRoomModal({ isOpen, onClose, onCreated }) {
+  const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
   const { connectionStatus } = useSocket();
 
@@ -56,12 +58,15 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
       };
 
       const result = await roomService.createRoom(payload);
+      const createdId = result?.roomId || result?.id || 'room-123';
+
       showToast('Tạo phòng chơi thành công!', 'success');
       
       if (onCreated) {
         onCreated(result);
       }
       onClose();
+      navigate(`/room/${createdId}`);
     } catch (err) {
       const status = err.response?.status;
       const msg = err.response?.data?.message || 'Không thể tạo phòng. Vui lòng thử lại sau.';

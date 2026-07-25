@@ -1,10 +1,12 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useOnlineCount } from '../../presence/socket/presenceSocket';
 
 export function LobbyList({ onCreateRoomClick }) {
+  const navigate = useNavigate();
   const {
     rooms,
     totalElements,
@@ -77,6 +79,7 @@ export function LobbyList({ onCreateRoomClick }) {
     } else {
       showToast(`Đang vào xem trận đấu của ${room.host?.username || 'phòng'}...`, 'info');
     }
+    navigate(`/room/${room.roomId}`);
   };
 
   const getTimeCategory = (mins) => {

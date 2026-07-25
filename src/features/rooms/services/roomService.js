@@ -33,4 +33,14 @@ export const roomService = {
     const response = await authClient.post(`/api/rooms/${roomId}/join`, { side });
     return response.data;
   },
+
+  /**
+   * Lấy chi tiết thông tin một phòng chơi
+   * GET /api/rooms/:roomId
+   */
+  getRoomDetails: async (roomId) => {
+    const response = await authClient.get(`/api/rooms/${roomId}`);
+    return response.data;
+  },
 };
+
