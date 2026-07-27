@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Maximize2, X, Clock, Users, Sparkles } from 'lucide-react';
 import { activeRoomManager } from '../services/activeRoomManager';
+import { useAuth } from '../../auth/context/AuthContext';
+import { roomService } from '../services/roomService';
+import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Floating Room Widget cho phép thu nhỏ phòng chờ ở góc màn hình.
@@ -11,6 +14,8 @@ export function FloatingRoomWidget() {
   const [activeRoom, setActiveRoom] = useState(() => activeRoomManager.getRoom());
   const location = useLocation();
   const navigate = useNavigate();
+  const { showToast } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     return activeRoomManager.subscribe((room) => {
@@ -33,9 +38,18 @@ export function FloatingRoomWidget() {
     navigate(`/room/${roomId}`);
   };
 
-  const handleLeave = (e) => {
+  const handleLeave = async (e) => {
     e.stopPropagation();
-    activeRoomManager.clearRoom();
+    try {
+      await roomService.leaveRoom(roomId);
+      showToast('Đã rời khỏi phòng chơi', 'info');
+      queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+      activeRoomManager.clearRoom();
+    } catch (err) {
+      showToast('Lỗi khi rời phòng: ' + (err.response?.data?.message || err.message), 'error');
+      queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+      activeRoomManager.clearRoom(); // fallback in case room is already gone
+    }
   };
 
   return (

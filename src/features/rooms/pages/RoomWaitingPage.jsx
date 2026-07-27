@@ -8,11 +8,14 @@ import { RoomSpectators } from '../components/RoomSpectators';
 import { RoomBoardPreview } from '../components/RoomBoardPreview';
 import { RoomZoomControls } from '../components/RoomZoomControls';
 import { useAuth } from '../../auth/context/AuthContext';
+import { roomService } from '../services/roomService';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function RoomWaitingPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
+  const queryClient = useQueryClient();
   const { room, isLoading, isError, refetch } = useRoomDetails(roomId);
 
   // Zoom scale state (0.75 -> 1.30)
@@ -69,9 +72,18 @@ export function RoomWaitingPage() {
     }, 1200);
   };
 
-  const handleLeaveRoom = () => {
-    showToast('Đã rời khỏi phòng chơi', 'info');
-    navigate('/dashboard');
+  const handleLeaveRoom = async () => {
+    try {
+      await roomService.leaveRoom(roomId);
+      showToast('Đã rời khỏi phòng chơi', 'info');
+      queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+      navigate('/dashboard');
+    } catch (err) {
+      showToast('Lỗi khi rời phòng: ' + (err.response?.data?.message || err.message), 'error');
+      // Nếu phòng không tồn tại (-1) hoặc bị xoá, vẫn cho user về dashboard
+      queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+      navigate('/dashboard');
+    }
   };
 
   const handleSeatChange = (side) => {

@@ -43,5 +43,14 @@ export const roomService = {
     const response = await authClient.get(`/api/rooms/${roomId}`);
     return response.data;
   },
+
+  /**
+   * Rời khỏi phòng chơi
+   * POST /api/rooms/:roomId/leave
+   */
+  leaveRoom: async (roomId) => {
+    const response = await authClient.post(`/api/rooms/${roomId}/leave`);
+    return response.data;
+  },
 };
 
