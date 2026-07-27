@@ -34,9 +34,11 @@ class StompClientManager {
 
     this.setStatus('CONNECTING');
 
-    const wsUrl = API_BASE_URL
-      ? `${API_BASE_URL.replace(/\/$/, '')}/ws`
-      : `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}/ws`;
+    // Ưu tiên VITE_WS_URL (cấu hình trực tiếp URL STOMP server, ví dụ cho Vercel)
+    // Nếu không có, dùng API_BASE_URL (ví dụ khi chạy local)
+    // Nếu cả 2 đều không có, dùng domain hiện tại làm fallback.
+    const baseWsUrl = import.meta.env.VITE_WS_URL || API_BASE_URL || `${window.location.protocol === 'https:' ? 'https:' : 'http:'}//${window.location.host}`;
+    const wsUrl = `${baseWsUrl.replace(/\/$/, '')}/ws`;
 
     const token = getAccessToken();
 
