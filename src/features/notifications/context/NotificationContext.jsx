@@ -89,7 +89,7 @@ export const NotificationProvider = ({ children }) => {
 
   // Subscribe to real-time notification events via notificationSocket adapter
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || connectionStatus !== 'CONNECTED') return;
 
     const unsubscribe = subscribeToNotifications(socket, (event) => {
       if (event.type === NOTIFICATION_EVENTS.NEW) {
@@ -103,7 +103,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       unsubscribe();
     };
-  }, [isAuthenticated, socket, showToast]);
+  }, [isAuthenticated, socket, showToast, connectionStatus]);
 
   const value = {
     notifications,
