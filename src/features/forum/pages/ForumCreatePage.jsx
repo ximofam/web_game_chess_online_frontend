@@ -46,9 +46,9 @@ export default function ForumCreatePage() {
     setIsSubmitting(true);
 
     try {
-      const post = await forumService.createPost({ title, content: contentStr });
+      await forumService.createPost({ title, content: contentStr });
       showToast('Bài viết đã được gửi và đang chờ duyệt!', 'success');
-      navigate(`/forum/posts/${post.id}`);
+      navigate('/forum/my-posts');
     } catch (err) {
       const msg = err.response?.data?.message ?? 'Không thể tạo bài viết. Thử lại sau.';
       showToast(msg, 'error');
