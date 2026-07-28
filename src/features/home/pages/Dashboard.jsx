@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../auth/context/AuthContext';
+import { useAuth } from '../../auth/context/AuthContext';
 import { User, Shield, LogIn, Sparkles } from 'lucide-react';
-import { PlayModeCards } from '../rooms/components/PlayModeCards';
-import { CreateRoomModal } from '../rooms/components/CreateRoomModal';
-import { MatchmakingModal } from '../rooms/components/MatchmakingModal';
-import { LobbyList } from '../rooms/components/LobbyList';
+import { PlayModeCards } from '../../rooms/components/PlayModeCards';
+import { CreateRoomModal } from '../../rooms/components/CreateRoomModal';
+import { MatchmakingModal } from '../../rooms/components/MatchmakingModal';
+import { LobbyList } from '../../rooms/components/LobbyList';
 
 export default function Dashboard() {
   const { currentUser, isGuest } = useAuth();

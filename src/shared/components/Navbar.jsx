@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Home, MessageSquare, BookOpen, LogIn, UserPlus, UserCheck, Loader2 } from 'lucide-react';
-import { useAuth } from '../../auth/context/AuthContext';
-import { useNotifications } from '../../notifications/context/NotificationContext';
-import NavbarAvatar from '../../profile/components/NavbarAvatar';
-import AvatarDropdown from '../../profile/components/AvatarDropdown';
-import NotificationBell from '../../notifications/components/NotificationBell';
+import { useAuth } from '../../features/auth/context/AuthContext';
+import { useNotifications } from '../../features/notifications/context/NotificationContext';
+import NavbarAvatar from '../../features/profile/components/NavbarAvatar';
+import AvatarDropdown from '../../features/profile/components/AvatarDropdown';
+import NotificationBell from '../../features/notifications/components/NotificationBell';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">

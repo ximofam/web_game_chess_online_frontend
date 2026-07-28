@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../features/auth/context/AuthContext';
-import Navbar from '../features/home/components/Navbar';
+import Navbar from '../shared/components/Navbar';
 import Footer from '../shared/components/Footer';
 
 /**
