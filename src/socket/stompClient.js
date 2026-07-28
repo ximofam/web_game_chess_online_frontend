@@ -1,6 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getAccessToken, API_BASE_URL } from '../features/auth/api/authClient';
+import { getAccessToken, API_BASE_URL, refreshToken } from '../features/auth/api/authClient';
 
 class StompClientManager {
   constructor() {
@@ -63,8 +63,27 @@ class StompClientManager {
         this.setStatus('DISCONNECTED');
         console.log('[STOMP Manager] Disconnected from WS server.');
       },
-      onStompError: (frame) => {
+      onStompError: async (frame) => {
         console.error('[STOMP Manager] STOMP Protocol Error', frame);
+
+        if (frame.headers && frame.headers.message && frame.headers.message.includes('Invalid JWT token')) {
+          console.log('[STOMP Manager] Token expired. Triggering refresh...');
+          try {
+            await refreshToken();
+            console.log('[STOMP Manager] Token refreshed. Reconnecting immediately...');
+
+            // Force immediate reconnect instead of waiting for reconnectDelay
+            if (this.client) {
+              this.client.deactivate();
+              setTimeout(() => {
+                if (this.client) this.client.activate();
+              }, 100);
+            }
+          } catch (err) {
+            console.error('[STOMP Manager] Token refresh failed during STOMP error.', err);
+          }
+        }
+
         this.setStatus('DISCONNECTED');
         if (onErrorCallback) onErrorCallback(frame);
       },

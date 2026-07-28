@@ -48,6 +48,45 @@ authClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const refreshToken = async () => {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      refreshSubscribers.push((newToken) => {
+        if (newToken) resolve(newToken);
+        else reject(new Error('Refresh failed'));
+      });
+    });
+  }
+
+  isRefreshing = true;
+
+  try {
+    const response = await authClient.post('/api/auth/refresh');
+    const newToken = response.data.accessToken;
+
+    setAccessToken(newToken);
+    isRefreshing = false;
+
+    // Execute all waiting requests with the new token
+    refreshSubscribers.forEach((callback) => callback(newToken));
+    refreshSubscribers = [];
+
+    return newToken;
+  } catch (refreshError) {
+    isRefreshing = false;
+    refreshSubscribers.forEach((callback) => callback(null));
+    refreshSubscribers = [];
+    memoryToken = null;
+
+    // Trigger global logout (clears context)
+    if (onLogoutCallback) {
+      onLogoutCallback();
+    }
+
+    throw refreshError;
+  }
+};
+
 // Response Interceptor: Catch 401s, run transparent token refresh
 authClient.interceptors.response.use(
   (response) => response,
@@ -58,43 +97,12 @@ authClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
       originalRequest._retry = true;
 
-      if (isRefreshing) {
-        // Wait for the ongoing refresh process to finish and retry
-        return new Promise((resolve) => {
-          refreshSubscribers.push((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            resolve(authClient(originalRequest));
-          });
-        });
-      }
-
-      isRefreshing = true;
-
       try {
-        // Call refresh token endpoint
-        const response = await authClient.post('/api/auth/refresh');
-        const newToken = response.data.accessToken;
-
-        setAccessToken(newToken);
-        isRefreshing = false;
-
-        // Execute all waiting requests with the new token
-        refreshSubscribers.forEach((callback) => callback(newToken));
-        refreshSubscribers = [];
-
+        const newToken = await refreshToken();
         // Retry the original request
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return authClient(originalRequest);
       } catch (refreshError) {
-        isRefreshing = false;
-        refreshSubscribers = [];
-        memoryToken = null;
-
-        // Trigger global logout (clears context)
-        if (onLogoutCallback) {
-          onLogoutCallback();
-        }
-
         return Promise.reject(refreshError);
       }
     }
