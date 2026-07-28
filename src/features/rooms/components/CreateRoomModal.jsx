@@ -55,7 +55,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
           incrementSeconds: Number(incrementSeconds),
           variant,
           rated,
-          isPrivate,
+          "private": isPrivate,
         },
       };
 
@@ -148,8 +148,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
                     setIncrementSeconds(preset.inc);
                   }}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${timeMinutes === preset.time && incrementSeconds === preset.inc
-                      ? 'bg-[#d4af37] text-[#0d0e12] border-[#d4af37] font-bold shadow-md'
-                      : 'bg-[#13161c] text-[#9ca3af] border-[#2d323f] hover:border-[#d4af37]/40 hover:text-[#f3f4f6]'
+                    ? 'bg-[#d4af37] text-[#0d0e12] border-[#d4af37] font-bold shadow-md'
+                    : 'bg-[#13161c] text-[#9ca3af] border-[#2d323f] hover:border-[#d4af37]/40 hover:text-[#f3f4f6]'
                     }`}
                 >
                   {preset.label}
@@ -203,8 +203,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               type="button"
               onClick={() => setRated(!rated)}
               className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${rated
-                  ? 'bg-[#d4af37]/10 border-[#d4af37]/50 text-[#d4af37]'
-                  : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
+                ? 'bg-[#d4af37]/10 border-[#d4af37]/50 text-[#d4af37]'
+                : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
                 }`}
             >
               <div className="flex items-center gap-2">
@@ -220,8 +220,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               type="button"
               onClick={() => setIsPrivate(!isPrivate)}
               className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${isPrivate
-                  ? 'bg-[#38bdf8]/10 border-[#38bdf8]/50 text-[#38bdf8]'
-                  : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
+                ? 'bg-[#38bdf8]/10 border-[#38bdf8]/50 text-[#38bdf8]'
+                : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
                 }`}
             >
               <div className="flex items-center gap-2">

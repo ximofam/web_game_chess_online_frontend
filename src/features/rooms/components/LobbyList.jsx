@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users } from 'lucide-react';
+import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users, Lock } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -252,6 +252,8 @@ export function LobbyList({ onCreateRoomClick }) {
                 const isRated = settings.rated !== false;
                 const category = getTimeCategory(timeMinutes);
                 const isWaiting = status === 'WAITING';
+                const isPrivate = settings.private || settings.isPrivate;
+                const isSpectatorLocked = settings.spectatorLocked;
 
                 return (
                   <tr key={roomId} className="group hover:bg-[#13161c]/80 transition-colors">
@@ -309,7 +311,14 @@ export function LobbyList({ onCreateRoomClick }) {
 
                     {/* ACTION */}
                     <td className="py-3 pr-2 text-right">
-                      {isWaiting ? (
+                      {isPrivate ? (
+                        <div className="flex items-center justify-end">
+                          <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
+                            <Lock className="w-3 h-3" />
+                            Phòng kín
+                          </span>
+                        </div>
+                      ) : isWaiting ? (
                         <div className="flex items-center justify-end gap-2">
                           {!(white && black) && (
                             <button
@@ -322,26 +331,43 @@ export function LobbyList({ onCreateRoomClick }) {
                               <span>VÀO CHƠI</span>
                             </button>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => handleJoinSpectate(room)}
-                            disabled={joiningRoomId === room.roomId}
-                            className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-                          >
-                            <Eye className="w-3 h-3" />
-                            <span>XEM</span>
-                          </button>
+                          {!isSpectatorLocked && (
+                            <button
+                              type="button"
+                              onClick={() => handleJoinSpectate(room)}
+                              disabled={joiningRoomId === room.roomId}
+                              className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>XEM</span>
+                            </button>
+                          )}
+                          {isSpectatorLocked && (white && black) && (
+                            <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
+                              <Lock className="w-3 h-3" />
+                              Khóa xem
+                            </span>
+                          )}
                         </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleJoinSpectate(room)}
-                          disabled={joiningRoomId === room.roomId}
-                          className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-                        >
-                          <Eye className="w-3 h-3" />
-                          <span>XEM</span>
-                        </button>
+                        <div className="flex items-center justify-end">
+                          {!isSpectatorLocked ? (
+                            <button
+                              type="button"
+                              onClick={() => handleJoinSpectate(room)}
+                              disabled={joiningRoomId === room.roomId}
+                              className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>XEM</span>
+                            </button>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
+                              <Lock className="w-3 h-3" />
+                              Khóa xem
+                            </span>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
