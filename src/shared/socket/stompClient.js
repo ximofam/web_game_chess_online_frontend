@@ -1,6 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getAccessToken, API_BASE_URL, refreshToken } from '../features/auth/api/authClient';
+import { getAccessToken, API_BASE_URL, refreshToken } from '../../features/auth/api/authClient';
 
 class StompClientManager {
   constructor() {

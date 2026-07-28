@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
-import { useSocket } from '../../../socket/useSocket';
+import { useSocket } from '../../../shared/socket/useSocket';
 
 /**
  * Hook fetch thông tin phòng chơi từ GET /api/rooms/:roomId

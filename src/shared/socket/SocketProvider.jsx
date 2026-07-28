@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../features/auth/context/AuthContext';
+import { useAuth } from '../../features/auth/context/AuthContext';
 import { stompClientManager } from './stompClient';
 import { mockSocketManager } from './mockSocket';
 

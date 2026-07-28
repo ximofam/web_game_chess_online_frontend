@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
-import { SocketProvider } from './socket/SocketProvider';
+import { SocketProvider } from './shared/socket/SocketProvider';
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
 import PublicLayout from './layouts/PublicLayout';
 import ProtectedLayout from './layouts/ProtectedLayout';
@@ -19,6 +19,9 @@ import LearnOverviewPage from './features/learn/pages/LearnOverviewPage';
 import LessonDetailPage from './features/learn/pages/LessonDetailPage';
 import PlayBotPage from './features/learn/pages/PlayBotPage';
 import RoomWaitingPage from './features/rooms/pages/RoomWaitingPage';
+import GlobalApiErrorHandler from './shared/errors/components/GlobalApiErrorHandler';
+import NotFoundPage from './shared/errors/pages/NotFoundPage';
+import ForbiddenPage from './shared/errors/pages/ForbiddenPage';
 
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
@@ -42,6 +45,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <GlobalApiErrorHandler />
         <AuthProvider>
           <SocketProvider>
             <NotificationProvider>
@@ -61,6 +65,8 @@ function App() {
                   <Route path="/learn/:lessonId" element={<LessonDetailPage />} />
                   <Route path="/forum" element={<ForumListPage />} />
                   <Route path="/forum/posts/:id" element={<PostDetailPage />} />
+                  <Route path="/403" element={<ForbiddenPage />} />
+                  <Route path="/404" element={<NotFoundPage />} />
                 </Route>
 
                 {/* Registered User Only Routes */}
@@ -72,7 +78,7 @@ function App() {
                 </Route>
 
                 {/* Catch-all Redirect */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/404" replace />} />
               </Routes>
             </NotificationProvider>
           </SocketProvider>

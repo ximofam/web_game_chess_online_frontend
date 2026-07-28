@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { X, Clock, Shield, Lock, Globe, Sparkles, Loader2, Play } from 'lucide-react';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
-import { useSocket } from '../../../socket/useSocket';
+import { useSocket } from '../../../shared/socket/useSocket';
 
 export function CreateRoomModal({ isOpen, onClose, onCreated }) {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
       queryClient.setQueryData(['room', createdId], result);
 
       showToast('Tạo phòng chơi thành công!', 'success');
-      
+
       if (onCreated) {
         onCreated(result);
       }
@@ -75,7 +75,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
     } catch (err) {
       const status = err.response?.status;
       const msg = err.response?.data?.message || 'Không thể tạo phòng. Vui lòng thử lại sau.';
-      
+
       if (status === 403) {
         showToast('Tạo phòng thất bại: Bạn phải duy trì kết nối WebSocket để khởi tạo phòng.', 'error');
       } else {
@@ -147,11 +147,10 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
                     setTimeMinutes(preset.time);
                     setIncrementSeconds(preset.inc);
                   }}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
-                    timeMinutes === preset.time && incrementSeconds === preset.inc
+                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${timeMinutes === preset.time && incrementSeconds === preset.inc
                       ? 'bg-[#d4af37] text-[#0d0e12] border-[#d4af37] font-bold shadow-md'
                       : 'bg-[#13161c] text-[#9ca3af] border-[#2d323f] hover:border-[#d4af37]/40 hover:text-[#f3f4f6]'
-                  }`}
+                    }`}
                 >
                   {preset.label}
                 </button>
@@ -203,11 +202,10 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
             <button
               type="button"
               onClick={() => setRated(!rated)}
-              className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
-                rated
+              className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${rated
                   ? 'bg-[#d4af37]/10 border-[#d4af37]/50 text-[#d4af37]'
                   : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
@@ -221,11 +219,10 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
             <button
               type="button"
               onClick={() => setIsPrivate(!isPrivate)}
-              className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
-                isPrivate
+              className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${isPrivate
                   ? 'bg-[#38bdf8]/10 border-[#38bdf8]/50 text-[#38bdf8]'
                   : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2">
                 {isPrivate ? <Lock className="w-4 h-4" /> : <Globe className="w-4 h-4" />}

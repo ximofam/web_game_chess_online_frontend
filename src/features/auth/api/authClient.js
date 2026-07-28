@@ -107,6 +107,14 @@ authClient.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 403) {
+      window.dispatchEvent(new Event('api:403'));
+    }
+
+    if (error.response?.status === 404) {
+      window.dispatchEvent(new Event('api:404'));
+    }
+
     return Promise.reject(error);
   }
 );
@@ -206,8 +214,8 @@ if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
       name: idx === 0
         ? 'Giao lưu Cờ Chớp Blitz 3m+2s'
         : idx === 1
-        ? 'Thách Đấu Cờ Nhanh 10m'
-        : `Phòng Cờ Giao Lưu #${100 + idx}`,
+          ? 'Thách Đấu Cờ Nhanh 10m'
+          : `Phòng Cờ Giao Lưu #${100 + idx}`,
       host,
       createdAt: Date.now() - (idx * 120000),
       settings: {

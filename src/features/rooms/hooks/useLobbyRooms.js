@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
-import { useSocket } from '../../../socket/useSocket';
+import { useSocket } from '../../../shared/socket/useSocket';
 
 /**
  * Custom Hook quản lý danh sách phòng chơi ở Sảnh (Lobby)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSocket } from '../../../socket/useSocket';
+import { useSocket } from '../../../shared/socket/useSocket';
 
 /**
  * Presence Socket Adapter
