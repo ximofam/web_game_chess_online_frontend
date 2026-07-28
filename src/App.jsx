@@ -9,6 +9,7 @@ import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 import LandingPage from './features/home/pages/LandingPage';
 import Dashboard from './features/home/pages/Dashboard';
+import ProfilePage from './features/profile/pages/ProfilePage';
 import NotificationsPage from './features/notifications/pages/NotificationsPage';
 import ForumListPage from './features/forum/pages/ForumListPage';
 import ForumCreatePage from './features/forum/pages/ForumCreatePage';
