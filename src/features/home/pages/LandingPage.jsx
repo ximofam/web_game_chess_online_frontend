@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Trophy, Zap, MessageSquare, ShieldCheck, UserCheck, ArrowRight, Sparkles, Award } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 
@@ -7,6 +8,7 @@ import { useAuth } from '../../auth/context/AuthContext';
  * Features hero showcase, guest quick start, feature highlights, and forum preview.
  */
 export const LandingPage = () => {
+  const { t } = useTranslation(['home']);
   const { loginGuest, showToast } = useAuth();
   const navigate = useNavigate();
 
@@ -31,20 +33,19 @@ export const LandingPage = () => {
         {/* Hero Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c1f28] border border-[#d4af37]/30 text-[#d4af37] text-xs font-semibold uppercase tracking-wider mb-6 z-10 animate-fade-in shadow-lg">
           <Sparkles className="w-4 h-4 text-[#d4af37]" />
-          <span>Đấu trường Cờ Vua Realtime</span>
+          <span>{t('home:hero_badge')}</span>
         </div>
 
         {/* Main Title & Subtitle */}
         <h1 className="font-playfair text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#f3f4f6] max-w-4xl leading-tight z-10 mb-6">
-          Master the Board. <br className="hidden sm:inline" />
+          {t('home:hero_title_line1')} <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-[#d4af37] via-[#f3cd57] to-[#b59226] bg-clip-text text-transparent">
-            Dominate the Arena.
+            {t('home:hero_title_line2')}
           </span>
         </h1>
 
         <p className="font-inter text-base sm:text-lg text-[#9ca3af] max-w-2xl leading-relaxed mb-10 z-10">
-          Trải nghiệm hệ thống đấu cờ vua trực tuyến hiện đại với tốc độ truyền tải realtime, 
-          hệ thống tính điểm Elo chuẩn quốc tế và diễn đàn phân tích thế cờ chuyên sâu.
+          {t('home:hero_subtitle')}
         </p>
 
         {/* Hero CTA Action Buttons */}
@@ -54,14 +55,14 @@ export const LandingPage = () => {
             className="w-full sm:w-auto bg-[#d4af37] text-[#0d0e12] font-bold py-3.5 px-7 rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer text-sm tracking-wide shadow-md"
           >
             <UserCheck className="w-5 h-5" />
-            <span>PLAY AS GUEST</span>
+            <span>{t('home:play_as_guest_btn')}</span>
           </button>
 
           <Link
             to="/login"
             className="w-full sm:w-auto bg-[#1a1d24] border border-[#373d4e] text-[#f3f4f6] hover:bg-[#252a35] hover:border-[#d4af37]/50 font-bold py-3.5 px-7 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-sm tracking-wide cursor-pointer shadow-md"
           >
-            <span>SIGN IN TO PLAY</span>
+            <span>{t('home:sign_in_btn')}</span>
             <ArrowRight className="w-4 h-4 text-[#d4af37]" />
           </Link>
         </div>
@@ -85,10 +86,10 @@ export const LandingPage = () => {
         <div className="max-w-6xl w-full">
           <div className="text-center mb-12">
             <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-[#f3f4f6] mb-3">
-              Tính năng Nổi bật
+              {t('home:features_title')}
             </h2>
             <p className="text-sm text-[#9ca3af] max-w-xl mx-auto">
-              Được thiết kế cho kỳ thủ ở mọi trình độ – từ đấu tập giao hữu đến giải đấu xếp hạng đỉnh cao.
+              {t('home:features_subtitle')}
             </p>
           </div>
 
@@ -99,10 +100,10 @@ export const LandingPage = () => {
                 <Zap className="w-6 h-6" />
               </div>
               <h3 className="font-playfair text-lg font-bold text-[#f3f4f6] m-0">
-                STOMP WebSocket Realtime
+                {t('home:feat_stomp_title')}
               </h3>
               <p className="text-xs text-[#9ca3af] leading-relaxed">
-                Kết nối thi đấu với độ trễ tối thiểu thông qua giao thức WebSocket và Pub/Sub Message Relay tự động.
+                {t('home:feat_stomp_desc')}
               </p>
             </div>
 
@@ -112,10 +113,10 @@ export const LandingPage = () => {
                 <Trophy className="w-6 h-6" />
               </div>
               <h3 className="font-playfair text-lg font-bold text-[#f3f4f6] m-0">
-                Xếp hạng & Elo Bảng điểm
+                {t('home:feat_elo_title')}
               </h3>
               <p className="text-xs text-[#9ca3af] leading-relaxed">
-                Hệ thống tính điểm Elo chuẩn xác theo chuẩn FIDE, giúp bạn theo dõi đà tăng trưởng kỹ năng cờ vua.
+                {t('home:feat_elo_desc')}
               </p>
             </div>
 
@@ -125,16 +126,16 @@ export const LandingPage = () => {
                 <MessageSquare className="w-6 h-6" />
               </div>
               <h3 className="font-playfair text-lg font-bold text-[#f3f4f6] m-0">
-                Diễn đàn Phân tích Thế cờ
+                {t('home:feat_forum_title')}
               </h3>
               <p className="text-xs text-[#9ca3af] leading-relaxed mb-1">
-                Giao lưu, chia sẻ bài viết chiến thuật và thảo luận về các ván cờ kinh điển cùng cộng đồng kỳ thủ.
+                {t('home:feat_forum_desc')}
               </p>
               <Link
                 to="/forum"
                 className="text-xs font-semibold text-[#d4af37] hover:underline flex items-center gap-1 mt-auto"
               >
-                <span>Xem Diễn đàn</span>
+                <span>{t('home:view_forum')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -147,10 +148,10 @@ export const LandingPage = () => {
         <div className="max-w-2xl flex flex-col items-center gap-4">
           <Award className="w-10 h-10 text-[#d4af37]" />
           <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6]">
-            Sẵn sàng nhập cuộc Đấu trường?
+            {t('home:cta_ready_title')}
           </h2>
           <p className="text-xs text-[#9ca3af] leading-relaxed">
-            Đăng ký tài khoản Chess Arena hoặc tham gia ngay lập tức dưới dạng Khách để bắt đầu trận đấu đầu tiên.
+            {t('home:cta_ready_desc')}
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
@@ -158,13 +159,13 @@ export const LandingPage = () => {
               onClick={handlePlayAsGuest}
               className="bg-[#d4af37] text-[#0d0e12] font-bold text-xs py-2.5 px-5 rounded-lg hover:bg-[#f3cd57] transition-all cursor-pointer"
             >
-              CHƠI NHANH VỚI KHÁCH
+              {t('home:quick_guest_btn')}
             </button>
             <Link
               to="/register"
               className="bg-[#242834] border border-[#373d4e] text-[#f3f4f6] font-bold text-xs py-2.5 px-5 rounded-lg hover:bg-[#2d3242] transition-all"
             >
-              ĐĂNG KÝ TÀI KHOẢN MỚI
+              {t('home:register_new_account')}
             </Link>
           </div>
         </div>

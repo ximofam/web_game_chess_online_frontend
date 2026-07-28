@@ -1,6 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
+import { useTranslation } from 'react-i18next';
 import { forumService } from '../services/forumService';
 import {
   Bold, Italic, Strikethrough, List, ListOrdered,
@@ -32,7 +33,9 @@ function ToolbarBtn({ onClick, active, title, children }) {
  * @param {Function} props.onChange  Called with editor JSON doc on each change
  * @param {string}   [props.placeholder]
  */
-export default function TiptapEditor({ onChange, placeholder = 'Nội dung bài viết...' }) {
+export default function TiptapEditor({ onChange, placeholder }) {
+  const { t } = useTranslation(['forum']);
+  const finalPlaceholder = placeholder || t('forum:post_content_placeholder');
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -92,11 +95,11 @@ export default function TiptapEditor({ onChange, placeholder = 'Nội dung bài 
         {btn(() => editor.chain().focus().toggleStrike().run(), 'Strikethrough', Strikethrough, editor.isActive('strike'))}
         <span className="w-px h-5 bg-[#2d323f] mx-1" />
         {btn(() => editor.chain().focus().toggleHeading({ level: 2 }).run(), 'Heading', Heading2, editor.isActive('heading', { level: 2 }))}
-        {btn(() => editor.chain().focus().toggleBulletList().run(), 'Danh sách', List, editor.isActive('bulletList'))}
-        {btn(() => editor.chain().focus().toggleOrderedList().run(), 'Danh sách số', ListOrdered, editor.isActive('orderedList'))}
-        {btn(() => editor.chain().focus().toggleBlockquote().run(), 'Trích dẫn', Quote, editor.isActive('blockquote'))}
+        {btn(() => editor.chain().focus().toggleBulletList().run(), t('forum:bullet_list'), List, editor.isActive('bulletList'))}
+        {btn(() => editor.chain().focus().toggleOrderedList().run(), t('forum:ordered_list'), ListOrdered, editor.isActive('orderedList'))}
+        {btn(() => editor.chain().focus().toggleBlockquote().run(), t('forum:blockquote'), Quote, editor.isActive('blockquote'))}
         <span className="w-px h-5 bg-[#2d323f] mx-1" />
-        <ToolbarBtn onClick={handleImageUpload} title="Thêm ảnh">
+        <ToolbarBtn onClick={handleImageUpload} title={t('forum:add_image')}>
           <ImagePlus className="w-3.5 h-3.5" />
         </ToolbarBtn>
         <span className="flex-1" />
@@ -110,7 +113,7 @@ export default function TiptapEditor({ onChange, placeholder = 'Nội dung bài 
       {/* Placeholder shown when empty */}
       {editor.isEmpty && (
         <p className="absolute top-[52px] left-4 text-sm text-[#9ca3af]/60 pointer-events-none select-none">
-          {placeholder}
+          {finalPlaceholder}
         </p>
       )}
     </div>

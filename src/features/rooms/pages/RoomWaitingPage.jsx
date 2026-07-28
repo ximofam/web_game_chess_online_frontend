@@ -11,7 +11,10 @@ import { roomService } from '../services/roomService';
 import { activeRoomManager } from '../services/activeRoomManager';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useTranslation } from 'react-i18next';
+
 export function RoomWaitingPage() {
+  const { t } = useTranslation(['room']);
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
@@ -35,10 +38,10 @@ export function RoomWaitingPage() {
   const handleConfirmLeave = async () => {
     try {
       await roomService.leaveRoom(roomId);
-      showToast('Đã rời khỏi phòng chơi', 'info');
+      showToast(t('room:leaveRoomSuccess', 'Left the room'), 'info');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     } catch (err) {
-      showToast('Lỗi khi rời phòng: ' + (err.response?.data?.message || err.message), 'error');
+      showToast(t('room:leaveRoomError', 'Error leaving room: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     }
     bypassBlockerRef.current = true;
@@ -51,7 +54,7 @@ export function RoomWaitingPage() {
 
   const handleConfirmMinimize = () => {
     activeRoomManager.setRoom(room);
-    showToast('Đã thu nhỏ phòng cờ ở góc màn hình!', 'info');
+    showToast(t('room:minimizeSuccess', 'Room minimized to screen corner!'), 'info');
     bypassBlockerRef.current = true;
     if (blocker.state === 'blocked') {
       blocker.proceed();
@@ -75,7 +78,7 @@ export function RoomWaitingPage() {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 space-y-4 text-center">
         <Loader2 className="w-10 h-10 animate-spin text-[#d4af37]" />
-        <p className="text-sm font-semibold text-[#f3f4f6]">Đang tải thông tin phòng cờ #{roomId?.slice(0, 8)}...</p>
+        <p className="text-sm font-semibold text-[#f3f4f6]">{t('room:loadingLobby', 'Loading lobby...')} #{roomId?.slice(0, 8)}</p>
       </div>
     );
   }
@@ -86,22 +89,22 @@ export function RoomWaitingPage() {
         <div className="w-12 h-12 rounded-2xl bg-[#ef4444]/10 border border-[#ef4444]/30 flex items-center justify-center text-[#ef4444]">
           <ShieldAlert className="w-6 h-6" />
         </div>
-        <h2 className="text-lg font-bold text-[#f3f4f6]">Không thể tải thông tin phòng</h2>
-        <p className="text-xs text-[#9ca3af]">Phòng chơi có thể đã bị xóa hoặc không tồn tại.</p>
+        <h2 className="text-lg font-bold text-[#f3f4f6]">{t('room:loadLobbyError', 'Failed to load lobby data.')}</h2>
+        <p className="text-xs text-[#9ca3af]">{t('room:noRoomsDesc', 'Create the first room to start playing!')}</p>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => refetch()}
             className="px-4 py-2 bg-[#13161c] border border-[#2d323f] rounded-xl text-xs font-bold text-[#d4af37] hover:bg-[#2d323f] cursor-pointer"
           >
-            Thử lại
+            {t('room:retry', 'Retry')}
           </button>
           <button
             type="button"
             onClick={() => navigate('/dashboard')}
             className="px-4 py-2 bg-[#d4af37] text-[#0d0e12] rounded-xl text-xs font-bold hover:bg-[#b59226] cursor-pointer"
           >
-            Về Sảnh chơi
+            {t('room:joinPlay', 'PLAY')}
           </button>
         </div>
       </div>
@@ -113,7 +116,7 @@ export function RoomWaitingPage() {
 
   const handleStartGame = async () => {
     setIsStarting(true);
-    showToast('Bắt đầu trận đấu cờ!', 'success');
+    showToast(t('room:creating', 'Creating...'), 'success');
     setTimeout(() => {
       setIsStarting(false);
       // In future: navigate to actual board play route e.g. /game/:gameId
@@ -121,7 +124,7 @@ export function RoomWaitingPage() {
   };
 
   const handleSeatChange = (side) => {
-    showToast(`Đã chuyển sang ghế quân ${side === 'WHITE' ? 'Trắng' : 'Đen'}`, 'success');
+    showToast(t('room:sitWhite', 'Sit as White'), 'success');
   };
 
   return (
@@ -142,19 +145,19 @@ export function RoomWaitingPage() {
               {isStarting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Đang khởi tạo trận đấu...</span>
+                  <span>{t('room:creating', 'Creating...')}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-[#0d0e12]" />
-                  <span>SẴN SÀNG</span>
+                  <span>{t('room:joinPlay', 'PLAY')}</span>
                 </>
               )}
             </button>
           ) : (
             <div className="flex-1 p-3 bg-[#13161c] border border-[#2d323f] rounded-xl text-center text-xs text-[#9ca3af] flex items-center justify-center gap-2">
               <AlertCircle className="w-4 h-4 text-[#d4af37]" />
-              <span>Đang chờ chủ phòng bắt đầu trận đấu...</span>
+              <span>{t('room:waitingPlayer', 'Waiting for player...')}</span>
             </div>
           )}
 
@@ -164,7 +167,7 @@ export function RoomWaitingPage() {
             className="sm:w-auto w-full bg-[#13161c] border border-[#2d323f] hover:bg-[#ef4444]/10 hover:border-[#ef4444]/40 hover:text-[#ef4444] text-[#9ca3af] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>Rời khỏi phòng</span>
+            <span>{t('room:leaveRoomSuccess', 'Leave room').replace('Left the', 'Leave')}</span>
           </button>
         </div>
 
@@ -175,7 +178,7 @@ export function RoomWaitingPage() {
             {/* SEATS (WHITE vs BLACK) */}
             <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg space-y-4">
               <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider border-b border-[#2d323f] pb-2">
-                Danh sách Người chơi
+                {t('room:playerList', 'Player List')}
               </h3>
               <RoomSeats room={room} onSeatChange={handleSeatChange} />
             </div>
@@ -205,9 +208,9 @@ export function RoomWaitingPage() {
               <div className="w-12 h-12 bg-[#d4af37]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#d4af37]/30">
                 <AlertCircle className="w-6 h-6 text-[#d4af37]" />
               </div>
-              <h3 className="text-lg font-bold text-[#f3f4f6]">Bạn đang rời khỏi trang</h3>
+              <h3 className="text-lg font-bold text-[#f3f4f6]">{t('room:expandWidgetTitle', 'Expand room widget')}</h3>
               <p className="text-sm text-[#9ca3af]">
-                Bạn muốn làm gì với phòng chờ hiện tại?
+                {t('room:waitingPlayer', 'Waiting for player...')}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -217,7 +220,7 @@ export function RoomWaitingPage() {
                 className="flex flex-col items-center justify-center gap-2 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] p-3 rounded-xl transition-all cursor-pointer"
               >
                 <LogOut className="w-5 h-5" />
-                <span className="text-xs font-semibold">Rời phòng</span>
+                <span className="text-xs font-semibold">{t('room:leaveRoomSuccess', 'Leave room').replace('Left the', 'Leave')}</span>
               </button>
               <button
                 type="button"
@@ -225,7 +228,7 @@ export function RoomWaitingPage() {
                 className="flex flex-col items-center justify-center gap-2 bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] border border-[#d4af37] p-3 rounded-xl transition-all cursor-pointer"
               >
                 <Minimize2 className="w-5 h-5" />
-                <span className="text-xs font-bold">Thu nhỏ</span>
+                <span className="text-xs font-bold">{t('room:minimize', 'Minimize')}</span>
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Chess } from 'chess.js';
+import { useTranslation } from 'react-i18next';
 import { getLessonById } from '../data/lessons';
 import LessonBoard from '../components/LessonBoard';
 import StepControls from '../components/StepControls';
@@ -11,6 +12,7 @@ import { ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 const LessonDetailPage = () => {
   const { lessonId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation(['learn']);
 
   const lesson = useMemo(() => getLessonById(lessonId), [lessonId]);
 
@@ -38,13 +40,13 @@ const LessonDetailPage = () => {
     return (
       <div className="min-h-screen bg-[#0d0e12] flex flex-col items-center justify-center p-6 text-center text-slate-100">
         <AlertCircle className="w-16 h-16 text-rose-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Lesson Not Found</h2>
-        <p className="text-slate-400 mb-6">The requested lesson standard does not exist or has been moved.</p>
+        <h2 className="text-2xl font-bold mb-2">{t('learn:lesson_not_found')}</h2>
+        <p className="text-slate-400 mb-6">{t('learn:lesson_not_exist')}</p>
         <Link
           to="/learn"
           className="px-6 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors"
         >
-          Back to Lessons
+          {t('learn:back_to_lessons')}
         </Link>
       </div>
     );
@@ -60,7 +62,7 @@ const LessonDetailPage = () => {
       setCurrentFen(chessInstance.fen());
       setLastMove({ from: result.move.from, to: result.move.to });
       setIsStepCompleted(true);
-      setFeedback({ type: 'success', text: currentStep.successMessage || 'Great move!' });
+      setFeedback({ type: 'success', text: t(`learn:lesson_${lesson.id}_step_${currentStepIndex}_success`, currentStep.successMessage) || t('learn:great_move') });
 
       ProgressTracker.saveStepProgress(lesson.id, currentStepIndex);
 
@@ -69,7 +71,7 @@ const LessonDetailPage = () => {
       }
       return true;
     } else {
-      setFeedback({ type: 'error', text: result.error || 'Wrong move! Try again.' });
+      setFeedback({ type: 'error', text: result.error || t('learn:wrong_move_try_again') });
       return false;
     }
   };
@@ -105,10 +107,10 @@ const LessonDetailPage = () => {
             to="/learn"
             className="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Lessons
+            <ArrowLeft className="w-4 h-4" /> {t('learn:back_to_lessons')}
           </Link>
           <span className="text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-900 border border-slate-800 px-3 py-1 rounded-full">
-            {lesson.category}
+            {t(`learn:category_${lesson.category.replace(/[^a-zA-Z]/g, '').toLowerCase()}`, lesson.category)}
           </span>
         </div>
 
@@ -134,12 +136,12 @@ const LessonDetailPage = () => {
                 <span className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
                   <Sparkles className="w-5 h-5" />
                 </span>
-                <h1 className="text-xl font-bold text-white">{lesson.title}</h1>
+                <h1 className="text-xl font-bold text-white">{t(`learn:lesson_${lesson.id}_title`, lesson.title)}</h1>
               </div>
 
               <div className="space-y-2 border-t border-slate-800 pt-4">
-                <h3 className="text-base font-semibold text-amber-400">{currentStep?.title}</h3>
-                <p className="text-sm text-slate-300 leading-relaxed">{currentStep?.description}</p>
+                <h3 className="text-base font-semibold text-amber-400">{t(`learn:lesson_${lesson.id}_step_${currentStepIndex}_title`, currentStep?.title)}</h3>
+                <p className="text-sm text-slate-300 leading-relaxed">{t(`learn:lesson_${lesson.id}_step_${currentStepIndex}_desc`, currentStep?.description)}</p>
               </div>
 
               {/* Feedback Alert Toast */}
@@ -163,7 +165,7 @@ const LessonDetailPage = () => {
               {/* Hint Box */}
               {showHint && currentStep?.hint?.text && (
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs sm:text-sm leading-relaxed animate-fade-in">
-                  💡 <strong>Hint:</strong> {currentStep.hint.text}
+                  💡 <strong>{t('learn:hint')}</strong> {t(`learn:lesson_${lesson.id}_step_${currentStepIndex}_hint`, currentStep.hint.text)}
                 </div>
               )}
             </div>

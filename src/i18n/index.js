@@ -2,15 +2,33 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import commonEn from './locales/en/common.json' with { type: 'json' };
-import navEn from './locales/en/nav.json' with { type: 'json' };
-import authEn from './locales/en/auth.json' with { type: 'json' };
-import homeEn from './locales/en/home.json' with { type: 'json' };
-import learnEn from './locales/en/learn.json' with { type: 'json' };
-import chessEn from './locales/en/chess.json' with { type: 'json' };
-import forumEn from './locales/en/forum.json' with { type: 'json' };
-import profileEn from './locales/en/profile.json' with { type: 'json' };
-import notificationsEn from './locales/en/notifications.json' with { type: 'json' };
+// EN
+import commonEn from './locales/en/common.json';
+import navEn from './locales/en/nav.json';
+import authEn from './locales/en/auth.json';
+import homeEn from './locales/en/home.json';
+import learnEn from './locales/en/learn.json';
+import chessEn from './locales/en/chess.json';
+import forumEn from './locales/en/forum.json';
+import profileEn from './locales/en/profile.json';
+import notificationsEn from './locales/en/notifications.json';
+import roomEn from './locales/en/room.json';
+import gameEn from './locales/en/game.json';
+import errorEn from './locales/en/error.json';
+
+// VI
+import commonVi from './locales/vi/common.json';
+import navVi from './locales/vi/nav.json';
+import authVi from './locales/vi/auth.json';
+import homeVi from './locales/vi/home.json';
+import learnVi from './locales/vi/learn.json';
+import chessVi from './locales/vi/chess.json';
+import forumVi from './locales/vi/forum.json';
+import profileVi from './locales/vi/profile.json';
+import notificationsVi from './locales/vi/notifications.json';
+import roomVi from './locales/vi/room.json';
+import gameVi from './locales/vi/game.json';
+import errorVi from './locales/vi/error.json';
 
 const resources = {
   en: {
@@ -23,8 +41,31 @@ const resources = {
     forum: forumEn,
     profile: profileEn,
     notifications: notificationsEn,
+    room: roomEn,
+    game: gameEn,
+    error: errorEn,
+  },
+  vi: {
+    common: commonVi,
+    nav: navVi,
+    auth: authVi,
+    home: homeVi,
+    learn: learnVi,
+    chess: chessVi,
+    forum: forumVi,
+    profile: profileVi,
+    notifications: notificationsVi,
+    room: roomVi,
+    game: gameVi,
+    error: errorVi,
   },
 };
+
+const namespaces = [
+  'common', 'nav', 'auth', 'home', 'learn', 
+  'chess', 'forum', 'profile', 'notifications', 
+  'room', 'game', 'error'
+];
 
 i18n
   .use(LanguageDetector)
@@ -33,7 +74,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'nav', 'auth', 'home', 'learn', 'chess', 'forum', 'profile', 'notifications'],
+    ns: namespaces,
     interpolation: {
       escapeValue: false,
     },

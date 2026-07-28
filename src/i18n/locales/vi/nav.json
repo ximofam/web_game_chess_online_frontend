@@ -1,0 +1,21 @@
+{
+  "brand": "CHESS ARENA",
+  "home": "Home",
+  "learn": "Learn Chess",
+  "forum": "Forum",
+  "play_as_guest": "PLAY AS GUEST",
+  "login": "Log in",
+  "register": "Register",
+  "logout": "Log out",
+  "profile": "My Profile",
+  "my_posts": "My Posts",
+  "notifications": "Notifications",
+  "github_repo": "View GitHub Repository",
+  "live_ws": "LIVE WS",
+  "connecting": "CONNECTING",
+  "offline": "OFFLINE (RETRY)",
+  "ws_connected_tooltip": "Realtime server connection is active",
+  "ws_connecting_tooltip": "Connecting to realtime server...",
+  "ws_disconnected_tooltip": "Disconnected from server. Click to reconnect!",
+  "footer_rights": "© 2026 CHESS ARENA. ALL RIGHTS RESERVED."
+}

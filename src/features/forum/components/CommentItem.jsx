@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import LikeButton from './LikeButton';
 import CommentForm from './CommentForm';
 import { forumService } from '../services/forumService';
@@ -12,6 +13,7 @@ function fmtDate(iso) {
  * CommentItem — renders one comment with inline like, reply form, and expandable replies.
  */
 export default function CommentItem({ comment, postId, isAuth, onLikeComment, onAddComment }) {
+  const { t } = useTranslation(['forum']);
   const { id, content, author, likeCount, liked, replyCount, createdAt } = comment;
 
   const [localLiked, setLocalLiked] = useState(liked);
@@ -79,7 +81,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment, on
         <div className="flex-1 min-w-0">
           {/* Header */}
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-[#f3f4f6]">{author?.username ?? 'Ẩn danh'}</span>
+            <span className="text-xs font-semibold text-[#f3f4f6]">{author?.username ?? t('forum:anonymous')}</span>
             <span className="text-[10px] text-[#9ca3af]">{createdAt ? fmtDate(createdAt) : ''}</span>
           </div>
 
@@ -100,7 +102,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment, on
                 onClick={() => setShowReplyForm(v => !v)}
                 className="text-xs text-[#9ca3af] hover:text-[#f3f4f6] font-medium transition-colors focus:outline-none"
               >
-                Phản hồi
+                {t('forum:reply')}
               </button>
             )}
 
@@ -112,7 +114,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment, on
                 className="flex items-center gap-1 text-xs text-[#d4af37] hover:text-[#f3cd57] font-semibold transition-colors focus:outline-none disabled:opacity-60"
               >
                 {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                {expanded ? 'Ẩn' : `${replyCount} phản hồi`}
+                {expanded ? t('forum:hide') : t('forum:replies_count', { count: replyCount })}
               </button>
             )}
           </div>
@@ -146,7 +148,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment, on
                   disabled={loadingReplies}
                   className="text-xs text-[#d4af37] hover:text-[#f3cd57] self-start font-semibold focus:outline-none"
                 >
-                  {loadingReplies ? 'Đang tải...' : 'Xem thêm phản hồi'}
+                  {loadingReplies ? t('forum:loading') : t('forum:load_more_replies')}
                 </button>
               )}
             </div>

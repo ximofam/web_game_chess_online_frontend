@@ -1,0 +1,8 @@
+{
+  "not_found_title": "Page Not Found",
+  "not_found_desc": "The page you're looking for seems to have vanished into the void. Let's get you back on track.",
+  "back_to_home": "Back to Home",
+  "forbidden_title": "Access Denied",
+  "forbidden_desc": "You don't have permission to access this area. Please contact an administrator if you believe this is a mistake.",
+  "go_back": "Go Back"
+}

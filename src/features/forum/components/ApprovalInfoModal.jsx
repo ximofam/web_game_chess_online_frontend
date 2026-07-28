@@ -1,26 +1,28 @@
 import { X, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInfo, title }) {
+  const { t } = useTranslation(['forum']);
   if (!isOpen) return null;
 
   const getStatusDisplay = (st) => {
     switch (st) {
       case 'APPROVED':
         return {
-          label: 'Đã phê duyệt',
+          label: t('forum:approved'),
           badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
           icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
         };
       case 'DENIED':
         return {
-          label: 'Từ chối phê duyệt',
+          label: t('forum:denied'),
           badgeClass: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
           icon: <AlertCircle className="w-5 h-5 text-rose-400" />,
         };
       case 'PENDING':
       default:
         return {
-          label: 'Đang chờ AI kiểm duyệt',
+          label: t('forum:pending_ai'),
           badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
           icon: <Clock className="w-5 h-5 text-amber-400 animate-spin" />,
         };
@@ -38,11 +40,11 @@ export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInf
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#2d323f]">
-          <h3 className="font-semibold text-lg text-[#f3f4f6]">Chi tiết kiểm duyệt</h3>
+          <h3 className="font-semibold text-lg text-[#f3f4f6]">{t('forum:approval_details')}</h3>
           <button
             onClick={onClose}
             className="p-1 text-[#9ca3af] hover:text-white rounded-lg hover:bg-[#252a36] transition-colors"
-            aria-label="Đóng"
+            aria-label={t('forum:close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -51,12 +53,12 @@ export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInf
         {/* Content */}
         <div className="p-6 space-y-4">
           <div>
-            <span className="text-xs text-[#9ca3af] uppercase tracking-wider font-medium">Bài viết</span>
+            <span className="text-xs text-[#9ca3af] uppercase tracking-wider font-medium">{t('forum:post')}</span>
             <p className="font-semibold text-[#f3f4f6] line-clamp-2 mt-0.5">{title}</p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#9ca3af] uppercase tracking-wider font-medium">Trạng thái:</span>
+            <span className="text-xs text-[#9ca3af] uppercase tracking-wider font-medium">{t('forum:status_label')}</span>
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${statusInfo.badgeClass}`}>
               {statusInfo.icon}
               <span>{statusInfo.label}</span>
@@ -67,7 +69,7 @@ export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInf
             <div className="p-4 bg-[#0d0e12] border border-[#2d323f] rounded-xl space-y-2">
               {approvalInfo.approvalNote && (
                 <div>
-                  <span className="text-xs text-[#9ca3af] font-medium">Ghi chú của hệ thống AI:</span>
+                  <span className="text-xs text-[#9ca3af] font-medium">{t('forum:ai_note_label')}</span>
                   <p className="text-sm text-[#e5e7eb] mt-1 whitespace-pre-line leading-relaxed">
                     {approvalInfo.approvalNote}
                   </p>
@@ -75,16 +77,16 @@ export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInf
               )}
               {approvalInfo.approvedAt && (
                 <div className="pt-2 border-t border-[#2d323f]/60 text-xs text-[#9ca3af]">
-                  Thời gian xử lý: {new Date(approvalInfo.approvedAt).toLocaleString('vi-VN')}
+                  {t('forum:processing_time_label')} {new Date(approvalInfo.approvedAt).toLocaleString('vi-VN')}
                 </div>
               )}
             </div>
           ) : status === 'PENDING' ? (
             <p className="text-sm text-[#9ca3af] italic">
-              Bài viết của bạn vừa được khởi tạo và đang được gửi đến hàng đợi AI kiểm duyệt nội dung tự động. Kết quả sẽ được cập nhật sớm nhất.
+              {t('forum:pending_desc')}
             </p>
           ) : (
-            <p className="text-sm text-[#9ca3af] italic">Không có thêm ghi chú kiểm duyệt.</p>
+            <p className="text-sm text-[#9ca3af] italic">{t('forum:no_more_notes')}</p>
           )}
         </div>
 
@@ -94,7 +96,7 @@ export default function ApprovalInfoModal({ isOpen, onClose, status, approvalInf
             onClick={onClose}
             className="px-4 py-2 text-sm font-semibold text-[#f3f4f6] bg-[#252a36] hover:bg-[#2d323f] rounded-xl transition-all"
           >
-            Đóng
+            {t('forum:close')}
           </button>
         </div>
       </div>

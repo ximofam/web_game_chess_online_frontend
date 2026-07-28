@@ -1,10 +1,11 @@
 import { Heart, Eye, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_BADGE = {
-  PENDING: { label: 'Đang duyệt', cls: 'bg-yellow-900/50 text-yellow-300 border-yellow-600/40' },
-  APPROVED: { label: 'Đã duyệt', cls: 'bg-emerald-900/50 text-emerald-300 border-emerald-600/40' },
-  DENIED: { label: 'Từ chối', cls: 'bg-red-900/50 text-red-300 border-red-600/40' },
+  PENDING: { labelKey: 'forum:pending', cls: 'bg-yellow-900/50 text-yellow-300 border-yellow-600/40' },
+  APPROVED: { labelKey: 'forum:approved', cls: 'bg-emerald-900/50 text-emerald-300 border-emerald-600/40' },
+  DENIED: { labelKey: 'forum:denied', cls: 'bg-red-900/50 text-red-300 border-red-600/40' },
 };
 
 function fmtDate(iso) {
@@ -15,6 +16,7 @@ function fmtDate(iso) {
  * PostCard — bài viết tóm tắt trong danh sách forum.
  */
 export default function PostCard({ post, onLike }) {
+  const { t } = useTranslation(['forum']);
   const { id, author, title, viewCount, likeCount, commentCount, createdAt, liked, status } = post;
   const badge = STATUS_BADGE[status];
   const initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
@@ -37,12 +39,12 @@ export default function PostCard({ post, onLike }) {
             ? <img src={author.avatarUrl} alt={author.username} className="w-full h-full object-cover" />
             : <User className="w-4 h-4" />}
         </div>
-        <span className="text-xs text-[#9ca3af] font-medium">{author?.username ?? 'Ẩn danh'}</span>
+        <span className="text-xs text-[#9ca3af] font-medium">{author?.username ?? t('forum:anonymous')}</span>
         <span className="text-[#2d323f] select-none">·</span>
         <span className="text-xs text-[#9ca3af]">{createdAt ? fmtDate(createdAt) : ''}</span>
         {badge && (
           <span className={`ml-auto text-[10px] font-semibold px-2 py-0.5 rounded border ${badge.cls}`}>
-            {badge.label}
+            {t(badge.labelKey)}
           </span>
         )}
       </div>
@@ -60,7 +62,7 @@ export default function PostCard({ post, onLike }) {
           className={`flex items-center gap-1.5 text-xs font-semibold transition-colors focus:outline-none ${
             liked ? 'text-[#d4af37]' : 'text-[#9ca3af] hover:text-[#d4af37]'
           }`}
-          aria-label={liked ? 'Bỏ thích' : 'Thích bài viết'}
+          aria-label={liked ? t('forum:unlike') : t('forum:like_post')}
         >
           <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-[#d4af37]' : ''}`} />
           {likeCount ?? 0}

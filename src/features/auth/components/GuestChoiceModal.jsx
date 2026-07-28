@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { UserCheck, LogIn, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function GuestChoiceModal({ isOpen, onClose }) {
+  const { t } = useTranslation(['auth']);
   const { loginGuest, showToast } = useAuth();
   const navigate = useNavigate();
 
@@ -11,10 +13,10 @@ export default function GuestChoiceModal({ isOpen, onClose }) {
   const handleContinueAsGuest = async () => {
     try {
       await loginGuest();
-      showToast('Đang trải nghiệm với tư cách Khách (Guest)', 'success');
+      showToast(t('auth:guest_toast_success'), 'success');
       if (onClose) onClose();
     } catch (err) {
-      showToast('Không thể khởi tạo phiên Guest', 'error');
+      showToast(t('auth:guest_toast_error'), 'error');
     }
   };
 
@@ -31,10 +33,10 @@ export default function GuestChoiceModal({ isOpen, onClose }) {
         </div>
 
         <h3 className="font-playfair text-2xl font-bold text-center mb-2 text-[#f3f4f6]">
-          Chào mừng bạn đến với Chess Arena
+          {t('auth:welcome_title')}
         </h3>
         <p className="text-sm text-[#9ca3af] text-center mb-6 leading-relaxed">
-          Bạn có thể tham gia trải nghiệm ngay với tư cách <strong className="text-[#d4af37]">Khách (Guest)</strong> hoặc <strong className="text-[#d4af37]">Đăng nhập</strong> tài khoản chính thức.
+          {t('auth:welcome_desc_1')}<strong className="text-[#d4af37]">{t('auth:welcome_desc_2')}</strong>{t('auth:welcome_desc_3')}<strong className="text-[#d4af37]">{t('auth:welcome_desc_4')}</strong>{t('auth:welcome_desc_5')}
         </p>
 
         <div className="space-y-3">
@@ -43,7 +45,7 @@ export default function GuestChoiceModal({ isOpen, onClose }) {
             className="w-full bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
           >
             <UserCheck className="w-5 h-5" />
-            <span>Tiếp tục với tư cách Khách (Guest)</span>
+            <span>{t('auth:continue_as_guest')}</span>
           </button>
 
           <button
@@ -51,12 +53,12 @@ export default function GuestChoiceModal({ isOpen, onClose }) {
             className="w-full bg-[#242834] border border-[#373d4e] hover:bg-[#2d3242] text-[#f3f4f6] font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <LogIn className="w-5 h-5 text-[#d4af37]" />
-            <span>Đăng nhập tài khoản</span>
+            <span>{t('auth:login_account')}</span>
           </button>
         </div>
 
         <div className="mt-5 text-center text-xs text-[#6b7280]">
-          * Khách có thể xem trang Chủ & Diễn đàn. Đăng nhập để sử dụng đầy đủ tính năng.
+          {t('auth:guest_disclaimer')}
         </div>
       </div>
     </div>

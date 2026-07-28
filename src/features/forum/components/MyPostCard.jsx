@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Eye, Heart, MessageSquare, Trash2, Info, ExternalLink, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ApprovalInfoModal from './ApprovalInfoModal';
 import { forumService } from '../services/forumService';
 
 export default function MyPostCard({ post, onDelete }) {
+  const { t } = useTranslation(['forum']);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [approvalInfo, setApprovalInfo] = useState(post.approvalInfo || null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -32,14 +34,14 @@ export default function MyPostCard({ post, onDelete }) {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            Đã duyệt
+            {t('forum:approved')}
           </span>
         );
       case 'DENIED':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
             <AlertCircle className="w-3.5 h-3.5" />
-            Từ chối
+            {t('forum:denied')}
           </span>
         );
       case 'PENDING':
@@ -47,7 +49,7 @@ export default function MyPostCard({ post, onDelete }) {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
             <Clock className="w-3.5 h-3.5 animate-spin" />
-            Chờ duyệt
+            {t('forum:pending')}
           </span>
         );
     }
@@ -85,15 +87,15 @@ export default function MyPostCard({ post, onDelete }) {
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#2d323f]/60 text-xs text-[#9ca3af]">
           {/* Metrics */}
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1" title="Lượt xem">
+            <span className="flex items-center gap-1" title={t('forum:views')}>
               <Eye className="w-4 h-4 text-[#9ca3af]" />
               {post.viewCount ?? 0}
             </span>
-            <span className="flex items-center gap-1" title="Lượt thích">
+            <span className="flex items-center gap-1" title={t('forum:likes')}>
               <Heart className="w-4 h-4 text-[#9ca3af]" />
               {post.likeCount ?? 0}
             </span>
-            <span className="flex items-center gap-1" title="Bình luận">
+            <span className="flex items-center gap-1" title={t('forum:comment')}>
               <MessageSquare className="w-4 h-4 text-[#9ca3af]" />
               {post.commentCount ?? 0}
             </span>
@@ -106,10 +108,10 @@ export default function MyPostCard({ post, onDelete }) {
               onClick={handleOpenInfo}
               disabled={loadingDetails}
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#2d323f] bg-[#1a1e29] hover:bg-[#252a36] text-[#e5e7eb] font-medium transition-colors disabled:opacity-50"
-              title="Xem thông tin kiểm duyệt"
+              title={t('forum:view_moderation_info')}
             >
               <Info className="w-3.5 h-3.5 text-[#d4af37]" />
-              Kiểm duyệt
+              {t('forum:moderation')}
             </button>
 
             {post.status === 'APPROVED' && (
@@ -117,10 +119,10 @@ export default function MyPostCard({ post, onDelete }) {
                 id={`view-public-post-${post.id}`}
                 to={`/forum/posts/${post.id}`}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#2d323f] bg-[#1a1e29] hover:bg-[#252a36] text-[#e5e7eb] font-medium transition-colors"
-                title="Xem bài viết"
+                title={t('forum:view_post')}
               >
                 <ExternalLink className="w-3.5 h-3.5 text-[#9ca3af]" />
-                Xem
+                {t('forum:view')}
               </RouterLink>
             )}
 
@@ -128,10 +130,10 @@ export default function MyPostCard({ post, onDelete }) {
               id={`delete-post-btn-${post.id}`}
               onClick={() => onDelete(post.id, post.title)}
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-medium transition-colors"
-              title="Xóa bài viết"
+              title={t('forum:delete_post')}
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Xóa
+              {t('forum:delete')}
             </button>
           </div>
         </div>

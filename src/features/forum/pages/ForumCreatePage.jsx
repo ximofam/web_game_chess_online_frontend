@@ -4,13 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { forumService } from '../services/forumService';
 import TiptapEditor from '../components/TiptapEditor';
 import { useAuth } from '../../auth/context/AuthContext';
-
-const schema = z.object({
-  title: z.string().min(1, 'Tiêu đề không được để trống').max(100, 'Tối đa 100 ký tự'),
-});
 
 /**
  * ForumCreatePage — tạo bài viết mới với Tiptap editor.
@@ -18,10 +15,15 @@ const schema = z.object({
  */
 export default function ForumCreatePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation(['forum']);
   const { showToast } = useAuth();
   const [editorContent, setEditorContent] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contentError, setContentError] = useState('');
+
+  const schema = z.object({
+    title: z.string().min(1, t('forum:err_title_empty')).max(100, t('forum:err_title_max_100')),
+  });
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -35,11 +37,11 @@ export default function ForumCreatePage() {
     const contentStr = editorContent ? JSON.stringify(editorContent) : '';
     if (!editorContent || editorContent.content?.length === 0 ||
         (editorContent.content?.length === 1 && editorContent.content[0]?.content === undefined)) {
-      setContentError('Nội dung không được để trống');
+      setContentError(t('forum:err_content_empty'));
       return;
     }
     if (contentStr.length > 10000) {
-      setContentError('Nội dung quá dài (tối đa 10000 ký tự)');
+      setContentError(t('forum:err_content_max_10000'));
       return;
     }
     setContentError('');
@@ -47,10 +49,10 @@ export default function ForumCreatePage() {
 
     try {
       await forumService.createPost({ title, content: contentStr });
-      showToast('Bài viết đã được gửi và đang chờ duyệt!', 'success');
+      showToast(t('forum:toast_post_submitted'), 'success');
       navigate('/forum/my-posts');
     } catch (err) {
-      const msg = err.response?.data?.message ?? 'Không thể tạo bài viết. Thử lại sau.';
+      const msg = err.response?.data?.message ?? t('forum:toast_post_error');
       showToast(msg, 'error');
     } finally {
       setIsSubmitting(false);
@@ -65,24 +67,24 @@ export default function ForumCreatePage() {
         className="flex items-center gap-2 text-sm text-[#9ca3af] hover:text-[#f3f4f6] mb-6 transition-colors focus:outline-none"
       >
         <ArrowLeft className="w-4 h-4" />
-        Quay lại forum
+        {t('forum:back_to_forum')}
       </button>
 
       <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-6 md:p-8">
-        <h1 className="font-playfair text-2xl font-bold text-[#f3f4f6] mb-6">Tạo bài viết mới</h1>
+        <h1 className="font-playfair text-2xl font-bold text-[#f3f4f6] mb-6">{t('forum:create_new_post')}</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           {/* Title */}
           <div>
             <label htmlFor="post-title" className="block text-xs font-semibold text-[#9ca3af] uppercase tracking-wider mb-2">
-              Tiêu đề <span className="text-red-400">*</span>
+              {t('forum:title_label')} <span className="text-red-400">*</span>
             </label>
             <div className="relative">
               <input
                 id="post-title"
                 type="text"
                 maxLength={100}
-                placeholder="Tiêu đề bài viết của bạn..."
+                placeholder={t('forum:title_placeholder')}
                 {...register('title')}
                 className="w-full bg-[#13161c] border border-[#2d323f] rounded-xl px-4 py-3 text-[#f3f4f6] text-sm placeholder:text-[#9ca3af]/60 focus:outline-none focus:border-[#d4af37]/50 transition-colors pr-16"
               />
@@ -98,14 +100,14 @@ export default function ForumCreatePage() {
           {/* Content */}
           <div>
             <label className="block text-xs font-semibold text-[#9ca3af] uppercase tracking-wider mb-2">
-              Nội dung <span className="text-red-400">*</span>
+              {t('forum:content_label')} <span className="text-red-400">*</span>
             </label>
             <div className="relative">
-              <TiptapEditor onChange={setEditorContent} placeholder="Chia sẻ kiến thức cờ vua của bạn..." />
+              <TiptapEditor onChange={setEditorContent} placeholder={t('forum:content_placeholder')} />
             </div>
             {contentError && <p className="text-xs text-red-400 mt-1">{contentError}</p>}
             <p className="text-[10px] text-[#9ca3af]/60 mt-1">
-              Hỗ trợ bold, italic, danh sách và hình ảnh. Bài viết sẽ được kiểm duyệt tự động qua AI trước khi đăng.
+              {t('forum:content_helper')}
             </p>
           </div>
 
@@ -116,7 +118,7 @@ export default function ForumCreatePage() {
               onClick={() => navigate(-1)}
               className="px-4 py-2 text-sm font-semibold text-[#9ca3af] border border-[#2d323f] rounded-xl hover:text-[#f3f4f6] hover:border-[#f3f4f6]/20 transition-colors focus:outline-none"
             >
-              Huỷ
+              {t('forum:cancel')}
             </button>
             <button
               id="submit-post-btn"
@@ -125,7 +127,7 @@ export default function ForumCreatePage() {
               className="flex items-center gap-2 px-5 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none"
             >
               <Send className="w-4 h-4" />
-              {isSubmitting ? 'Đang đăng...' : 'Đăng bài'}
+              {isSubmitting ? t('forum:publishing') : t('forum:publish')}
             </button>
           </div>
         </form>

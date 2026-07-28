@@ -21,5 +21,12 @@
   "welcome_back": "Welcome back, {{username}}!",
   "dashboard_title": "Player Dashboard",
   "current_elo": "Current Elo Rating",
-  "rank_title": "Division Rank"
+  "rank_title": "Division Rank",
+  "guest_mode_title": "Guest Mode",
+  "guest_mode_desc": "Sign in to create rooms and save match results.",
+  "login_btn": "Sign in",
+  "stats_wins": "Wins",
+  "stats_draws": "Draws",
+  "stats_losses": "Losses",
+  "play_modes_title": "Play Modes"
 }

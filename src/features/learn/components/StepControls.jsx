@@ -1,4 +1,5 @@
 import { RotateCcw, HelpCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const StepControls = ({
   currentStepIndex,
@@ -9,15 +10,16 @@ const StepControls = ({
   onRestartStep,
   onNextStep,
 }) => {
+  const { t } = useTranslation(['learn']);
   return (
     <div className="flex flex-col gap-4 bg-slate-900/80 border border-slate-800 rounded-xl p-4 sm:p-5 shadow-lg">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-          Step {currentStepIndex + 1} of {totalSteps}
+          {t('learn:step_n_of_m', { current: currentStepIndex + 1, total: totalSteps })}
         </span>
         {isStepCompleted && (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-fade-in">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Completed
+            <CheckCircle2 className="w-3.5 h-3.5" /> {t('learn:completed')}
           </span>
         )}
       </div>
@@ -44,7 +46,7 @@ const StepControls = ({
           onClick={onRestartStep}
           className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-700 hover:text-white rounded-lg transition-colors border border-slate-700"
         >
-          <RotateCcw className="w-4 h-4" /> Restart
+          <RotateCcw className="w-4 h-4" /> {t('learn:restart')}
         </button>
 
         <button
@@ -55,7 +57,7 @@ const StepControls = ({
               : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
           }`}
         >
-          <HelpCircle className="w-4 h-4" /> {showHint ? 'Hide Hint' : 'Show Hint'}
+          <HelpCircle className="w-4 h-4" /> {showHint ? t('learn:hide_hint') : t('learn:show_hint')}
         </button>
 
         {isStepCompleted && (
@@ -63,7 +65,7 @@ const StepControls = ({
             onClick={onNextStep}
             className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-lg shadow-amber-400/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
           >
-            {currentStepIndex + 1 >= totalSteps ? 'Finish Lesson' : 'Next Step'}
+            {currentStepIndex + 1 >= totalSteps ? t('learn:finish_lesson') : t('learn:next_step')}
             <ArrowRight className="w-4 h-4" />
           </button>
         )}

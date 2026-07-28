@@ -7,6 +7,7 @@ import { useNotifications } from '../../features/notifications/context/Notificat
 import NavbarAvatar from '../../features/profile/components/NavbarAvatar';
 import AvatarDropdown from '../../features/profile/components/AvatarDropdown';
 import NotificationBell from '../../features/notifications/components/NotificationBell';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -99,6 +100,8 @@ export const Navbar = () => {
 
       {/* User Actions & Auth Status */}
       <div className="flex items-center gap-2.5 sm:gap-3">
+        <LanguageSwitcher />
+
         {isAuthenticated ? (
           <div className="flex items-center gap-3 md:gap-4">
             <div className="hidden sm:flex flex-col text-right">

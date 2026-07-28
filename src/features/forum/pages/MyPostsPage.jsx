@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Plus, Search, RefreshCw, FileText, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { forumService } from '../services/forumService';
 import MyPostCard from '../components/MyPostCard';
 import PostSkeleton from '../components/PostSkeleton';
 
 export default function MyPostsPage() {
+  const { t } = useTranslation(['forum']);
   const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -56,10 +58,10 @@ export default function MyPostsPage() {
   const allMyPosts = data?.pages.flatMap((p) => p.content) ?? [];
 
   const tabs = [
-    { id: 'ALL', label: 'Tất cả' },
-    { id: 'PENDING', label: 'Chờ duyệt' },
-    { id: 'APPROVED', label: 'Đã duyệt' },
-    { id: 'DENIED', label: 'Từ chối' },
+    { id: 'ALL', label: t('forum:tab_all') },
+    { id: 'PENDING', label: t('forum:tab_pending') },
+    { id: 'APPROVED', label: t('forum:tab_approved') },
+    { id: 'DENIED', label: t('forum:tab_denied') },
   ];
 
   return (
@@ -70,7 +72,7 @@ export default function MyPostsPage() {
           to="/forum"
           className="inline-flex items-center gap-1.5 text-sm text-[#9ca3af] hover:text-[#d4af37] transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Quay lại Diễn đàn
+          <ArrowLeft className="w-4 h-4" /> {t('forum:back_to_forum')}
         </Link>
 
         <Link
@@ -78,16 +80,16 @@ export default function MyPostsPage() {
           to="/forum/create"
           className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all"
         >
-          <Plus className="w-4 h-4" /> Viết bài mới
+          <Plus className="w-4 h-4" /> {t('forum:write_new_post')}
         </Link>
       </div>
 
       <div className="mb-8">
         <h1 className="font-playfair text-3xl font-bold text-[#f3f4f6] mb-2 flex items-center gap-3">
-          <FileText className="w-8 h-8 text-[#d4af37]" /> Quản lý bài viết của tôi
+          <FileText className="w-8 h-8 text-[#d4af37]" /> {t('forum:manage_my_posts')}
         </h1>
         <p className="text-sm text-[#9ca3af]">
-          Theo dõi trạng thái duyệt bài, ghi chú của AI và quản lý tất cả bài thảo luận bạn đã tạo.
+          {t('forum:manage_posts_desc')}
         </p>
       </div>
 
@@ -115,7 +117,7 @@ export default function MyPostsPage() {
         <form onSubmit={handleSearchSubmit} className="relative min-w-[240px]">
           <input
             type="text"
-            placeholder="Tìm theo tiêu đề..."
+            placeholder={t('forum:search_by_title')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-[#161922] border border-[#2d323f] rounded-xl text-sm text-[#f3f4f6] placeholder-[#9ca3af] focus:outline-hidden focus:border-[#d4af37] transition-colors"
@@ -133,27 +135,27 @@ export default function MyPostsPage() {
         </div>
       ) : isError ? (
         <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">Không thể tải bài viết của bạn</p>
+          <p className="text-lg mb-2">{t('forum:err_cannot_load_my_posts')}</p>
           <button
             onClick={() => refetch()}
             className="text-sm text-[#d4af37] hover:underline inline-flex items-center gap-1 mt-2"
           >
-            <RefreshCw className="w-4 h-4" /> Thử lại
+            <RefreshCw className="w-4 h-4" /> {t('forum:try_again')}
           </button>
         </div>
       ) : allMyPosts.length === 0 ? (
         <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">Không tìm thấy bài viết nào</p>
+          <p className="text-lg mb-2">{t('forum:no_posts_found')}</p>
           <p className="text-sm mb-4">
             {activeTab !== 'ALL'
-              ? `Bạn chưa có bài viết nào ở trạng thái "${tabs.find((t) => t.id === activeTab)?.label}".`
-              : 'Bạn chưa tạo bài viết nào trên hệ thống.'}
+              ? t('forum:no_posts_in_status', { status: tabs.find((t) => t.id === activeTab)?.label })
+              : t('forum:no_posts_created_yet')}
           </p>
           <Link
             to="/forum/create"
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] transition-all"
           >
-            <Plus className="w-4 h-4" /> Tạo bài viết đầu tiên
+            <Plus className="w-4 h-4" /> {t('forum:create_first_post')}
           </Link>
         </div>
       ) : (
@@ -178,10 +180,10 @@ export default function MyPostsPage() {
               >
                 {isFetchingNextPage ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" /> Đang tải...
+                    <RefreshCw className="w-4 h-4 animate-spin" /> {t('forum:loading')}
                   </>
                 ) : (
-                  'Xem thêm'
+                  t('forum:load_more')
                 )}
               </button>
             </div>
@@ -197,12 +199,12 @@ export default function MyPostsPage() {
               <div className="p-2 bg-rose-500/10 rounded-xl">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-[#f3f4f6]">Xác nhận xóa bài viết</h3>
+              <h3 className="text-lg font-bold text-[#f3f4f6]">{t('forum:confirm_delete_post')}</h3>
             </div>
 
             <p className="text-sm text-[#9ca3af]">
-              Bạn có chắc chắn muốn xóa bài viết{' '}
-              <span className="text-[#f3f4f6] font-semibold">"{deletingPost.title}"</span>? Hành động này không thể hoàn tác.
+              {t('forum:are_you_sure_delete_post')}{' '}
+              <span className="text-[#f3f4f6] font-semibold">"{deletingPost.title}"</span>{t('forum:delete_irreversible')}
             </p>
 
             <div className="flex items-center justify-end gap-3 pt-2">
@@ -211,7 +213,7 @@ export default function MyPostsPage() {
                 disabled={deleteMutation.isPending}
                 className="px-4 py-2 text-sm font-semibold text-[#f3f4f6] bg-[#252a36] hover:bg-[#2d323f] rounded-xl transition-all"
               >
-                Hủy bỏ
+                {t('forum:cancel_delete')}
               </button>
               <button
                 id="confirm-delete-btn"
@@ -221,10 +223,10 @@ export default function MyPostsPage() {
               >
                 {deleteMutation.isPending ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" /> Đang xóa...
+                    <RefreshCw className="w-4 h-4 animate-spin" /> {t('forum:deleting')}
                   </>
                 ) : (
-                  'Xóa bài viết'
+                  t('forum:delete_post')
                 )}
               </button>
             </div>

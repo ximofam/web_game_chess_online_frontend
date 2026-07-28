@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Plus, RefreshCw, Search, ArrowUpDown, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { forumService } from '../services/forumService';
 import PostCard from '../components/PostCard';
 import PostSkeleton from '../components/PostSkeleton';
@@ -11,6 +12,7 @@ import { useAuth } from '../../auth/context/AuthContext';
  * ForumListPage — danh sách bài viết APPROVED, hỗ trợ tìm kiếm, sắp xếp và phân trang.
  */
 export default function ForumListPage() {
+  const { t } = useTranslation(['forum']);
   const { isAuthenticated, currentUser } = useAuth();
   const queryClient = useQueryClient();
 
@@ -89,7 +91,7 @@ export default function ForumListPage() {
               className="flex items-center gap-2 px-4 py-2 border border-[#2d323f] bg-[#161922] text-[#e5e7eb] font-semibold text-sm rounded-xl hover:border-[#d4af37]/50 hover:text-[#d4af37] transition-all"
             >
               <FileText className="w-4 h-4 text-[#d4af37]" />
-              Bài viết của tôi
+              {t('forum:my_posts_nav')}
             </Link>
 
             <Link
@@ -98,7 +100,7 @@ export default function ForumListPage() {
               className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all"
             >
               <Plus className="w-4 h-4" />
-              Tạo bài viết
+              {t('forum:create_post_nav')}
             </Link>
           </div>
         )}
@@ -111,7 +113,7 @@ export default function ForumListPage() {
           <input
             id="forum-search-input"
             type="text"
-            placeholder="Tìm kiếm tiêu đề bài viết..."
+            placeholder={t('forum:search_placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-[#0d0e12] border border-[#2d323f] rounded-xl text-sm text-[#f3f4f6] placeholder-[#9ca3af] focus:outline-hidden focus:border-[#d4af37] transition-colors"
@@ -122,16 +124,16 @@ export default function ForumListPage() {
         {/* Sort Select */}
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
           <ArrowUpDown className="w-4 h-4 text-[#9ca3af]" />
-          <span className="text-xs text-[#9ca3af] font-medium hidden sm:inline">Sắp xếp:</span>
+          <span className="text-xs text-[#9ca3af] font-medium hidden sm:inline">{t('forum:sort_label')}</span>
           <select
             id="forum-sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="bg-[#0d0e12] border border-[#2d323f] text-[#f3f4f6] text-xs font-semibold rounded-xl px-3 py-2 focus:outline-hidden focus:border-[#d4af37] cursor-pointer"
           >
-            <option value="newest">Mới nhất</option>
-            <option value="mostViewed">Xem nhiều nhất</option>
-            <option value="mostLiked">Thích nhiều nhất</option>
+            <option value="newest">{t('forum:sort_newest')}</option>
+            <option value="mostViewed">{t('forum:sort_most_viewed')}</option>
+            <option value="mostLiked">{t('forum:sort_most_liked')}</option>
           </select>
         </div>
       </div>
@@ -145,17 +147,17 @@ export default function ForumListPage() {
         </div>
       ) : isError ? (
         <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">Không thể tải bài viết</p>
-          <p className="text-sm">Vui lòng thử lại sau.</p>
+          <p className="text-lg mb-2">{t('forum:err_cannot_load_posts')}</p>
+          <p className="text-sm">{t('forum:please_try_again')}</p>
         </div>
       ) : allPosts.length === 0 ? (
         <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">Chưa có bài viết nào</p>
+          <p className="text-lg mb-2">{t('forum:no_posts_yet')}</p>
           {search ? (
-            <p className="text-sm">Không tìm thấy bài viết phù hợp với "{search}"</p>
+            <p className="text-sm">{t('forum:no_posts_match', { search })}</p>
           ) : canPost ? (
             <Link to="/forum/create" className="text-[#d4af37] text-sm hover:underline">
-              Hãy là người đầu tiên chia sẻ →
+              {t('forum:be_the_first_to_share')}
             </Link>
           ) : null}
         </div>
@@ -185,10 +187,10 @@ export default function ForumListPage() {
               >
                 {isFetchingNextPage ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" /> Đang tải...
+                    <RefreshCw className="w-4 h-4 animate-spin" /> {t('forum:loading')}
                   </>
                 ) : (
-                  'Xem thêm bài viết'
+                  t('forum:load_more_posts')
                 )}
               </button>
             </div>

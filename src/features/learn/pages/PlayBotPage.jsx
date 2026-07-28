@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Chess } from 'chess.js';
+import { useTranslation } from 'react-i18next';
 import LessonBoard from '../components/LessonBoard';
 import BotSelector from '../components/BotSelector';
 import { RandomBot } from '../engine/bots/RandomBot';
@@ -9,6 +10,7 @@ import { StockfishBot } from '../engine/bots/StockfishBot';
 import { ArrowLeft, RotateCcw, Eye } from 'lucide-react';
 
 const PlayBotPage = () => {
+  const { t } = useTranslation(['learn']);
   const [strategyType, setStrategyType] = useState('random');
   const [difficulty, setDifficulty] = useState(1);
   const [playerColor, setPlayerColor] = useState('white');
@@ -18,7 +20,7 @@ const PlayBotPage = () => {
   const [boardFen, setBoardFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState(null);
   const [isBotThinking, setIsBotThinking] = useState(false);
-  const [gameStatus, setGameStatus] = useState('Playing');
+  const [gameStatus, setGameStatus] = useState(t('learn:game_in_progress'));
 
   // Create Bot Strategy instance
   const botInstance = useMemo(() => {
@@ -36,14 +38,14 @@ const PlayBotPage = () => {
 
   const updateGameStatus = (currentChess) => {
     if (currentChess.isCheckmate()) {
-      const winner = currentChess.turn() === 'w' ? 'Black (Bot)' : 'White (You)';
-      setGameStatus(`Checkmate! Winner: ${winner}`);
+      const winner = currentChess.turn() === 'w' ? t('learn:black_bot') : t('learn:white_you');
+      setGameStatus(t('learn:checkmate_winner', { winner }));
     } else if (currentChess.isDraw() || currentChess.isStalemate()) {
-      setGameStatus('Draw / Stalemate!');
+      setGameStatus(t('learn:draw_stalemate'));
     } else if (currentChess.inCheck()) {
-      setGameStatus('CHECK!');
+      setGameStatus(t('learn:check'));
     } else {
-      setGameStatus('Game in progress');
+      setGameStatus(t('learn:game_in_progress'));
     }
   };
 
@@ -52,8 +54,8 @@ const PlayBotPage = () => {
     setChess(newChess);
     setBoardFen(newChess.fen());
     setLastMove(null);
-    setGameStatus('Playing');
-  }, []);
+    setGameStatus(t('learn:game_in_progress'));
+  }, [t]);
 
   const handlePlayerColorChange = (color) => {
     setPlayerColor(color);
@@ -142,7 +144,7 @@ const PlayBotPage = () => {
             to="/learn"
             className="inline-flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-amber-400 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Learn Overview
+            <ArrowLeft className="w-4 h-4" /> {t('learn:back_to_learn_overview')}
           </Link>
         </div>
 
@@ -155,7 +157,7 @@ const PlayBotPage = () => {
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${isBotThinking ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
                 <span className="text-sm font-semibold text-slate-200">
-                  {isBotThinking ? `${botInstance.name} is thinking...` : gameStatus}
+                  {isBotThinking ? t('learn:bot_is_thinking', { botName: botInstance.name }) : gameStatus}
                 </span>
               </div>
 
@@ -168,10 +170,10 @@ const PlayBotPage = () => {
                       ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
                       : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
                   }`}
-                  title={showLegalMoves ? 'Hide legal moves' : 'Show legal moves'}
+                  title={showLegalMoves ? t('learn:hide_legal_moves') : t('learn:show_legal_moves')}
                 >
                   <Eye className="w-3.5 h-3.5" />
-                  <span>{showLegalMoves ? 'Legal Moves: ON' : 'Legal Moves: OFF'}</span>
+                  <span>{showLegalMoves ? t('learn:legal_moves_on') : t('learn:legal_moves_off')}</span>
                 </button>
 
                 {/* Restart Game Button */}
@@ -179,7 +181,7 @@ const PlayBotPage = () => {
                   onClick={resetGame}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" /> Restart Game
+                  <RotateCcw className="w-3.5 h-3.5" /> {t('learn:restart_game')}
                 </button>
               </div>
             </div>

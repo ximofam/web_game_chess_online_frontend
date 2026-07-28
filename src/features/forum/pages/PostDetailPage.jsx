@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { ArrowLeft, Eye, User, Calendar, RefreshCw, Lock } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import { forumService } from '../services/forumService';
 import CommentItem from '../components/CommentItem';
 import CommentForm from '../components/CommentForm';
@@ -60,9 +61,9 @@ function TiptapRender({ content }) {
 }
 
 const STATUS_BADGE = {
-  PENDING: { label: 'Đang duyệt', cls: 'bg-yellow-900/50 text-yellow-300 border-yellow-600/40' },
-  APPROVED: { label: 'Đã duyệt', cls: 'bg-emerald-900/50 text-emerald-300 border-emerald-600/40' },
-  DENIED: { label: 'Từ chối', cls: 'bg-red-900/50 text-red-300 border-red-600/40' },
+  PENDING: { labelKey: 'forum:pending', cls: 'bg-yellow-900/50 text-yellow-300 border-yellow-600/40' },
+  APPROVED: { labelKey: 'forum:approved', cls: 'bg-emerald-900/50 text-emerald-300 border-emerald-600/40' },
+  DENIED: { labelKey: 'forum:denied', cls: 'bg-red-900/50 text-red-300 border-red-600/40' },
 };
 
 /**
@@ -71,6 +72,7 @@ const STATUS_BADGE = {
  */
 export default function PostDetailPage() {
   const { id } = useParams();
+  const { t } = useTranslation(['forum']);
   const queryClient = useQueryClient();
   const { isAuthenticated, currentUser } = useAuth();
   const canInteract = isAuthenticated && currentUser?.role !== 'GUEST';
@@ -140,9 +142,9 @@ export default function PostDetailPage() {
 
   if (postError || !post) return (
     <div className="flex-1 flex flex-col items-center justify-center text-[#9ca3af] gap-4 py-20">
-      <p className="text-lg font-semibold text-[#f3f4f6]">Không tìm thấy bài viết</p>
-      <p className="text-sm">Bài viết không tồn tại hoặc chưa được phê duyệt.</p>
-      <Link to="/forum" className="text-[#d4af37] text-sm hover:underline">← Quay lại forum</Link>
+      <p className="text-lg font-semibold text-[#f3f4f6]">{t('forum:post_not_found')}</p>
+      <p className="text-sm">{t('forum:post_not_exists')}</p>
+      <Link to="/forum" className="text-[#d4af37] text-sm hover:underline">← {t('forum:back_to_forum')}</Link>
     </div>
   );
 
@@ -165,7 +167,7 @@ export default function PostDetailPage() {
         <div className="flex flex-wrap items-center gap-3 mb-4">
           {badge && (
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${badge.cls}`}>
-              {badge.label}
+              {t(badge.labelKey)}
             </span>
           )}
           <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
@@ -174,7 +176,7 @@ export default function PostDetailPage() {
           </div>
           <div className="flex items-center gap-1.5 text-xs text-[#9ca3af]">
             <Eye className="w-3.5 h-3.5" />
-            {post.viewCount ?? 0} lượt xem
+            {post.viewCount ?? 0} {t('forum:views_count_text')}
           </div>
         </div>
 
@@ -190,7 +192,7 @@ export default function PostDetailPage() {
               ? <img src={post.author.avatarUrl} alt={post.author.username} className="w-full h-full object-cover" />
               : <User className="w-4 h-4 text-[#d4af37]" />}
           </div>
-          <span className="text-sm font-semibold text-[#f3f4f6]">{post.author?.username ?? 'Ẩn danh'}</span>
+          <span className="text-sm font-semibold text-[#f3f4f6]">{post.author?.username ?? t('forum:anonymous')}</span>
         </div>
 
         {/* Content */}
@@ -218,7 +220,7 @@ export default function PostDetailPage() {
       {/* Comments section */}
       <section id="comments-section">
         <h2 className="font-playfair text-xl font-bold text-[#f3f4f6] mb-5">
-          Bình luận {post.commentCount ? `(${post.commentCount})` : ''}
+          {t('forum:comments_title')} {post.commentCount ? `(${post.commentCount})` : ''}
         </h2>
 
         {/* Comment form */}
@@ -231,8 +233,8 @@ export default function PostDetailPage() {
             <Lock className="w-4 h-4 shrink-0" />
             <span>
               {isAuthenticated
-                ? 'Tài khoản GUEST không thể bình luận.'
-                : <><Link to="/login" className="text-[#d4af37] hover:underline">Đăng nhập</Link> để bình luận.</>}
+                ? t('forum:guest_cannot_comment')
+                : <><Link to="/login" className="text-[#d4af37] hover:underline">{t('forum:login')}</Link>{t('forum:to_comment')}</>}
             </span>
           </div>
         )}
@@ -252,7 +254,7 @@ export default function PostDetailPage() {
             ))}
           </div>
         ) : allComments.length === 0 ? (
-          <p className="text-sm text-[#9ca3af] text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+          <p className="text-sm text-[#9ca3af] text-center py-8">{t('forum:no_comments_yet')}</p>
         ) : (
           <div className="divide-y divide-[#2d323f]">
             {allComments.map(comment => (
@@ -276,8 +278,8 @@ export default function PostDetailPage() {
               className="flex items-center gap-2 px-5 py-2 border border-[#2d323f] rounded-xl text-sm text-[#9ca3af] hover:border-[#d4af37]/40 hover:text-[#d4af37] transition-all disabled:opacity-60"
             >
               {loadingMoreComments
-                ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Đang tải...</>
-                : 'Xem thêm bình luận'}
+                ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> {t('forum:loading')}</>
+                : t('forum:load_more_comments')}
             </button>
           </div>
         )}

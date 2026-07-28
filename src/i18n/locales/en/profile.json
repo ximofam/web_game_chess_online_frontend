@@ -26,5 +26,19 @@
   "avatar_upload_failed": "Avatar upload failed. Please try again.",
   "invalid_image_type": "Invalid image. Supported formats are JPG, JPEG, PNG, and WEBP.",
   "image_too_large": "Image is too large. Limit file size to under 2MB.",
-  "supported_formats": "Supports JPG, PNG, WEBP (Max 2MB)"
+  "supported_formats": "Supports JPG, PNG, WEBP (Max 2MB)",
+  "tactical_error_encountered": "Tactical Error Encountered",
+  "failed_to_fetch_player_details": "Failed to fetch player details from the server.",
+  "retry_action": "RETRY ACTION",
+  "choose_gender": "Choose Gender",
+  "open_player_profile_menu": "Open player profile menu",
+  "online": "Online",
+  "offline": "Offline",
+  "username": "Username",
+  "email_address": "Email Address",
+  "full_name": "Full Name",
+  "cancel": "CANCEL",
+  "save_changes": "SAVE CHANGES",
+  "failed_to_synchronize_player_credentials": "Failed to synchronize player credentials. Check network status.",
+  "no_authenticated_player_profile_found": "No authenticated player profile found."
 }

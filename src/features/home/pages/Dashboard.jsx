@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/context/AuthContext';
 import { User, Shield, LogIn, Sparkles } from 'lucide-react';
 import { PlayModeCards } from '../../rooms/components/PlayModeCards';
@@ -8,6 +9,7 @@ import { MatchmakingModal } from '../../rooms/components/MatchmakingModal';
 import { LobbyList } from '../../rooms/components/LobbyList';
 
 export default function Dashboard() {
+  const { t } = useTranslation(['home']);
   const { currentUser, isGuest } = useAuth();
 
   // Modals state
@@ -26,8 +28,8 @@ export default function Dashboard() {
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-sm text-[#f3f4f6]">Chế độ Khách (Guest)</h3>
-                <p className="text-xs text-[#9ca3af]">Đăng nhập để khởi tạo phòng chơi và lưu kết quả thi đấu.</p>
+                <h3 className="font-bold text-sm text-[#f3f4f6]">{t('home:guest_mode_title')}</h3>
+                <p className="text-xs text-[#9ca3af]">{t('home:guest_mode_desc')}</p>
               </div>
             </div>
 
@@ -36,7 +38,7 @@ export default function Dashboard() {
               className="bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Đăng nhập</span>
+              <span>{t('home:login_btn')}</span>
             </Link>
           </div>
         )}
@@ -76,22 +78,22 @@ export default function Dashboard() {
               <div className="grid grid-cols-3 gap-2 text-center mt-4 pt-3.5 border-t border-[#2d323f]/80">
                 <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
                   <span className="block text-sm font-bold text-[#10b981]">142</span>
-                  <span className="text-[10px] text-[#9ca3af] uppercase">Thắng</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">{t('home:stats_wins')}</span>
                 </div>
                 <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
                   <span className="block text-sm font-bold text-[#38bdf8]">32</span>
-                  <span className="text-[10px] text-[#9ca3af] uppercase">Hòa</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">{t('home:stats_draws')}</span>
                 </div>
                 <div className="bg-[#13161c] py-2 rounded-lg border border-[#2d323f]">
                   <span className="block text-sm font-bold text-[#ef4444]">12</span>
-                  <span className="text-[10px] text-[#9ca3af] uppercase">Thua</span>
+                  <span className="text-[10px] text-[#9ca3af] uppercase">{t('home:stats_losses')}</span>
                 </div>
               </div>
             </div>
 
             {/* 3 ACTION BUTTONS (PLAY MODE STACK) */}
             <div className="bg-[#1a1d24] border border-[#2d323f] p-4.5 rounded-2xl shadow-md">
-              <h3 className="font-playfair text-base font-bold text-[#f3f4f6] mb-3">Chế Độ Thi Đấu</h3>
+              <h3 className="font-playfair text-base font-bold text-[#f3f4f6] mb-3">{t('home:play_modes_title')}</h3>
               <PlayModeCards
                 onCreateRoomClick={() => setIsCreateModalOpen(true)}
                 onMatchmakingClick={() => setIsMatchmakingModalOpen(true)}

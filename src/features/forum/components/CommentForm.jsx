@@ -3,10 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Send, X } from 'lucide-react';
-
-const schema = z.object({
-  content: z.string().min(1, 'Không được để trống').max(5000, 'Tối đa 5000 ký tự'),
-});
+import { useTranslation } from 'react-i18next';
 
 /**
  * CommentForm — tạo comment cấp 1 hoặc reply.
@@ -17,7 +14,12 @@ const schema = z.object({
  * @param {Function} [props.onCancel] If provided, show cancel button
  */
 export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
+  const { t } = useTranslation(['forum']);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const schema = z.object({
+    content: z.string().min(1, t('forum:err_empty')).max(5000, t('forum:err_max_5000')),
+  });
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
@@ -40,7 +42,7 @@ export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
         id={parentId ? `reply-input-${parentId}` : `comment-input-${postId}`}
         {...register('content')}
         rows={parentId ? 2 : 3}
-        placeholder={parentId ? 'Viết phản hồi...' : 'Viết bình luận...'}
+        placeholder={parentId ? t('forum:placeholder_reply') : t('forum:placeholder_comment')}
         className="w-full bg-[#13161c] border border-[#2d323f] rounded-lg px-3 py-2 text-sm text-[#f3f4f6] placeholder:text-[#9ca3af]/60 focus:outline-none focus:border-[#d4af37]/50 resize-none"
       />
       {errors.content && (
@@ -54,7 +56,7 @@ export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
             className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-[#9ca3af] hover:text-[#f3f4f6] border border-[#2d323f] rounded-lg transition-colors focus:outline-none"
           >
             <X className="w-3.5 h-3.5" />
-            Huỷ
+            {t('forum:cancel')}
           </button>
         )}
         <button
@@ -64,7 +66,7 @@ export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#d4af37] text-[#0d0e12] rounded-lg hover:bg-[#f3cd57] transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none"
         >
           <Send className="w-3.5 h-3.5" />
-          {isSubmitting ? 'Đang gửi...' : parentId ? 'Phản hồi' : 'Bình luận'}
+          {isSubmitting ? t('forum:sending') : parentId ? t('forum:reply') : t('forum:comment')}
         </button>
       </div>
     </form>

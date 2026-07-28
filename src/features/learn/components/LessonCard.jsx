@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Shield, Compass, Zap, Target, AlertTriangle, Crown, ShieldAlert, Flame, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
 
 const ICON_MAP = {
@@ -14,6 +15,7 @@ const ICON_MAP = {
 
 const LessonCard = ({ lesson, isCompleted }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['learn']);
   const IconComponent = ICON_MAP[lesson.icon] || Shield;
 
   const difficultyColors = {
@@ -34,7 +36,7 @@ const LessonCard = ({ lesson, isCompleted }) => {
         <div className="flex items-center gap-2">
           {isCompleted && (
             <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Done
+              <CheckCircle2 className="w-3.5 h-3.5" /> {t('learn:done')}
             </span>
           )}
           <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${difficultyColors[lesson.difficulty] || difficultyColors.Beginner}`}>
@@ -45,10 +47,10 @@ const LessonCard = ({ lesson, isCompleted }) => {
 
       <div>
         <h3 className="text-lg font-bold text-slate-100 group-hover:text-amber-400 transition-colors mb-1.5">
-          {lesson.title}
+          {t(`learn:lesson_${lesson.id}_title`, lesson.title)}
         </h3>
         <p className="text-sm text-slate-400 line-clamp-2 mb-4">
-          {lesson.description}
+          {t(`learn:lesson_${lesson.id}_desc`, lesson.description)}
         </p>
       </div>
 
@@ -57,7 +59,7 @@ const LessonCard = ({ lesson, isCompleted }) => {
           <Clock className="w-3.5 h-3.5 text-slate-400" /> {lesson.estimatedTime}
         </span>
         <span className="flex items-center gap-1 text-amber-400 font-semibold group-hover:translate-x-1 transition-transform">
-          Start <ChevronRight className="w-4 h-4" />
+          {t('learn:start')} <ChevronRight className="w-4 h-4" />
         </span>
       </div>
     </div>

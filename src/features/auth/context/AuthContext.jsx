@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import { authService } from '../services/authService';
 import { setAccessToken, registerOnLogout } from '../api/authClient';
@@ -10,6 +11,7 @@ import GuestChoiceModal from '../components/GuestChoiceModal';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const { t } = useTranslation(['auth']);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-      showToast('Đã đăng xuất thành công.', 'success');
+      showToast(t('auth:logout_success_toast'), 'success');
     } catch (err) {
       console.warn('Logout request failed or timed out', err);
     } finally {
@@ -80,14 +82,14 @@ export const AuthProvider = ({ children }) => {
         data = await authService.loginGuest();
       } catch (regErr) {
         console.error('Failed guest registration/login flow', regErr);
-        showToast('Không thể khởi tạo tài khoản Khách (Guest).', 'error');
+        showToast(t('auth:guest_init_error_toast'), 'error');
         throw regErr;
       }
     }
 
     if (!data?.accessToken) {
       const err = new Error('No access token received for guest account');
-      showToast('Đăng nhập Khách (Guest) không thành công.', 'error');
+      showToast(t('auth:guest_login_error_toast'), 'error');
       throw err;
     }
 
@@ -213,7 +215,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     registerOnLogout(() => {
       logoutLocal();
-      showToast('Phiên đăng nhập đã hết hạn.', 'error');
+      showToast(t('auth:session_expired_toast'), 'error');
       navigate('/', { replace: true });
     });
 

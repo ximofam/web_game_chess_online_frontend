@@ -1,4 +1,5 @@
 import { Bot, Sparkles, ShieldAlert, Cpu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const BotSelector = ({
   selectedStrategy,
@@ -9,6 +10,7 @@ const BotSelector = ({
   onSelectColor,
   disabled = false,
 }) => {
+  const { t } = useTranslation(['learn']);
   return (
     <div className="flex flex-col gap-5 p-5 bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl">
       <div className="flex items-center gap-3">
@@ -16,15 +18,15 @@ const BotSelector = ({
           <Bot className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-slate-100">Bot Strategy & Difficulty</h3>
-          <p className="text-xs text-slate-400">Configure your AI opponent on the frontend</p>
+          <h3 className="text-sm font-bold text-slate-100">{t('learn:bot_strategy_title')}</h3>
+          <p className="text-xs text-slate-400">{t('learn:bot_strategy_desc')}</p>
         </div>
       </div>
 
       {/* Strategy Selection */}
       <div>
         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-          AI Engine Strategy
+          {t('learn:ai_engine_strategy')}
         </label>
         <div className="grid grid-cols-3 gap-2">
           <button
@@ -38,7 +40,7 @@ const BotSelector = ({
             }`}
           >
             <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>Random</span>
+            <span>{t('learn:strategy_random')}</span>
           </button>
 
           <button
@@ -52,7 +54,7 @@ const BotSelector = ({
             }`}
           >
             <ShieldAlert className="w-4 h-4 text-amber-400" />
-            <span>MiniMax</span>
+            <span>{t('learn:strategy_minimax')}</span>
           </button>
 
           <button
@@ -66,7 +68,7 @@ const BotSelector = ({
             }`}
           >
             <Cpu className="w-4 h-4 text-amber-400" />
-            <span>Stockfish</span>
+            <span>{t('learn:strategy_stockfish')}</span>
           </button>
         </div>
       </div>
@@ -74,13 +76,13 @@ const BotSelector = ({
       {/* Difficulty Level */}
       <div>
         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-          Difficulty Level
+          {t('learn:difficulty_level')}
         </label>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { lvl: 1, label: 'Easy' },
-            { lvl: 2, label: 'Medium' },
-            { lvl: 3, label: 'Hard' },
+            { lvl: 1, label: t('learn:diff_easy') },
+            { lvl: 2, label: t('learn:diff_medium') },
+            { lvl: 3, label: t('learn:diff_hard') },
           ].map(({ lvl, label }) => (
             <button
               key={lvl}
@@ -102,7 +104,7 @@ const BotSelector = ({
       {/* Side selection */}
       <div>
         <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-          Play As
+          {t('learn:play_as')}
         </label>
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -115,7 +117,7 @@ const BotSelector = ({
                 : 'bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
           >
-            ⚪ White (Moves 1st)
+            {t('learn:play_white')}
           </button>
           <button
             type="button"
@@ -127,7 +129,7 @@ const BotSelector = ({
                 : 'bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
           >
-            ⚫ Black (Moves 2nd)
+            {t('learn:play_black')}
           </button>
         </div>
       </div>
