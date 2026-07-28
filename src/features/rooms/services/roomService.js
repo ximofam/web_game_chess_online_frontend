@@ -52,5 +52,14 @@ export const roomService = {
     const response = await authClient.post(`/api/rooms/${roomId}/leave`);
     return response.data;
   },
+
+  /**
+   * Lấy lịch sử chat của phòng
+   * GET /api/rooms/:roomId/chat
+   */
+  getRoomChat: async (roomId) => {
+    const response = await authClient.get(`/api/rooms/${roomId}/chat`);
+    return response.data;
+  },
 };
 

@@ -103,8 +103,6 @@ export function useRoomDetails(roomId) {
         }
 
         if (event.type === 'ROOM_DELETED') {
-          // Xoá cache phòng và redirect về sảnh
-          queryClient.removeQueries({ queryKey: ['room', roomId] });
           queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
           showToast('Phòng chơi đã bị hủy do chủ phòng rời đi.', 'error');
           navigate('/dashboard');

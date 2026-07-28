@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
 import { activeRoomManager } from '../services/activeRoomManager';
 
-export function RoomHeader({ room }) {
+export function RoomHeader({ room, onMinimize }) {
   const navigate = useNavigate();
   const { showToast } = useAuth();
   const [copied, setCopied] = useState(false);
@@ -23,6 +23,10 @@ export function RoomHeader({ room }) {
   };
 
   const handleMinimize = () => {
+    if (onMinimize) {
+      onMinimize();
+      return;
+    }
     activeRoomManager.setRoom(room);
     showToast('Đã thu nhỏ phòng cờ ở góc màn hình!', 'info');
     navigate('/dashboard');
@@ -56,15 +60,6 @@ export function RoomHeader({ room }) {
     <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       {/* LEFT: BACK & TITLE */}
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate('/dashboard')}
-          className="p-2.5 rounded-xl bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] transition-colors cursor-pointer shrink-0"
-          title="Quay lại sảnh"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-playfair text-xl sm:text-2xl font-bold text-[#f3f4f6] truncate max-w-[280px] sm:max-w-md">

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
 import { SocketProvider } from './shared/socket/SocketProvider';
@@ -41,49 +41,55 @@ const HomeIndex = () => {
   return isAuthenticated ? <Dashboard /> : <LandingPage />;
 };
 
+const router = createBrowserRouter([
+  {
+    element: (
+      <AuthProvider>
+        <SocketProvider>
+          <NotificationProvider>
+            <GlobalApiErrorHandler />
+            <Outlet />
+          </NotificationProvider>
+        </SocketProvider>
+      </AuthProvider>
+    ),
+    children: [
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      {
+        element: <PublicLayout />,
+        children: [
+          { path: '/', element: <HomeIndex /> },
+          { path: '/landing', element: <LandingPage /> },
+          { path: '/dashboard', element: <Dashboard /> },
+          { path: '/room/:roomId', element: <RoomWaitingPage /> },
+          { path: '/learn', element: <LearnOverviewPage /> },
+          { path: '/learn/play-bot', element: <PlayBotPage /> },
+          { path: '/learn/:lessonId', element: <LessonDetailPage /> },
+          { path: '/forum', element: <ForumListPage /> },
+          { path: '/forum/posts/:id', element: <PostDetailPage /> },
+          { path: '/403', element: <ForbiddenPage /> },
+          { path: '/404', element: <NotFoundPage /> },
+        ],
+      },
+      {
+        element: <ProtectedLayout />,
+        children: [
+          { path: '/profile', element: <ProfilePage /> },
+          { path: '/notifications', element: <NotificationsPage /> },
+          { path: '/forum/create', element: <ForumCreatePage /> },
+          { path: '/forum/my-posts', element: <MyPostsPage /> },
+        ],
+      },
+      { path: '*', element: <Navigate to="/404" replace /> },
+    ],
+  },
+]);
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <GlobalApiErrorHandler />
-        <AuthProvider>
-          <SocketProvider>
-            <NotificationProvider>
-              <Routes>
-                {/* Auth Routes (Login, Register - Directly Accessible) */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-
-                {/* Public Routes (Accessible to Guest & User with Navbar + Footer) */}
-                <Route element={<PublicLayout />}>
-                  <Route path="/" element={<HomeIndex />} />
-                  <Route path="/landing" element={<LandingPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/room/:roomId" element={<RoomWaitingPage />} />
-                  <Route path="/learn" element={<LearnOverviewPage />} />
-                  <Route path="/learn/play-bot" element={<PlayBotPage />} />
-                  <Route path="/learn/:lessonId" element={<LessonDetailPage />} />
-                  <Route path="/forum" element={<ForumListPage />} />
-                  <Route path="/forum/posts/:id" element={<PostDetailPage />} />
-                  <Route path="/403" element={<ForbiddenPage />} />
-                  <Route path="/404" element={<NotFoundPage />} />
-                </Route>
-
-                {/* Registered User Only Routes */}
-                <Route element={<ProtectedLayout />}>
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/notifications" element={<NotificationsPage />} />
-                  <Route path="/forum/create" element={<ForumCreatePage />} />
-                  <Route path="/forum/my-posts" element={<MyPostsPage />} />
-                </Route>
-
-                {/* Catch-all Redirect */}
-                <Route path="*" element={<Navigate to="/404" replace />} />
-              </Routes>
-            </NotificationProvider>
-          </SocketProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
 }
