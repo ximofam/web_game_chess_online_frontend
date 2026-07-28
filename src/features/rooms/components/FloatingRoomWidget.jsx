@@ -5,6 +5,7 @@ import { activeRoomManager } from '../services/activeRoomManager';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRoomDetails } from '../hooks/useRoomDetails';
 
 /**
  * Floating Room Widget cho phép thu nhỏ phòng chờ ở góc màn hình.
@@ -23,14 +24,29 @@ export function FloatingRoomWidget() {
     });
   }, []);
 
-  if (!activeRoom) return null;
+  const { room: fetchedRoom, isError } = useRoomDetails(activeRoom?.roomId, {
+    onRoomDeleted: () => {
+      activeRoomManager.clearRoom();
+    }
+  });
+
+  // Clear room on error (e.g., room deleted while offline)
+  useEffect(() => {
+    if (isError && activeRoom) {
+      activeRoomManager.clearRoom();
+    }
+  }, [isError, activeRoom]);
+
+  const displayRoom = fetchedRoom || activeRoom;
+
+  if (!displayRoom) return null;
 
   // Don't display widget when user is already inside the full room page
-  if (location.pathname === `/room/${activeRoom.roomId}`) {
+  if (location.pathname === `/room/${displayRoom.roomId}`) {
     return null;
   }
 
-  const { roomId, name, settings = {}, white, black } = activeRoom;
+  const { roomId, name, settings = {}, white, black } = displayRoom;
   const { timeMinutes = 5, incrementSeconds = 3 } = settings;
   const playerCount = (white ? 1 : 0) + (black ? 1 : 0);
 

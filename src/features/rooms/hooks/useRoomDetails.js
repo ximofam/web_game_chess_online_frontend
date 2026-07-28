@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../shared/socket/useSocket';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Hook fetch thông tin phòng chơi từ GET /api/rooms/:roomId
@@ -15,6 +16,7 @@ export function useRoomDetails(roomId, options = {}) {
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
   const { subscribe, unsubscribe, connectionStatus } = useSocket();
+  const { t } = useTranslation(['room']);
 
   const query = useQuery({
     queryKey: ['room', roomId],
@@ -83,6 +85,9 @@ export function useRoomDetails(roomId, options = {}) {
 
             return { ...oldRoom, [role]: user };
           });
+          if (window.location.pathname !== `/room/${roomId}`) {
+            showToast(t('room:playerJoined', '{{username}} joined the room', { username: user.username }), 'info');
+          }
         }
 
         if (event.type === 'PLAYER_LEFT') {
@@ -101,11 +106,21 @@ export function useRoomDetails(roomId, options = {}) {
 
             return { ...oldRoom, [role]: null };
           });
+          if (window.location.pathname !== `/room/${roomId}` && userId !== currentUser?.id) {
+            showToast(t('room:playerLeft', 'A player left the room'), 'info');
+          }
+        }
+
+        if (event.type === 'CHAT_MESSAGE') {
+          if (window.location.pathname !== `/room/${roomId}` && event.data?.sender?.id !== currentUser?.id) {
+            const sender = event.data?.sender?.username || 'Ai đó';
+            showToast(`💬 ${sender}: ${event.data?.message}`, 'info');
+          }
         }
 
         if (event.type === 'ROOM_DELETED') {
           queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
-          showToast('Phòng chơi đã bị hủy do chủ phòng rời đi.', 'error');
+          showToast(t('room:roomDeletedMsg', 'Room was deleted by host.'), 'error');
           if (onRoomDeleted) {
             onRoomDeleted();
           } else {
