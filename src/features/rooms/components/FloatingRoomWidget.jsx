@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Maximize2, X, Clock, Users, Sparkles } from 'lucide-react';
 import { activeRoomManager } from '../services/activeRoomManager';

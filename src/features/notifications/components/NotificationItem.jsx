@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react-refresh/only-export-components */
 import { useNavigate } from 'react-router-dom';
 import { Eye, Trash2, MailOpen, User } from 'lucide-react';
 

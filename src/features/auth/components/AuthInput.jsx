@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * Reusable, fully accessible Chess-themed Input field.

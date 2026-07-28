@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNotifications } from '../context/NotificationContext';
 import NotificationItem from '../components/NotificationItem';
 import LoadingSkeleton from '../components/LoadingSkeleton';

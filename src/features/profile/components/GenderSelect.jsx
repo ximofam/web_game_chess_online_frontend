@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * GenderSelect displays a premium styled select element for

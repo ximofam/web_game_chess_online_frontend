@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, ChevronUp, User } from 'lucide-react';
 import LikeButton from './LikeButton';
 import CommentForm from './CommentForm';

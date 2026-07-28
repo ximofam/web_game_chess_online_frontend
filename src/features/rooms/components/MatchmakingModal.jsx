@@ -1,4 +1,3 @@
-import React from 'react';
 import { X, Swords, Sparkles, Zap, ShieldCheck, Timer } from 'lucide-react';
 
 export function MatchmakingModal({ isOpen, onClose }) {

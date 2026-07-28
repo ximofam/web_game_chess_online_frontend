@@ -58,7 +58,7 @@ export const subscribeOnlineCount = (socket, callback) => {
         if (!isNaN(count)) {
           callback(count);
         }
-      } catch (e) {
+      } catch (error) {
         const count = Number(message.body);
         if (!isNaN(count)) {
           callback(count);

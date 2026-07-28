@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useBlocker } from 'react-router-dom';
 import { Play, LogOut, Loader2, AlertCircle, ShieldAlert, Minimize2, X } from 'lucide-react';
 import { useRoomDetails } from '../hooks/useRoomDetails';

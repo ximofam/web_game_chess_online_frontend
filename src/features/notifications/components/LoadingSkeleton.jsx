@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * Shimmering loading skeleton for notification lists.

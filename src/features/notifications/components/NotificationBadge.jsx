@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * NotificationBadge displays the number of unread alerts.

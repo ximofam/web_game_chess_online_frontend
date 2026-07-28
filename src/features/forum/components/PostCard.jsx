@@ -1,4 +1,3 @@
-import React from 'react';
 import { Heart, Eye, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

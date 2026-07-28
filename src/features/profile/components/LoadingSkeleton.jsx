@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * LoadingSkeleton displays animated pulsing blocks representing

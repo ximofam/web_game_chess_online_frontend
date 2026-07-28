@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * DatePicker wraps a standard HTML5 date input and translates

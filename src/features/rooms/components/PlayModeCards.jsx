@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, Swords, Bot, Sparkles, ChevronRight } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Send, Lock, Loader2, MessageSquare } from 'lucide-react';
 import { useSocket } from '../../../shared/socket/useSocket';
@@ -23,6 +23,7 @@ export function RoomChat({ roomId, room }) {
   // Sync query data to local state for appending new messages
   useEffect(() => {
     if (history && Array.isArray(history)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages(history);
     }
   }, [history]);

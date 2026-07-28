@@ -240,7 +240,7 @@ export default function PostDetailPage() {
         {/* Comments list */}
         {commentsLoading ? (
           <div className="space-y-4">
-            {[1,2,3].map(i => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="flex gap-3 animate-pulse">
                 <div className="w-8 h-8 rounded-full bg-[#2d323f] shrink-0" />
                 <div className="flex-1 space-y-2">

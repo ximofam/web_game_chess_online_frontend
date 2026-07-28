@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users, Lock } from 'lucide-react';
@@ -16,7 +16,7 @@ export function LobbyList({ onCreateRoomClick }) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'WAITING' | 'IN_PROGRESS'
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearchTerm(searchTerm), 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -53,7 +53,7 @@ export function LobbyList({ onCreateRoomClick }) {
   };
 
   // Auto-fetch next page if current content height is too small to display a scrollbar
-  React.useEffect(() => {
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 

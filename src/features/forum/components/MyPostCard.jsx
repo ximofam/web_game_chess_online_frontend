@@ -53,7 +53,7 @@ export default function MyPostCard({ post, onDelete }) {
     }
   };
 
-  const formattedDate = new Date(post.createdAt || Date.now()).toLocaleDateString('vi-VN', {
+  const formattedDate = new Date(post.createdAt || new Date().toISOString()).toLocaleDateString('vi-VN', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

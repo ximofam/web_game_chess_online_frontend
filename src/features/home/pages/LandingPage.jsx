@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Trophy, Zap, MessageSquare, ShieldCheck, UserCheck, ArrowRight, Sparkles, Award } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';

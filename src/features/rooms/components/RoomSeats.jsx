@@ -1,4 +1,3 @@
-import React from 'react';
 import { User, Crown, ArrowLeftRight, CheckCircle2, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 

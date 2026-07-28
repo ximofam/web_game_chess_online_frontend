@@ -1,4 +1,3 @@
-import React from 'react';
 import { Eye, Users } from 'lucide-react';
 
 export function RoomSpectators({ spectators = [] }) {
