@@ -16,7 +16,12 @@ export function RoomWaitingPage() {
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
-  const { room, isLoading, isError, refetch } = useRoomDetails(roomId);
+  const { room, isLoading, isError, refetch } = useRoomDetails(roomId, {
+    onRoomDeleted: () => {
+      bypassBlockerRef.current = true;
+      navigate('/dashboard');
+    }
+  });
 
   const [isStarting, setIsStarting] = useState(false);
   const bypassBlockerRef = useRef(false);

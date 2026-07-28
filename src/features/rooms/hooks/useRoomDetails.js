@@ -9,7 +9,8 @@ import { useSocket } from '../../../shared/socket/useSocket';
  * Hook fetch thông tin phòng chơi từ GET /api/rooms/:roomId
  * Có hỗ trợ Mock Fallback khi DEV / backend endpoint chưa sẵn sàng.
  */
-export function useRoomDetails(roomId) {
+export function useRoomDetails(roomId, options = {}) {
+  const { onRoomDeleted } = options;
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
@@ -105,7 +106,11 @@ export function useRoomDetails(roomId) {
         if (event.type === 'ROOM_DELETED') {
           queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
           showToast('Phòng chơi đã bị hủy do chủ phòng rời đi.', 'error');
-          navigate('/dashboard');
+          if (onRoomDeleted) {
+            onRoomDeleted();
+          } else {
+            navigate('/dashboard');
+          }
         }
       } catch (err) {
         console.error('[Room Socket] Failed to parse realtime event', err);
