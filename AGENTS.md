@@ -16,3 +16,7 @@ Unless explicitly instructed otherwise, always provide translations for both **E
 # Frontend design work
  
 For any task involving new UI, pages, or visual/design decisions, read **DESIGN.md** first and follow it.
+# Code Organization Rules
+
+1. **Reusable Utilities**: Any utility function with high reusability potential (e.g., date/time formatting, string manipulation, calculation helpers) MUST NOT be defined inline within components. Instead, extract them and place them in the `src/shared/utils/` directory.
+2. Import these shared utilities wherever needed to avoid code duplication and keep components focused purely on UI and state logic.

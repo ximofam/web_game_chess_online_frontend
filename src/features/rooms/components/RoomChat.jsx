@@ -4,6 +4,7 @@ import { Send, Lock, Loader2, MessageSquare } from 'lucide-react';
 import { useSocket } from '../../../shared/socket/useSocket';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
+import { formatTime } from '../../../shared/utils/timeUtils';
 
 export function RoomChat({ roomId, room }) {
   const [messages, setMessages] = useState([]);
@@ -70,13 +71,13 @@ export function RoomChat({ roomId, room }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full max-h-[500px] bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
       <div className="flex items-center gap-2 p-3 border-b border-[#2d323f] bg-[#1a1d24]">
         <MessageSquare className="w-4 h-4 text-[#d4af37]" />
         <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider">Trò chuyện</h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[300px] bg-[#0d0e12]/30">
+      <div className="flex-1 overflow-y-auto p-4 pr-2 space-y-3 min-h-[300px] bg-[#0d0e12]/30 scrollbar-thin">
         {isLoading ? (
           <div className="flex justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-[#d4af37]" />
@@ -88,17 +89,23 @@ export function RoomChat({ roomId, room }) {
         ) : (
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === currentUser?.id;
+
             return (
               <div key={idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                <span className="text-[10px] text-[#9ca3af] mb-1 px-1">
+                <span className="text-[10px] text-[#9ca3af] mb-1 px-1 flex items-center gap-1">
                   {msg.sender?.username || 'Unknown'}
+                  {msg.sentAt && (
+                    <>
+                      <span>•</span>
+                      <span>{formatTime(msg.sentAt)}</span>
+                    </>
+                  )}
                 </span>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                    isMe
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${isMe
                       ? 'bg-[#d4af37] text-[#0d0e12] rounded-br-none'
                       : 'bg-[#2d323f] text-[#f3f4f6] rounded-bl-none'
-                  }`}
+                    }`}
                   style={{ wordBreak: 'break-word' }}
                 >
                   {msg.message}
