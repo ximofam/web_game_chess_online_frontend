@@ -26,7 +26,7 @@ export function RoomChat({ roomId, room }) {
   // Sync query data to local state for appending new messages
   useEffect(() => {
     if (history && Array.isArray(history)) {
-       
+
       setMessages(history);
     }
   }, [history]);
@@ -35,7 +35,7 @@ export function RoomChat({ roomId, room }) {
   useEffect(() => {
     if (!roomId || connectionStatus !== 'CONNECTED') return;
 
-    const topic = `/topic/room/${roomId}`;
+    const topic = `/topic/room.${roomId}`;
     const subId = subscribe(topic, (messageFrame) => {
       try {
         const event = JSON.parse(messageFrame.body);
@@ -105,8 +105,8 @@ export function RoomChat({ roomId, room }) {
                 </span>
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${isMe
-                      ? 'bg-[#d4af37] text-[#0d0e12] rounded-br-none'
-                      : 'bg-[#2d323f] text-[#f3f4f6] rounded-bl-none'
+                    ? 'bg-[#d4af37] text-[#0d0e12] rounded-br-none'
+                    : 'bg-[#2d323f] text-[#f3f4f6] rounded-bl-none'
                     }`}
                   style={{ wordBreak: 'break-word' }}
                 >

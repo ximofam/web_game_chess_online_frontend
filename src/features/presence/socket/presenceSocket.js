@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSocket } from '../../../shared/socket/useSocket';
+import { presenceService } from '../services/presenceService';
 
 /**
  * Presence Socket Adapter
@@ -14,7 +16,7 @@ export const PRESENCE_EVENTS = {
 
 export const subscribeToPresence = (socket, eventHandler) => {
   if (!socket || typeof socket.subscribe !== 'function') {
-    return () => {};
+    return () => { };
   }
 
   const destination = '/topic/presence';
@@ -41,13 +43,11 @@ export const sendPresenceHeartbeat = (socket) => {
 };
 
 /**
- * Subscribes to online user count updates.
- * - `/app/presence.online-count`: triggers initial @SubscribeMapping response
- * - `/topic/presence.online-count`: receives real-time broadcast updates
+ * Subscribes to real-time online user count updates.
  */
 export const subscribeOnlineCount = (socket, callback) => {
   if (!socket || typeof socket.subscribe !== 'function') {
-    return () => {};
+    return () => { };
   }
 
   const handleMessage = (message) => {
@@ -67,33 +67,37 @@ export const subscribeOnlineCount = (socket, callback) => {
     }
   };
 
-  const subAppId = socket.subscribe('/app/presence.online-count', handleMessage);
   const subTopicId = socket.subscribe('/topic/presence.online-count', handleMessage);
 
   return () => {
-    socket.unsubscribe(subAppId);
     socket.unsubscribe(subTopicId);
   };
 };
 
 /**
- * Hook to get and listen to the real-time online user count
+ * Hook to get the real-time online user count via REST API and Websocket
  */
 export const useOnlineCount = () => {
   const socket = useSocket();
-  const [onlineCount, setOnlineCount] = useState(0);
+  const queryClient = useQueryClient();
+
+  const { data: onlineCount = 0 } = useQuery({
+    queryKey: ['presence', 'onlineCount'],
+    queryFn: () => presenceService.getOnlineCount(),
+    staleTime: Infinity, // Rely on websocket for updates
+  });
 
   useEffect(() => {
     if (socket.connectionStatus !== 'CONNECTED') return;
 
+    queryClient.invalidateQueries({ queryKey: ['presence', 'onlineCount'] });
+
     const unsubscribe = subscribeOnlineCount(socket, (count) => {
-      setOnlineCount(count);
+      queryClient.setQueryData(['presence', 'onlineCount'], count);
     });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [socket, socket.connectionStatus]);
+    return () => unsubscribe();
+  }, [socket, socket.connectionStatus, queryClient]);
 
   return onlineCount;
 };

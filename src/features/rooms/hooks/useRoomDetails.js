@@ -63,7 +63,7 @@ export function useRoomDetails(roomId, options = {}) {
   useEffect(() => {
     if (!roomId || connectionStatus !== 'CONNECTED') return;
 
-    const topic = `/topic/room/${roomId}`;
+    const topic = `/topic/room.${roomId}`;
     const subId = subscribe(topic, (message) => {
       try {
         const event = JSON.parse(message.body);
