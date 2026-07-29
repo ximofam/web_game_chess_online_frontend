@@ -15,7 +15,7 @@ export default function GuestChoiceModal({ isOpen, onClose }) {
       await loginGuest();
       showToast(t('auth:guest_toast_success'), 'success');
       if (onClose) onClose();
-    } catch (err) {
+    } catch (_err) {
       showToast(t('auth:guest_toast_error'), 'error');
     }
   };

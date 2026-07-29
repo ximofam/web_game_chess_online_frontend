@@ -26,7 +26,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
     if (isOpen) {
       // Just to satisfy linter or avoid setting state, wait, actually setting state in effect is fine if we suppress it or handle it better.
       // Let's use eslint-disable-next-line
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setName(currentUser?.username ? `${currentUser.username}\'s room` : "Player\'s room");
     }
   }, [isOpen, currentUser]);

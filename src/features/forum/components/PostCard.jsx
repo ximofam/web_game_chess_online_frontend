@@ -19,7 +19,7 @@ export default function PostCard({ post, onLike }) {
   const { t } = useTranslation(['forum']);
   const { id, author, title, viewCount, likeCount, commentCount, createdAt, liked, status } = post;
   const badge = STATUS_BADGE[status];
-  const initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
+  const _initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
 
   const handleLike = (e) => {
     e.preventDefault();

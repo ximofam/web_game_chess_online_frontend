@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Ghost, Home, Search } from 'lucide-react';
+import { Ghost, Home } from 'lucide-react';
 
 const NotFoundPage = () => {
   const { t } = useTranslation(['error']);

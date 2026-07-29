@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Copy, Check, Clock, Shield, Lock, Globe, User, Radio, Minimize2 } from 'lucide-react';
+import { Copy, Check, Clock, Shield, Lock, Globe, User, Radio, Minimize2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
 import { activeRoomManager } from '../services/activeRoomManager';

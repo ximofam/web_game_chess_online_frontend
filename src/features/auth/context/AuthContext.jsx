@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       } catch (e) {
         console.warn('Failed to refresh guest token cookie', e);
       }
-    } catch (loginErr) {
+    } catch (_loginErr) {
       // Step 2: If loginGuest fails (no guest account yet), call registerGuest
       try {
         await authService.registerGuest();
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       setIsGuestModalOpen(false);
       return guestObj;
-    } catch (profileErr) {
+    } catch (_profileErr) {
       const guestObj = data.user || {
         id: 'guest_' + Math.floor(Math.random() * 1000),
         username: 'Guest Player',
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
       setIsGuestModalOpen(false);
       showToast(`Welcome back, ${userObj.username}!`, 'success');
       return userObj;
-    } catch (err) {
+    } catch (_err) {
       const fallbackUser = { ...data.user, role: data.user?.role || 'USER', isGuest: false };
       setCurrentUser(fallbackUser);
       setIsAuthenticated(true);
@@ -175,7 +175,7 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser(userObj);
           setIsAuthenticated(true);
           return data.accessToken;
-        } catch (profileErr) {
+        } catch (_profileErr) {
           if (data.user) {
             const userRole = data.user.role || (isGuest ? 'GUEST' : 'USER');
             const fallbackUser = {
@@ -228,7 +228,7 @@ export const AuthProvider = ({ children }) => {
       try {
         // First check for active registered user session
         await refreshToken();
-      } catch (err) {
+      } catch (_err) {
         // Refresh returned 401 -> non-authenticated visitor lands on Landing Page
       } finally {
         setIsLoading(false);

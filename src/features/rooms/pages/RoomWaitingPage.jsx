@@ -44,6 +44,7 @@ export function RoomWaitingPage() {
       showToast(t('room:leaveRoomError', 'Error leaving room: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     }
+    // eslint-disable-next-line react-hooks/immutability
     bypassBlockerRef.current = true;
     if (blocker.state === 'blocked') {
       blocker.proceed();
@@ -55,6 +56,7 @@ export function RoomWaitingPage() {
   const handleConfirmMinimize = () => {
     activeRoomManager.setRoom(room);
     showToast(t('room:minimizeSuccess', 'Room minimized to screen corner!'), 'info');
+    // eslint-disable-next-line react-hooks/immutability
     bypassBlockerRef.current = true;
     if (blocker.state === 'blocked') {
       blocker.proceed();
@@ -71,6 +73,7 @@ export function RoomWaitingPage() {
 
   // Cleanup bypass flag on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     bypassBlockerRef.current = false;
   }, []);
 
@@ -123,7 +126,7 @@ export function RoomWaitingPage() {
     }, 1200);
   };
 
-  const handleSeatChange = (side) => {
+  const handleSeatChange = () => {
     showToast(t('room:sitWhite', 'Sit as White'), 'success');
   };
 

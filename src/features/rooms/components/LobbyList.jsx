@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Search, RefreshCw, Radio, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users, Lock } from 'lucide-react';
+import { Search, RefreshCw, Layers, User, Clock, Shield, Play, Eye, AlertCircle, Loader2, Users, Lock } from 'lucide-react';
 import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';

@@ -102,7 +102,7 @@ class StompClientManager {
       this.subscriptions.forEach((sub) => {
         try {
           sub.unsubscribe();
-        } catch (error) {
+        } catch (_error) {
           // ignore
         }
       });

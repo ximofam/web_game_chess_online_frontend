@@ -37,7 +37,7 @@ export const NotificationProvider = ({ children }) => {
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))
       );
       setUnreadCount((c) => Math.max(0, c - 1));
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to mark notification as read.', 'error');
     }
   };
@@ -48,7 +48,7 @@ export const NotificationProvider = ({ children }) => {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
       if (showToast) showToast('All notifications marked as read.', 'success');
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to mark all as read.', 'error');
     }
   };
@@ -61,7 +61,7 @@ export const NotificationProvider = ({ children }) => {
       if (itemToDelete && !itemToDelete.read) {
         setUnreadCount((c) => Math.max(0, c - 1));
       }
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to delete notification.', 'error');
     }
   };
@@ -72,7 +72,7 @@ export const NotificationProvider = ({ children }) => {
       setNotifications([]);
       setUnreadCount(0);
       if (showToast) showToast('Notification history cleared.', 'success');
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to clear notification history.', 'error');
     }
   };

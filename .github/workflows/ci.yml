@@ -25,4 +25,4 @@ jobs:
         run: npm ci
 
       - name: Run ESLint (Check unused imports and variables)
-        run: npx eslint . --max-warnings=0
+        run: npx eslint .

@@ -24,7 +24,7 @@ export function RoomChat({ roomId, room }) {
   // Sync query data to local state for appending new messages
   useEffect(() => {
     if (history && Array.isArray(history)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setMessages(history);
     }
   }, [history]);

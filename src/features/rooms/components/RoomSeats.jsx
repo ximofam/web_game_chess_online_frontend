@@ -1,4 +1,4 @@
-import { User, Crown, ArrowLeftRight, CheckCircle2, Plus } from 'lucide-react';
+import { User, Crown, CheckCircle2, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 
 export function RoomSeats({ room, onSeatChange }) {
@@ -6,7 +6,7 @@ export function RoomSeats({ room, onSeatChange }) {
   if (!room) return null;
 
   const { white, black, host, status } = room;
-  const isHost = currentUser?.id === host?.id;
+  const _isHost = currentUser?.id === host?.id;
   const isWaiting = status === 'WAITING';
 
   const isUserWhite = currentUser && white && currentUser.id === white.id;

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trophy, Zap, MessageSquare, ShieldCheck, UserCheck, ArrowRight, Sparkles, Award } from 'lucide-react';
+import { Trophy, Zap, MessageSquare, UserCheck, ArrowRight, Sparkles, Award } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 
 /**
@@ -17,7 +17,7 @@ export const LandingPage = () => {
       await loginGuest();
       showToast('Chào mừng bạn trải nghiệm với tư cách Khách (Guest)!', 'success');
       navigate('/dashboard');
-    } catch (err) {
+    } catch (_err) {
       showToast('Không thể khởi tạo phiên Khách. Vui lòng thử lại.', 'error');
     }
   };

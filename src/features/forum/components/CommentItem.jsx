@@ -12,7 +12,7 @@ function fmtDate(iso) {
 /**
  * CommentItem — renders one comment with inline like, reply form, and expandable replies.
  */
-export default function CommentItem({ comment, postId, isAuth, onLikeComment, onAddComment }) {
+export default function CommentItem({ comment, postId, isAuth, onLikeComment: _onLikeComment, onAddComment: _onAddComment }) {
   const { t } = useTranslation(['forum']);
   const { id, content, author, likeCount, liked, replyCount, createdAt } = comment;
 
@@ -25,7 +25,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment, on
   const [expanded, setExpanded] = useState(false);
   const [loadingReplies, setLoadingReplies] = useState(false);
 
-  const initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
+  const _initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
 
   const handleLike = async () => {
     const newLiked = !localLiked;

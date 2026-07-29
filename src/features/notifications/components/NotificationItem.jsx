@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useNavigate } from 'react-router-dom';
-import { Eye, Trash2, MailOpen, User } from 'lucide-react';
+import { Eye, Trash2, User } from 'lucide-react';
 
 /**
  * Helper to display human-readable relative time intervals.
@@ -28,7 +28,7 @@ export const formatRelativeTime = (dateString) => {
 export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }) => {
   const navigate = useNavigate();
   const { sender, type, title, message, createdAt, read, metadata } = item;
-  const initial = sender?.username ? sender.username.charAt(0).toUpperCase() : 'U';
+  const _initial = sender?.username ? sender.username.charAt(0).toUpperCase() : 'U';
 
   const handleItemClick = async (e) => {
     // If clicking action buttons, do not trigger navigation
