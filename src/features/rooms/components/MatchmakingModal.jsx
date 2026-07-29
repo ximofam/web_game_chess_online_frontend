@@ -1,6 +1,8 @@
 import { Swords, Sparkles, Zap, ShieldCheck, Timer } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function MatchmakingModal({ isOpen, onClose }) {
+  const { t } = useTranslation(['room']);
   if (!isOpen) return null;
 
   return (
@@ -12,11 +14,11 @@ export function MatchmakingModal({ isOpen, onClose }) {
             <Swords className="w-8 h-8" />
           </div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 mb-2">
-            <Sparkles className="w-3.5 h-3.5" /> Tính năng đang phát triển (Tương lai)
+            <Sparkles className="w-3.5 h-3.5" /> {t('room:featureInDevelopment', 'Tính năng đang phát triển (Tương lai)')}
           </span>
-          <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6]">Ghép Trận Tự Động (Matchmaking)</h2>
+          <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6]">{t('room:autoMatchmaking', 'Ghép Trận Tự Động (Matchmaking)')}</h2>
           <p className="text-xs text-[#9ca3af] mt-1">
-            Hệ thống matchmaking thuật toán Swiss / ELO tự động ghép cặp người chơi tương đồng trình độ.
+            {t('room:matchmakingDesc', 'Hệ thống matchmaking thuật toán Swiss / ELO tự động ghép cặp người chơi tương đồng trình độ.')}
           </p>
         </div>
 
@@ -27,9 +29,9 @@ export function MatchmakingModal({ isOpen, onClose }) {
               <Zap className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-[#f3f4f6]">Ghép Trận Siêu Tốc</h4>
+              <h4 className="text-xs font-bold text-[#f3f4f6]">{t('room:fastMatchmaking', 'Ghép Trận Siêu Tốc')}</h4>
               <p className="text-[11px] text-[#9ca3af]">
-                Tìm kiếm đối thủ sẵn sàng trong 1-5 giây bằng một cú click chuột đơn giản.
+                {t('room:fastMatchmakingDesc', 'Tìm kiếm đối thủ sẵn sàng trong 1-5 giây bằng một cú click chuột đơn giản.')}
               </p>
             </div>
           </div>
@@ -39,9 +41,9 @@ export function MatchmakingModal({ isOpen, onClose }) {
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-[#f3f4f6]">Cân Bằng Chỉ Số ELO</h4>
+              <h4 className="text-xs font-bold text-[#f3f4f6]">{t('room:balanceElo', 'Cân Bằng Chỉ Số ELO')}</h4>
               <p className="text-[11px] text-[#9ca3af]">
-                Tự động thu hẹp hoặc mở rộng biên độ Elo xung quanh vị thứ thi đấu của bạn.
+                {t('room:balanceEloDesc', 'Tự động thu hẹp hoặc mở rộng biên độ Elo xung quanh vị thứ thi đấu của bạn.')}
               </p>
             </div>
           </div>
@@ -51,9 +53,9 @@ export function MatchmakingModal({ isOpen, onClose }) {
               <Timer className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-[#f3f4f6]">Đa Dạng Thể Loại</h4>
+              <h4 className="text-xs font-bold text-[#f3f4f6]">{t('room:diverseModes', 'Đa Dạng Thể Loại')}</h4>
               <p className="text-[11px] text-[#9ca3af]">
-                Hỗ trợ Bullet (1m), Blitz (3m, 5m) và Rapid (10m) thi đấu tính điểm Rank.
+                {t('room:diverseModesDesc', 'Hỗ trợ Bullet (1m), Blitz (3m, 5m) và Rapid (10m) thi đấu tính điểm Rank.')}
               </p>
             </div>
           </div>
@@ -61,13 +63,13 @@ export function MatchmakingModal({ isOpen, onClose }) {
 
         {/* FOOTER ACTION */}
         <div className="p-4 border-t border-[#2d323f] bg-[#13161c] flex items-center justify-between">
-          <span className="text-xs text-[#9ca3af]">Dự kiến ra mắt trong phiên bản tới</span>
+          <span className="text-xs text-[#9ca3af]">{t('room:comingSoon', 'Dự kiến ra mắt trong phiên bản tới')}</span>
           <button
             type="button"
             onClick={onClose}
             className="bg-[#38bdf8] text-[#0d0e12] font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-[#0284c7] transition-all cursor-pointer shadow-md"
           >
-            ĐÃ HIỂU
+            {t('room:gotIt', 'ĐÃ HIỂU')}
           </button>
         </div>
       </div>

@@ -30,6 +30,7 @@ export default function ForumCreatePage() {
     defaultValues: { title: '' },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const titleValue = watch('title');
 
   const onSubmit = async ({ title }) => {

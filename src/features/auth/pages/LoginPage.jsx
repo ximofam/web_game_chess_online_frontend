@@ -94,8 +94,8 @@ export default function LoginPage() {
 
         {/* Tournament Meta */}
         <div className="w-full flex items-center justify-between text-xs text-chess-muted z-10">
-          <span>SERIES 2026</span>
-          <span>ONLINE CHESS LOBBY</span>
+          <span>{t('auth:series_2026', 'SERIES 2026')}</span>
+          <span>{t('auth:online_chess_lobby', 'ONLINE CHESS LOBBY')}</span>
         </div>
       </section>
 
@@ -138,7 +138,7 @@ export default function LoginPage() {
               label={t('auth:username_or_email')}
               id="login-username"
               type="text"
-              placeholder="Kasparov_01 or you@domain.com"
+              placeholder={t('auth:username_or_email_placeholder', 'Kasparov_01 or you@domain.com')}
               error={errors.usernameOrEmail}
               registration={register('usernameOrEmail')}
               disabled={isPending}

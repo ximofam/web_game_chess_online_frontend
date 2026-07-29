@@ -36,7 +36,7 @@ const PlayBotPage = () => {
     };
   }, [botInstance]);
 
-  const updateGameStatus = (currentChess) => {
+  const updateGameStatus = useCallback((currentChess) => {
     if (currentChess.isCheckmate()) {
       const winner = currentChess.turn() === 'w' ? t('learn:black_bot') : t('learn:white_you');
       setGameStatus(t('learn:checkmate_winner', { winner }));
@@ -47,7 +47,7 @@ const PlayBotPage = () => {
     } else {
       setGameStatus(t('learn:game_in_progress'));
     }
-  };
+  }, [t]);
 
   const resetGame = useCallback(() => {
     const newChess = new Chess();
@@ -113,7 +113,7 @@ const PlayBotPage = () => {
         clearTimeout(timer);
       };
     }
-  }, [chess, boardFen, playerColor, botInstance]);
+  }, [chess, boardFen, playerColor, botInstance, updateGameStatus]);
 
   const handleMove = (moveCandidate) => {
     const playerTurnColor = playerColor === 'white' ? 'w' : 'b';

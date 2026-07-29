@@ -1,3 +1,4 @@
+/* global process */
 import STOCKFISH from 'stockfish.js';
 
 console.log('--- TESTING STOCKFISH.JS API ---');

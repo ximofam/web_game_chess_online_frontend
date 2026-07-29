@@ -3,6 +3,7 @@ import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { stompClientManager } from './stompClient';
 import { mockSocketManager } from './mockSocket';
+import { useTranslation } from 'react-i18next';
 
 export const SocketContext = createContext(null);
 
@@ -10,6 +11,7 @@ const isMockMode = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 
 const activeManager = isMockMode ? mockSocketManager : stompClientManager;
 
 export const SocketProvider = ({ children }) => {
+  const { t } = useTranslation(['common']);
   const { isAuthenticated, showToast } = useAuth();
   const [connectionStatus, setConnectionStatus] = useState(activeManager.getStatus());
   const [reconnectCount, setReconnectCount] = useState(0);
@@ -22,18 +24,18 @@ export const SocketProvider = ({ children }) => {
 
       if (newStatus === 'DISCONNECTED') {
         if (wasConnectedRef.current && showToast) {
-          showToast('Mất kết nối với máy chủ realtime.', 'error');
+          showToast(t('common:wsDisconnected', 'Mất kết nối với máy chủ realtime.'), 'error');
         }
         wasConnectedRef.current = false;
       } else if (newStatus === 'CONNECTED') {
         if (!wasConnectedRef.current && showToast) {
-          showToast('Đã kết nối máy chủ realtime thành công.', 'success');
+          showToast(t('common:wsConnected', 'Đã kết nối máy chủ realtime thành công.'), 'success');
         }
         wasConnectedRef.current = true;
       }
     });
     return () => unsubscribeStatus();
-  }, [showToast]);
+  }, [showToast, t]);
 
   const connect = useCallback(() => {
     if (!isAuthenticated) return;
@@ -48,12 +50,12 @@ export const SocketProvider = ({ children }) => {
   const reconnect = useCallback(() => {
     if (!isAuthenticated) return;
     if (showToast) {
-      showToast('Đang thử kết nối lại máy chủ realtime...', 'info');
+      showToast(t('common:wsReconnecting', 'Đang thử kết nối lại máy chủ realtime...'), 'info');
     }
     wasConnectedRef.current = false;
     activeManager.disconnect();
     setReconnectCount((c) => c + 1);
-  }, [isAuthenticated, showToast]);
+  }, [isAuthenticated, showToast, t]);
 
   // Lifecycle management based on authentication & reconnect trigger
   useEffect(() => {

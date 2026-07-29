@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 
 /**
  * GenderSelect displays a premium styled select element for
@@ -5,6 +6,7 @@
  * Designed to be used with React Hook Form's Controller or register.
  */
 export const GenderSelect = ({ label, id, error, value = '', onChange, ...props }) => {
+  const { t } = useTranslation(['profile']);
   const hasError = !!error;
   const errorId = `${id}-error`;
 
@@ -31,16 +33,16 @@ export const GenderSelect = ({ label, id, error, value = '', onChange, ...props 
           {...props}
         >
           <option value="" disabled className="bg-[#1a1d24]">
-            Choose Gender
+            {t('profile:genderSelect.choose', 'Choose Gender')}
           </option>
           <option value="MALE" className="bg-[#1a1d24]">
-            Male
+            {t('profile:genderSelect.male', 'Male')}
           </option>
           <option value="FEMALE" className="bg-[#1a1d24]">
-            Female
+            {t('profile:genderSelect.female', 'Female')}
           </option>
           <option value="OTHER" className="bg-[#1a1d24]">
-            Other
+            {t('profile:genderSelect.other', 'Other')}
           </option>
         </select>
         {/* Custom Chevron Indicator */}

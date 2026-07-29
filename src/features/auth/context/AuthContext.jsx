@@ -132,20 +132,20 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(userObj);
       setIsAuthenticated(true);
       setIsGuestModalOpen(false);
-      showToast(`Welcome back, ${userObj.username}!`, 'success');
+      showToast(t('auth:welcome_back', 'Welcome back, {{username}}!', { username: userObj.username }), 'success');
       return userObj;
     } catch (_err) {
       const fallbackUser = { ...data.user, role: data.user?.role || 'USER', isGuest: false };
       setCurrentUser(fallbackUser);
       setIsAuthenticated(true);
       setIsGuestModalOpen(false);
-      showToast(`Welcome back, ${fallbackUser.username || 'player'}!`, 'success');
+      showToast(t('auth:welcome_back_fallback', 'Welcome back, {{username}}!', { username: fallbackUser.username || 'player' }), 'success');
       return fallbackUser;
     }
   };
 
   // Refresh token helper (Single-Flight guarded to prevent Token Rotation 401 race conditions)
-  const refreshToken = async () => {
+  const refreshToken = useCallback(async () => {
     if (refreshPromiseRef.current) {
       return refreshPromiseRef.current;
     }
@@ -197,7 +197,7 @@ export const AuthProvider = ({ children }) => {
     })();
 
     return refreshPromiseRef.current;
-  };
+  }, [isGuest]);
 
   const updateCurrentUser = (updatedUser) => {
     setCurrentUser(updatedUser);
@@ -236,7 +236,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initAuth();
-  }, []);
+  }, [navigate, refreshToken, showToast, t]);
 
   const value = {
     isAuthenticated,
@@ -265,7 +265,7 @@ export const AuthProvider = ({ children }) => {
             </svg>
           </div>
           <p className="font-playfair text-lg tracking-widest text-[#d4af37] animate-pulse">
-            LOADING BOARD...
+            {t('auth:loading_board', 'LOADING BOARD...')}
           </p>
         </div>
       ) : (

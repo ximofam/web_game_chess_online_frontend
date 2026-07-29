@@ -5,8 +5,10 @@ import { X, Clock, Shield, Lock, Globe, Sparkles, Loader2, Play } from 'lucide-r
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../shared/socket/useSocket';
+import { useTranslation } from 'react-i18next';
 
 export function CreateRoomModal({ isOpen, onClose, onCreated }) {
+  const { t } = useTranslation(['room']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { currentUser, showToast } = useAuth();
@@ -38,14 +40,14 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
 
     const trimmedName = name.trim();
     if (!trimmedName) {
-      showToast('Tên phòng là bắt buộc!', 'error');
+      showToast(t('room:roomNameRequired', 'Tên phòng là bắt buộc!'), 'error');
       return;
     }
 
     // Check if WebSocket is online as per API spec rule:
     // "Người dùng phải đang Online (có kết nối WebSocket) thì mới được phép gọi API này."
     if (connectionStatus === 'DISCONNECTED') {
-      showToast('Bạn cần có kết nối trực tuyến (Realtime WebSocket) để tạo phòng!', 'error');
+      showToast(t('room:onlineRequiredToCreateRoom', 'Bạn cần có kết nối trực tuyến (Realtime WebSocket) để tạo phòng!'), 'error');
       return;
     }
 
@@ -69,7 +71,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
       // Cập nhật cache để RoomWaitingPage dùng ngay mà không cần gọi getRoomDetails
       queryClient.setQueryData(['room', createdId], result);
 
-      showToast('Tạo phòng chơi thành công!', 'success');
+      showToast(t('room:createRoomSuccess', 'Tạo phòng chơi thành công!'), 'success');
 
       if (onCreated) {
         onCreated(result);
@@ -78,10 +80,10 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
       navigate(`/room/${createdId}`);
     } catch (err) {
       const status = err.response?.status;
-      const msg = err.response?.data?.message || 'Không thể tạo phòng. Vui lòng thử lại sau.';
+      const msg = err.response?.data?.message || t('room:createRoomError', 'Không thể tạo phòng. Vui lòng thử lại sau.');
 
       if (status === 403) {
-        showToast('Tạo phòng thất bại: Bạn phải duy trì kết nối WebSocket để khởi tạo phòng.', 'error');
+        showToast(t('room:createRoomWebsocketError', 'Tạo phòng thất bại: Bạn phải duy trì kết nối WebSocket để khởi tạo phòng.'), 'error');
       } else {
         showToast(msg, 'error');
       }
@@ -108,8 +110,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-playfair text-lg font-bold text-[#f3f4f6]">Cấu Hình Phòng Chơi mới</h2>
-              <p className="text-xs text-[#9ca3af]">Thiết lập luật đấu & thời gian thi đấu</p>
+              <h2 className="font-playfair text-lg font-bold text-[#f3f4f6]">{t('room:createNewRoom', 'Cấu Hình Phòng Chơi mới')}</h2>
+              <p className="text-xs text-[#9ca3af]">{t('room:roomSettingsDesc', 'Thiết lập luật đấu & thời gian thi đấu')}</p>
             </div>
           </div>
           <button
@@ -125,14 +127,14 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
           {/* TÊN PHÒNG */}
           <div>
             <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2">
-              Tên phòng chơi <span className="text-[#ef4444]">*</span>
+              {t('room:roomName', 'Tên phòng chơi')} <span className="text-[#ef4444]">*</span>
             </label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="VD: Player's room"
+              placeholder={t('room:roomNamePlaceholder', "VD: Player's room")}
               className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-sm rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all placeholder-[#4b5563]"
             />
           </div>
@@ -140,7 +142,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
           {/* QUICK PRESETS */}
           <div>
             <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2">
-              Mẫu thời gian nhanh
+              {t('room:quickTimePresets', 'Mẫu thời gian nhanh')}
             </label>
             <div className="flex flex-wrap gap-2">
               {presetTimes.map((preset, idx) => (
@@ -166,37 +168,37 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#d4af37]" /> Thời gian (Phút)
+                <Clock className="w-3.5 h-3.5 text-[#d4af37]" /> {t('room:timeMinutes', 'Thời gian (Phút)')}
               </label>
               <select
                 value={timeMinutes}
                 onChange={(e) => setTimeMinutes(e.target.value)}
                 className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-sm rounded-xl p-3 focus:outline-none transition-all cursor-pointer"
               >
-                <option value={1}>1 phút (Bullet)</option>
-                <option value={3}>3 phút (Blitz)</option>
-                <option value={5}>5 phút (Blitz)</option>
-                <option value={10}>10 phút (Rapid)</option>
-                <option value={15}>15 phút (Rapid)</option>
-                <option value={30}>30 phút (Classical)</option>
+                <option value={1}>{t('room:1MinBullet', '1 phút (Bullet)')}</option>
+                <option value={3}>{t('room:3MinBlitz', '3 phút (Blitz)')}</option>
+                <option value={5}>{t('room:5MinBlitz', '5 phút (Blitz)')}</option>
+                <option value={10}>{t('room:10MinRapid', '10 phút (Rapid)')}</option>
+                <option value={15}>{t('room:15MinRapid', '15 phút (Rapid)')}</option>
+                <option value={30}>{t('room:30MinClassical', '30 phút (Classical)')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#d4af37]" /> Cộng giây / Nước đi
+                <Clock className="w-3.5 h-3.5 text-[#d4af37]" /> {t('room:incrementSeconds', 'Cộng giây / Nước đi')}
               </label>
               <select
                 value={incrementSeconds}
                 onChange={(e) => setIncrementSeconds(e.target.value)}
                 className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-sm rounded-xl p-3 focus:outline-none transition-all cursor-pointer"
               >
-                <option value={0}>+0 giây</option>
-                <option value={1}>+1 giây</option>
-                <option value={2}>+2 giây</option>
-                <option value={3}>+3 giây</option>
-                <option value={5}>+5 giây</option>
-                <option value={10}>+10 giây</option>
+                <option value={0}>{t('room:0SecInc', '+0 giây')}</option>
+                <option value={1}>{t('room:1SecInc', '+1 giây')}</option>
+                <option value={2}>{t('room:2SecInc', '+2 giây')}</option>
+                <option value={3}>{t('room:3SecInc', '+3 giây')}</option>
+                <option value={5}>{t('room:5SecInc', '+5 giây')}</option>
+                <option value={10}>{t('room:10SecInc', '+10 giây')}</option>
               </select>
             </div>
           </div>
@@ -214,8 +216,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
                 <div>
-                  <span className="block text-xs font-bold text-[#f3f4f6]">Tính điểm Elo</span>
-                  <span className="text-[10px] opacity-80">{rated ? 'Trận Rated' : 'Không tính điểm'}</span>
+                  <span className="block text-xs font-bold text-[#f3f4f6]">{t('room:ratedMatch', 'Tính điểm Elo')}</span>
+                  <span className="text-[10px] opacity-80">{rated ? t('room:rated', 'Trận Rated') : t('room:unrated', 'Không tính điểm')}</span>
                 </div>
               </div>
             </button>
@@ -231,8 +233,8 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               <div className="flex items-center gap-2">
                 {isPrivate ? <Lock className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
                 <div>
-                  <span className="block text-xs font-bold text-[#f3f4f6]">Chế độ phòng</span>
-                  <span className="text-[10px] opacity-80">{isPrivate ? 'Phòng Riêng tư' : 'Hiện ở Sảnh'}</span>
+                  <span className="block text-xs font-bold text-[#f3f4f6]">{t('room:roomMode', 'Chế độ phòng')}</span>
+                  <span className="text-[10px] opacity-80">{isPrivate ? t('room:privateRoom', 'Phòng Riêng tư') : t('room:publicRoom', 'Hiện ở Sảnh')}</span>
                 </div>
               </div>
             </button>
@@ -245,7 +247,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] text-xs font-semibold transition-colors cursor-pointer"
             >
-              Hủy bỏ
+              {t('room:cancel', 'Hủy bỏ')}
             </button>
             <button
               type="submit"
@@ -255,12 +257,12 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Đang tạo...</span>
+                  <span>{t('room:creating', 'Đang tạo...')}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-4 h-4 fill-[#0d0e12]" />
-                  <span>TẠO PHÒNG NGAY</span>
+                  <span>{t('room:createRoomNow', 'TẠO PHÒNG NGAY')}</span>
                 </>
               )}
             </button>

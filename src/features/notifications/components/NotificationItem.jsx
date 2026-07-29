@@ -1,11 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useNavigate } from 'react-router-dom';
 import { Eye, Trash2, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Helper to display human-readable relative time intervals.
  */
-export const formatRelativeTime = (dateString) => {
+export const formatRelativeTime = (dateString, t) => {
   const now = new Date();
   const date = new Date(dateString);
   const diffMs = now - date;
@@ -16,16 +17,24 @@ export const formatRelativeTime = (dateString) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (seconds < 60) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
+  if (!t) {
+    if (seconds < 60) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  }
+
+  if (seconds < 60) return t('notifications:time.justNow', 'Just now');
+  if (minutes < 60) return t('notifications:time.minutesAgo', '{{count}}m ago', { count: minutes });
+  if (hours < 24) return t('notifications:time.hoursAgo', '{{count}}h ago', { count: hours });
+  return t('notifications:time.daysAgo', '{{count}}d ago', { count: days });
 };
 
 /**
  * NotificationItem represents a single notification row with details and actions.
  */
 export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }) => {
+  const { t } = useTranslation(['notifications']);
   const navigate = useNavigate();
   const { sender, type, title, message, createdAt, read, metadata } = item;
   const _initial = sender?.username ? sender.username.charAt(0).toUpperCase() : 'U';
@@ -75,10 +84,10 @@ export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
           <span className="text-xs font-semibold text-[#f3f4f6] truncate">
-            {sender?.username || 'System'}
+            {sender?.username || t('notifications:item.system', 'System')}
           </span>
           <span className="text-[10px] text-[#9ca3af] whitespace-nowrap">
-            {formatRelativeTime(createdAt)}
+            {formatRelativeTime(createdAt, t)}
           </span>
         </div>
         <p className={`text-xs text-[#f3f4f6] font-semibold mb-1 leading-normal ${!read ? 'font-semibold' : 'font-normal'}`}>
@@ -93,7 +102,7 @@ export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }
       <div className="flex flex-col items-center gap-2 shrink-0">
         {/* Unread circle status */}
         {!read && (
-          <span className="w-2.5 h-2.5 bg-[#d4af37] rounded-full border border-[#1a1d24]" title="Unread" />
+          <span className="w-2.5 h-2.5 bg-[#d4af37] rounded-full border border-[#1a1d24]" title={t('notifications:item.unreadTitle', 'Unread')} />
         )}
 
         <div className="flex items-center gap-1">
@@ -101,7 +110,7 @@ export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }
             <button
               onClick={() => onMarkRead(item.id)}
               className="action-btn p-1 hover:bg-[#2d323f] text-[#9ca3af] hover:text-[#d4af37] rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#d4af37]"
-              title="Mark as read"
+              title={t('notifications:item.markAsReadTitle', 'Mark as read')}
             >
               <Eye className="w-3.5 h-3.5" />
             </button>
@@ -110,7 +119,7 @@ export const NotificationItem = ({ item, onMarkRead, onDelete, onCloseDropdown }
             <button
               onClick={() => onDelete(item.id)}
               className="action-btn p-1 hover:bg-[#2d323f] text-[#9ca3af] hover:text-red-400 rounded transition-colors focus:outline-none focus:ring-1 focus:ring-red-400"
-              title="Delete notification"
+              title={t('notifications:item.deleteTitle', 'Delete notification')}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>

@@ -4,10 +4,12 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../shared/socket/useSocket';
 import { notificationService } from '../services/notificationService';
 import { subscribeToNotifications, NOTIFICATION_EVENTS } from '../socket/notificationSocket';
+import { useTranslation } from 'react-i18next';
 
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
+  const { t } = useTranslation(['notifications']);
   const { isAuthenticated, showToast } = useAuth();
   const socket = useSocket();
   const { connectionStatus, reconnect } = socket;
@@ -38,7 +40,7 @@ export const NotificationProvider = ({ children }) => {
       );
       setUnreadCount((c) => Math.max(0, c - 1));
     } catch (_err) {
-      if (showToast) showToast('Failed to mark notification as read.', 'error');
+      if (showToast) showToast(t('notifications:toast.markReadError', 'Failed to mark notification as read.'), 'error');
     }
   };
 
@@ -47,9 +49,9 @@ export const NotificationProvider = ({ children }) => {
       await notificationService.markAllRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
-      if (showToast) showToast('All notifications marked as read.', 'success');
+      if (showToast) showToast(t('notifications:toast.markAllReadSuccess', 'All notifications marked as read.'), 'success');
     } catch (_err) {
-      if (showToast) showToast('Failed to mark all as read.', 'error');
+      if (showToast) showToast(t('notifications:toast.markAllReadError', 'Failed to mark all as read.'), 'error');
     }
   };
 
@@ -62,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
         setUnreadCount((c) => Math.max(0, c - 1));
       }
     } catch (_err) {
-      if (showToast) showToast('Failed to delete notification.', 'error');
+      if (showToast) showToast(t('notifications:toast.deleteError', 'Failed to delete notification.'), 'error');
     }
   };
 
@@ -71,9 +73,9 @@ export const NotificationProvider = ({ children }) => {
       await notificationService.deleteAll();
       setNotifications([]);
       setUnreadCount(0);
-      if (showToast) showToast('Notification history cleared.', 'success');
+      if (showToast) showToast(t('notifications:toast.clearAllSuccess', 'Notification history cleared.'), 'success');
     } catch (_err) {
-      if (showToast) showToast('Failed to clear notification history.', 'error');
+      if (showToast) showToast(t('notifications:toast.clearAllError', 'Failed to clear notification history.'), 'error');
     }
   };
 

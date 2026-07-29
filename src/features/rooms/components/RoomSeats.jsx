@@ -1,7 +1,9 @@
 import { User, Crown, CheckCircle2, Plus } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export function RoomSeats({ room, onSeatChange }) {
+  const { t } = useTranslation(['room']);
   const { currentUser } = useAuth();
   if (!room) return null;
 
@@ -21,7 +23,7 @@ export function RoomSeats({ room, onSeatChange }) {
         {/* SIDE LABEL BADGE */}
         <div className="w-full flex items-center justify-between border-b border-[#2d323f]/60 pb-2 mb-3">
           <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${bgBadge}`}>
-            Quân {sideName}
+            {t('room:pieceSide', 'Quân {{side}}', { side: sideName })}
           </span>
           {isCurrentHost && (
             <span className="flex items-center gap-1 text-[10px] font-bold text-[#d4af37] bg-[#d4af37]/10 px-2 py-0.5 rounded-full border border-[#d4af37]/30">
@@ -49,10 +51,10 @@ export function RoomSeats({ room, onSeatChange }) {
 
           <div>
             <h4 className="font-bold text-sm text-[#f3f4f6]">
-              {isOccupied ? player.username : 'Ghế trống'}
+              {isOccupied ? player.username : t('room:emptySeat', 'Ghế trống')}
             </h4>
             <p className="text-[11px] text-[#9ca3af]">
-              {isOccupied ? `Elo: ${player.elo || 1500}` : 'Đang chờ người chơi...'}
+              {isOccupied ? t('room:eloRating', 'Elo: {{elo}}', { elo: player.elo || 1500 }) : t('room:waitingPlayer', 'Đang chờ người chơi...')}
             </p>
           </div>
         </div>
@@ -67,11 +69,11 @@ export function RoomSeats({ room, onSeatChange }) {
                 className="w-full bg-[#d4af37]/15 hover:bg-[#d4af37] text-[#d4af37] hover:text-[#0d0e12] border border-[#d4af37]/40 font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Plus className="w-4 h-4" />
-                <span>Ngồi ghế {sideName}</span>
+                <span>{t('room:sitSeat', 'Ngồi ghế {{side}}', { side: sideName })}</span>
               </button>
             ) : (isUserWhite && side === 'WHITE') || (isUserBlack && side === 'BLACK') ? (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#10b981]">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Bạn đang ở đây
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('room:youAreHere', 'Bạn đang ở đây')}
               </span>
             ) : null}
           </div>
@@ -86,7 +88,7 @@ export function RoomSeats({ room, onSeatChange }) {
       {renderSeat(
         white,
         'WHITE',
-        'Trắng',
+        t('room:white', 'Trắng'),
         'bg-[#f3f4f6]/10 text-[#f3f4f6] border-[#f3f4f6]/30'
       )}
 
@@ -101,7 +103,7 @@ export function RoomSeats({ room, onSeatChange }) {
       {renderSeat(
         black,
         'BLACK',
-        'Đen',
+        t('room:black', 'Đen'),
         'bg-[#2d323f] text-[#9ca3af] border-[#4b5563]'
       )}
     </div>

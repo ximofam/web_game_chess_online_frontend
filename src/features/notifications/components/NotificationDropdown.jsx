@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, BellOff, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import NotificationItem from './NotificationItem';
 
 /**
@@ -15,6 +16,7 @@ export const NotificationDropdown = ({
   onDelete,
   onClose,
 }) => {
+  const { t } = useTranslation(['notifications']);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -55,11 +57,11 @@ export const NotificationDropdown = ({
       <div className="px-4 py-3 bg-[#13161c] border-b border-[#2d323f] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-[#f3f4f6] tracking-wide">
-            Notifications
+            {t('notifications:dropdown.title', 'Notifications')}
           </span>
           {unreadCount > 0 && (
             <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {unreadCount} new
+              {unreadCount} {t('notifications:dropdown.new', 'new')}
             </span>
           )}
         </div>
@@ -68,10 +70,10 @@ export const NotificationDropdown = ({
           <button
             onClick={onMarkAllRead}
             className="flex items-center gap-1 text-xs text-[#d4af37] hover:text-[#f3cd57] font-semibold transition-colors focus:outline-none focus:ring-1 focus:ring-[#d4af37] cursor-pointer"
-            title="Mark all as read"
+            title={t('notifications:dropdown.markAllReadTitle', 'Mark all as read')}
           >
             <Check className="w-3.5 h-3.5" />
-            <span>Mark all read</span>
+            <span>{t('notifications:dropdown.markAllRead', 'Mark all read')}</span>
           </button>
         )}
       </div>
@@ -94,10 +96,10 @@ export const NotificationDropdown = ({
               <BellOff className="w-5 h-5 text-[#9ca3af]/60" />
             </div>
             <p className="text-xs text-[#f3f4f6] font-semibold mb-1">
-              Your board is clear
+              {t('notifications:dropdown.emptyTitle', 'Your board is clear')}
             </p>
             <p className="text-[10px] text-[#9ca3af] max-w-[200px]">
-              No new moves or invites. We'll alert you of game updates!
+              {t('notifications:dropdown.emptyDesc', "No new moves or invites. We'll alert you of game updates!")}
             </p>
           </div>
         )}
@@ -110,7 +112,7 @@ export const NotificationDropdown = ({
           onClick={onClose}
           className="w-full py-2.5 px-4 text-xs font-semibold text-[#d4af37] hover:text-[#f3cd57] flex items-center justify-center gap-1.5 transition-colors focus:outline-none focus:bg-[#2d323f]/20"
         >
-          <span>View All Notifications</span>
+          <span>{t('notifications:dropdown.viewAll', 'View All Notifications')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

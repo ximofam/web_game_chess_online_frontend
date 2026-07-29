@@ -99,8 +99,8 @@ export default function RegisterPage() {
 
         {/* Tournament Meta */}
         <div className="w-full flex items-center justify-between text-xs text-chess-muted z-10">
-          <span>SERIES 2026</span>
-          <span>ONLINE CHESS LOBBY</span>
+          <span>{t('auth:series_2026', 'SERIES 2026')}</span>
+          <span>{t('auth:online_chess_lobby', 'ONLINE CHESS LOBBY')}</span>
         </div>
       </section>
 
@@ -143,7 +143,7 @@ export default function RegisterPage() {
               label={t('auth:username')}
               id="register-username"
               type="text"
-              placeholder="e.g. Kasparov_01"
+              placeholder={t('auth:username_placeholder', 'e.g. Kasparov_01')}
               error={errors.username}
               registration={register('username')}
               disabled={isPending}
@@ -153,7 +153,7 @@ export default function RegisterPage() {
               label={t('auth:email')}
               id="register-email"
               type="email"
-              placeholder="you@domain.com"
+              placeholder={t('auth:email_placeholder', 'you@domain.com')}
               error={errors.email}
               registration={register('email')}
               disabled={isPending}

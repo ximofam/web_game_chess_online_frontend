@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { PlusCircle, Swords, Bot, Sparkles, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function PlayModeCards({ onCreateRoomClick, onMatchmakingClick }) {
+  const { t } = useTranslation(['room']);
   return (
     <div className="space-y-3">
       {/* 1. TẠO PHÒNG CHƠI */}
@@ -16,7 +18,7 @@ export function PlayModeCards({ onCreateRoomClick, onMatchmakingClick }) {
           </div>
           <div>
             <h3 className="font-semibold text-sm text-[#f3f4f6] group-hover:text-[#d4af37] transition-colors flex items-center gap-2">
-              Tạo Phòng Chơi
+              {t('room:createRoomButton', 'Tạo Phòng Chơi')}
             </h3>
           </div>
         </div>
@@ -36,10 +38,10 @@ export function PlayModeCards({ onCreateRoomClick, onMatchmakingClick }) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm text-[#f3f4f6] group-hover:text-[#38bdf8] transition-colors">
-                Ghép Trận Nhanh
+                {t('room:fastMatchmaking', 'Ghép Trận Nhanh')}
               </h3>
               <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30">
-                <Sparkles className="w-2.5 h-2.5" /> Tương lai
+                <Sparkles className="w-2.5 h-2.5" /> {t('room:future', 'Tương lai')}
               </span>
             </div>
           </div>
@@ -58,7 +60,7 @@ export function PlayModeCards({ onCreateRoomClick, onMatchmakingClick }) {
           </div>
           <div>
             <h3 className="font-semibold text-sm text-[#f3f4f6] group-hover:text-[#10b981] transition-colors">
-              Đánh Với Máy
+              {t('room:playWithBot', 'Đánh Với Máy')}
             </h3>
           </div>
         </div>

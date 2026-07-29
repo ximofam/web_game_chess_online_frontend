@@ -6,8 +6,10 @@ import { useLobbyRooms } from '../hooks/useLobbyRooms';
 import { roomService } from '../services/roomService';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useOnlineCount } from '../../presence/socket/presenceSocket';
+import { useTranslation } from 'react-i18next';
 
 export function LobbyList({ onCreateRoomClick }) {
+  const { t } = useTranslation(['room']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [joiningRoomId, setJoiningRoomId] = useState(null);
@@ -80,13 +82,13 @@ export function LobbyList({ onCreateRoomClick }) {
   const handleJoinPlay = async (room) => {
     try {
       setJoiningRoomId(room.roomId);
-      showToast(`Đang tham gia phòng "${room.name || room.roomId}"...`, 'info');
+      showToast(t('room:joiningRoom', 'Đang tham gia phòng "{{name}}"...', { name: room.name || room.roomId }), 'info');
       const role = room.white ? 'black' : 'white';
       const result = await roomService.joinRoom(room.roomId, role);
       queryClient.setQueryData(['room', room.roomId], result);
       navigate(`/room/${room.roomId}`);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Không thể tham gia phòng', 'error');
+      showToast(err.response?.data?.message || t('room:joinRoomError', 'Không thể tham gia phòng'), 'error');
     } finally {
       setJoiningRoomId(null);
     }
@@ -95,12 +97,12 @@ export function LobbyList({ onCreateRoomClick }) {
   const handleJoinSpectate = async (room) => {
     try {
       setJoiningRoomId(room.roomId);
-      showToast(`Đang vào xem trận đấu của ${room.host?.username || 'phòng'}...`, 'info');
+      showToast(t('room:spectatingRoom', 'Đang vào xem trận đấu của {{name}}...', { name: room.host?.username || t('room:defaultRoomLabel', 'phòng') }), 'info');
       const result = await roomService.joinRoom(room.roomId, 'spectator');
       queryClient.setQueryData(['room', room.roomId], result);
       navigate(`/room/${room.roomId}`);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Không thể xem phòng', 'error');
+      showToast(err.response?.data?.message || t('room:spectateRoomError', 'Không thể xem phòng'), 'error');
     } finally {
       setJoiningRoomId(null);
     }
@@ -120,11 +122,11 @@ export function LobbyList({ onCreateRoomClick }) {
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           <h2 className="font-playfair text-xl font-bold text-[#f3f4f6]">Lobby</h2>
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#d4af37] bg-[#d4af37]/10 px-2.5 py-0.5 rounded-full border border-[#d4af37]/30">
-            Tổng: {totalElements} phòng
+            {t('room:totalRoomsCount', 'Tổng: {{count}} phòng', { count: totalElements })}
           </span>
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
             <Users className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{onlineCount} online</span>
+            <span>{onlineCount} {t('room:online', 'online')}</span>
           </span>
         </div>
 
@@ -136,7 +138,7 @@ export function LobbyList({ onCreateRoomClick }) {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm phòng / host..."
+              placeholder={t('room:searchRoomHost', 'Tìm phòng / host...')}
               className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-xs rounded-xl pl-8 pr-2.5 py-1.5 focus:outline-none transition-all placeholder-[#4b5563]"
             />
           </div>
@@ -145,7 +147,7 @@ export function LobbyList({ onCreateRoomClick }) {
             type="button"
             onClick={() => refetch()}
             className="p-2 rounded-xl bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#d4af37] transition-colors cursor-pointer shrink-0"
-            title="Tải lại"
+            title={t('room:reload', 'Tải lại')}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#d4af37]' : ''}`} />
           </button>
@@ -163,7 +165,7 @@ export function LobbyList({ onCreateRoomClick }) {
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Tất cả
+            {t('room:all', 'Tất cả')}
           </button>
           <button
             type="button"
@@ -173,7 +175,7 @@ export function LobbyList({ onCreateRoomClick }) {
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Đang chờ
+            {t('room:waiting', 'Đang chờ')}
           </button>
           <button
             type="button"
@@ -183,7 +185,7 @@ export function LobbyList({ onCreateRoomClick }) {
               : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
           >
-            Đang đấu
+            {t('room:inProgress', 'Đang đấu')}
           </button>
         </div>
 
@@ -197,26 +199,26 @@ export function LobbyList({ onCreateRoomClick }) {
       {isLoading ? (
         <div className="py-12 text-center text-[#9ca3af] space-y-2">
           <RefreshCw className="w-6 h-6 mx-auto animate-spin text-[#d4af37]" />
-          <p className="text-xs font-medium">Đang tải sảnh chơi...</p>
+          <p className="text-xs font-medium">{t('room:loadingLobby', 'Đang tải sảnh chơi...')}</p>
         </div>
       ) : isError ? (
         <div className="py-8 text-center text-[#ef4444] bg-[#13161c] rounded-xl border border-[#ef4444]/20 p-4 space-y-2">
           <AlertCircle className="w-6 h-6 mx-auto" />
-          <p className="text-xs font-semibold">Không thể tải dữ liệu sảnh.</p>
+          <p className="text-xs font-semibold">{t('room:loadLobbyError', 'Không thể tải dữ liệu sảnh.')}</p>
           <button
             type="button"
             onClick={() => refetch()}
             className="text-xs text-[#d4af37] underline font-semibold cursor-pointer"
           >
-            Thử lại
+            {t('room:retry', 'Thử lại')}
           </button>
         </div>
       ) : filteredRooms.length === 0 ? (
         <div className="py-12 text-center bg-[#13161c] rounded-xl border border-[#2d323f] p-6 space-y-3">
           <Layers className="w-8 h-8 text-[#d4af37] mx-auto opacity-80" />
           <div>
-            <h4 className="text-sm font-bold text-[#f3f4f6]">Chưa có phòng chơi nào</h4>
-            <p className="text-xs text-[#9ca3af] mt-0.5">Tạo phòng đầu tiên để bắt đầu thách đấu!</p>
+            <h4 className="text-sm font-bold text-[#f3f4f6]">{t('room:noRooms', 'Chưa có phòng chơi nào')}</h4>
+            <p className="text-xs text-[#9ca3af] mt-0.5">{t('room:createFirstRoom', 'Tạo phòng đầu tiên để bắt đầu thách đấu!')}</p>
           </div>
           {onCreateRoomClick && (
             <button
@@ -224,7 +226,7 @@ export function LobbyList({ onCreateRoomClick }) {
               onClick={onCreateRoomClick}
               className="bg-[#d4af37] text-[#0d0e12] hover:bg-[#b59226] font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer shadow-md"
             >
-              + Tạo phòng chơi
+              {t('room:createRoomButton', '+ Tạo phòng chơi')}
             </button>
           )}
         </div>
@@ -237,11 +239,11 @@ export function LobbyList({ onCreateRoomClick }) {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#1a1d24] shadow-md z-10">
               <tr className="border-b border-[#2d323f] text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wider">
-                <th className="pb-2.5 pt-1 pl-2">Host / Tên phòng</th>
-                <th className="pb-2.5 pt-1">Thời gian</th>
-                <th className="pb-2.5 pt-1">Chế độ</th>
-                <th className="pb-2.5 pt-1">Người chơi</th>
-                <th className="pb-2.5 pt-1 pr-2 text-right">Thao tác</th>
+                <th className="pb-2.5 pt-1 pl-2">{t('room:hostRoomName', 'Host / Tên phòng')}</th>
+                <th className="pb-2.5 pt-1">{t('room:time', 'Thời gian')}</th>
+                <th className="pb-2.5 pt-1">{t('room:mode', 'Chế độ')}</th>
+                <th className="pb-2.5 pt-1">{t('room:players', 'Người chơi')}</th>
+                <th className="pb-2.5 pt-1 pr-2 text-right">{t('room:action', 'Thao tác')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#2d323f]/50 text-xs">
@@ -269,10 +271,10 @@ export function LobbyList({ onCreateRoomClick }) {
                         </div>
                         <div className="truncate max-w-[160px] sm:max-w-[220px]">
                           <span className="block font-semibold text-[#f3f4f6] group-hover:text-[#d4af37] transition-colors truncate">
-                            {name || `Phòng Cờ #${roomId?.slice(0, 8)}`}
+                            {name || t('room:chessRoomPrefixWithId', 'Phòng Cờ #{{id}}', { id: roomId?.slice(0, 8) })}
                           </span>
                           <span className="text-[10px] text-[#9ca3af]">
-                            Host: {host?.username || 'Player'}
+                            {t('room:host', 'Host: ')}{host?.username || 'Player'}
                           </span>
                         </div>
                       </div>
@@ -315,7 +317,7 @@ export function LobbyList({ onCreateRoomClick }) {
                         <div className="flex items-center justify-end">
                           <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
                             <Lock className="w-3 h-3" />
-                            Phòng kín
+                            {t('room:privateRoom', 'Phòng kín')}
                           </span>
                         </div>
                       ) : isWaiting ? (
@@ -328,7 +330,7 @@ export function LobbyList({ onCreateRoomClick }) {
                               className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] transition-all cursor-pointer shadow-sm disabled:opacity-50"
                             >
                               <Play className="w-3 h-3 fill-[#0d0e12]" />
-                              <span>VÀO CHƠI</span>
+                              <span>{t('room:play', 'VÀO CHƠI')}</span>
                             </button>
                           )}
                           {!isSpectatorLocked && (
@@ -339,13 +341,13 @@ export function LobbyList({ onCreateRoomClick }) {
                               className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
                             >
                               <Eye className="w-3 h-3" />
-                              <span>XEM</span>
+                              <span>{t('room:spectate', 'XEM')}</span>
                             </button>
                           )}
                           {isSpectatorLocked && (white && black) && (
                             <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
                               <Lock className="w-3 h-3" />
-                              Khóa xem
+                              {t('room:spectateLocked', 'Khóa xem')}
                             </span>
                           )}
                         </div>
@@ -359,12 +361,12 @@ export function LobbyList({ onCreateRoomClick }) {
                               className="py-1.5 px-3 rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#38bdf8] border border-[#38bdf8]/40 transition-all cursor-pointer shadow-sm disabled:opacity-50"
                             >
                               <Eye className="w-3 h-3" />
-                              <span>XEM</span>
+                              <span>{t('room:spectate', 'XEM')}</span>
                             </button>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 py-1.5 px-3 bg-[#13161c] border border-[#2d323f] rounded-lg text-[10px] font-semibold text-[#6b7280]">
                               <Lock className="w-3 h-3" />
-                              Khóa xem
+                              {t('room:spectateLocked', 'Khóa xem')}
                             </span>
                           )}
                         </div>
@@ -380,13 +382,13 @@ export function LobbyList({ onCreateRoomClick }) {
           {isFetchingNextPage && (
             <div className="py-3 text-center text-xs text-[#d4af37] flex items-center justify-center gap-2 bg-[#13161c]/50">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Đang tải thêm phòng...</span>
+              <span>{t('room:loadingMoreRooms', 'Đang tải thêm phòng...')}</span>
             </div>
           )}
 
           {!hasNextPage && rooms.length > 0 && (
             <div className="py-2.5 text-center text-[11px] text-[#6b7280] border-t border-[#2d323f]/40">
-              Đã hiển thị tất cả các phòng cờ
+              {t('room:allRoomsLoaded', 'Đã hiển thị tất cả các phòng cờ')}
             </div>
           )}
         </div>

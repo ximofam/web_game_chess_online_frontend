@@ -5,8 +5,10 @@ import { useSocket } from '../../../shared/socket/useSocket';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { formatTime } from '../../../shared/utils/timeUtils';
+import { useTranslation } from 'react-i18next';
 
 export function RoomChat({ roomId, room }) {
+  const { t } = useTranslation(['room']);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
@@ -66,7 +68,7 @@ export function RoomChat({ roomId, room }) {
       setInputValue('');
     } catch (err) {
       console.error('Failed to send message', err);
-      showToast('Lỗi gửi tin nhắn', 'error');
+      showToast(t('room:sendMessageError', 'Lỗi gửi tin nhắn'), 'error');
     }
   };
 
@@ -74,7 +76,7 @@ export function RoomChat({ roomId, room }) {
     <div className="flex flex-col h-full max-h-[500px] bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
       <div className="flex items-center gap-2 p-3 border-b border-[#2d323f] bg-[#1a1d24]">
         <MessageSquare className="w-4 h-4 text-[#d4af37]" />
-        <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider">Trò chuyện</h3>
+        <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider">{t('room:chat', 'Trò chuyện')}</h3>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 pr-2 space-y-3 min-h-[300px] bg-[#0d0e12]/30 scrollbar-thin">
@@ -84,7 +86,7 @@ export function RoomChat({ roomId, room }) {
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center text-xs text-[#9ca3af] italic py-4">
-            Chưa có tin nhắn nào.
+            {t('room:noMessages', 'Chưa có tin nhắn nào.')}
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -121,7 +123,7 @@ export function RoomChat({ roomId, room }) {
         {chatLocked ? (
           <div className="flex items-center justify-center gap-2 text-xs text-[#ef4444] py-2 bg-[#ef4444]/10 rounded-xl">
             <Lock className="w-3.5 h-3.5" />
-            <span>Chat trong phòng đã bị khóa</span>
+            <span>{t('room:chatLocked', 'Chat trong phòng đã bị khóa')}</span>
           </div>
         ) : (
           <form onSubmit={handleSendMessage} className="flex gap-2">
@@ -129,7 +131,7 @@ export function RoomChat({ roomId, room }) {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Nhập tin nhắn..."
+              placeholder={t('room:enterMessage', 'Nhập tin nhắn...')}
               className="flex-1 bg-[#0d0e12] border border-[#2d323f] rounded-xl px-3 py-2 text-sm text-[#f3f4f6] placeholder-[#6b7280] focus:outline-none focus:border-[#d4af37] transition-colors"
             />
             <button

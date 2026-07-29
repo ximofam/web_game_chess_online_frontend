@@ -4,12 +4,14 @@ import NotificationItem from '../components/NotificationItem';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import EmptyState from '../components/EmptyState';
 import { CheckCheck, Trash2, RefreshCw, ArrowDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * NotificationsPage renders the player's notification history log.
  * Header and Footer are provided by ProtectedLayout.
  */
 export const NotificationsPage = () => {
+  const { t } = useTranslation(['notifications']);
   const {
     notifications,
     unreadCount,
@@ -67,7 +69,7 @@ export const NotificationsPage = () => {
         {/* Header Actions */}
         <div className="flex items-center justify-between border-b border-[#2d323f] pb-4">
           <h2 className="font-playfair text-2xl font-bold text-[#f3f4f6] m-0">
-            Notification Arena
+            {t('notifications:page.title', 'Notification Arena')}
           </h2>
 
           {uniqueItems.length > 0 && (
@@ -76,20 +78,20 @@ export const NotificationsPage = () => {
                 <button
                   onClick={markAllAsRead}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#2d323f] hover:bg-[#2d323f]/50 hover:text-[#d4af37] text-xs font-semibold text-[#f3f4f6] transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#d4af37]"
-                  title="Mark all as read"
+                  title={t('notifications:page.markAllReadTitle', 'Mark all as read')}
                 >
                   <CheckCheck className="w-4 h-4 text-[#d4af37]" />
-                  <span>MARK ALL READ</span>
+                  <span>{t('notifications:page.markAllRead', 'MARK ALL READ')}</span>
                 </button>
               )}
 
               <button
                 onClick={clearAll}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 border border-red-500/30 hover:bg-red-900/40 hover:border-red-500/60 text-xs font-semibold text-red-200 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-red-500"
-                title="Clear all history"
+                title={t('notifications:page.clearAllTitle', 'Clear all history')}
               >
                 <Trash2 className="w-4 h-4 text-red-400" />
-                <span>CLEAR ALL</span>
+                <span>{t('notifications:page.clearAll', 'CLEAR ALL')}</span>
               </button>
             </div>
           )}
@@ -120,7 +122,7 @@ export const NotificationsPage = () => {
                   ) : (
                     <ArrowDown className="w-4 h-4" />
                   )}
-                  <span>LOAD MORE NOTIFICATIONS</span>
+                  <span>{t('notifications:page.loadMore', 'LOAD MORE NOTIFICATIONS')}</span>
                 </button>
               </div>
             )}

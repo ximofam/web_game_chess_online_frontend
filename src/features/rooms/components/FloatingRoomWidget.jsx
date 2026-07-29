@@ -6,12 +6,14 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRoomDetails } from '../hooks/useRoomDetails';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Floating Room Widget cho phép thu nhỏ phòng chờ ở góc màn hình.
  * Người chơi có thể tự do xem Sảnh, Học cờ, Diễn đàn trong khi phòng vẫn ở trạng thái chờ.
  */
 export function FloatingRoomWidget() {
+  const { t } = useTranslation(['room']);
   const [activeRoom, setActiveRoom] = useState(() => activeRoomManager.getRoom());
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,11 +60,11 @@ export function FloatingRoomWidget() {
     e.stopPropagation();
     try {
       await roomService.leaveRoom(roomId);
-      showToast('Đã rời khỏi phòng chơi', 'info');
+      showToast(t('room:leftRoom', 'Đã rời khỏi phòng chơi'), 'info');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
       activeRoomManager.clearRoom();
     } catch (err) {
-      showToast('Lỗi khi rời phòng: ' + (err.response?.data?.message || err.message), 'error');
+      showToast(t('room:leaveRoomError', 'Lỗi khi rời phòng: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
       activeRoomManager.clearRoom(); // fallback in case room is already gone
     }
@@ -82,7 +84,7 @@ export function FloatingRoomWidget() {
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
             <h4 className="font-bold text-xs text-[#f3f4f6] truncate">
-              {name || `Phòng Cờ #${roomId?.slice(0, 6)}`}
+              {name || t('room:chessRoomPrefixWithId', 'Phòng Cờ #{{id}}', { id: roomId?.slice(0, 6) })}
             </h4>
           </div>
 
@@ -104,10 +106,10 @@ export function FloatingRoomWidget() {
             type="button"
             onClick={handleExpand}
             className="flex items-center gap-1 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] font-bold text-xs px-2.5 py-1.5 rounded-xl transition-all shadow-md cursor-pointer"
-            title="Phóng to mở rộng phòng chờ"
+            title={t('room:expandRoomTooltip', 'Phóng to mở rộng phòng chờ')}
           >
             <Maximize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Phóng to</span>
+            <span className="hidden sm:inline">{t('room:expand', 'Phóng to')}</span>
           </button>
 
           {/* ĐÓNG / RỜI PHÒNG */}
@@ -115,7 +117,7 @@ export function FloatingRoomWidget() {
             type="button"
             onClick={handleLeave}
             className="p-1.5 rounded-xl text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors cursor-pointer"
-            title="Đóng widget phòng"
+            title={t('room:closeWidgetTooltip', 'Đóng widget phòng')}
           >
             <X className="w-4 h-4" />
           </button>

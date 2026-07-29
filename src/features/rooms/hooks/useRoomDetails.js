@@ -135,7 +135,7 @@ export function useRoomDetails(roomId, options = {}) {
     return () => {
       if (subId) unsubscribe(subId);
     };
-  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast]);
+  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast, currentUser?.id, onRoomDeleted, t]);
 
   return {
     room: query.data,

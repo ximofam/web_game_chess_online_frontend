@@ -158,7 +158,7 @@ export default function PostDetailPage() {
         className="inline-flex items-center gap-2 text-sm text-[#9ca3af] hover:text-[#f3f4f6] mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        Forum
+        {t('forum:forum', 'Forum')}
       </Link>
 
       {/* Article */}

@@ -1,3 +1,4 @@
+/* global process */
 /**
  * Auth Self Check Script
  * Running: node scratch/authSelfCheck.js
