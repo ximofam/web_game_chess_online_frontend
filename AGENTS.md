@@ -26,3 +26,8 @@ For any task involving new UI, pages, or visual/design decisions, read **DESIGN.
 When using or instructed to use the `/agent-skills:spec-driven-development` skill, you MUST adhere to the following constraints for generating the specification file:
 1. Always create the specification document inside the `./tasks/` directory. Create this directory if it doesn't exist.
 2. Use the naming convention `spec-<feature>.md` (e.g., `spec-rooms.md` for a room feature).
+
+# Code Quality & Linting Rules
+
+1. After completing any code implementation or modification, you MUST run `npx eslint .` (or `npx eslint . --fix`) in the terminal to check for and fix lint errors.
+2. Manually resolve any remaining warnings or errors that cannot be auto-fixed before concluding your task.

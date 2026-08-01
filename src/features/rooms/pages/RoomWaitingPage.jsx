@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useBlocker } from 'react-router-dom';
-import { Play, LogOut, Loader2, AlertCircle, ShieldAlert, Minimize2, X, CheckCircle2 } from 'lucide-react';
+import { LogOut, Loader2, AlertCircle, ShieldAlert, Minimize2, X, CheckCircle2 } from 'lucide-react';
 import { useRoomDetails } from '../hooks/useRoomDetails';
 import { RoomHeader } from '../components/RoomHeader';
 import { RoomSeats } from '../components/RoomSeats';
@@ -27,7 +27,7 @@ export function RoomWaitingPage() {
     }
   });
 
-  const [isStarting, setIsStarting] = useState(false);
+
   const [isReadyPending, setIsReadyPending] = useState(false);
   const bypassBlockerRef = useRef(false);
 
@@ -130,7 +130,7 @@ export function RoomWaitingPage() {
     setIsReadyPending(true);
     try {
       await roomService.ready(room.roomId, readyStatus);
-    } catch (error) {
+    } catch (_error) {
       showToast(t('room:readyError', 'Failed to update ready state'), 'error');
     } finally {
       setIsReadyPending(false);
@@ -143,8 +143,8 @@ export function RoomWaitingPage() {
 
   return (
     <>
-      <CountdownOverlay 
-        startAt={room.startAt} 
+      <CountdownOverlay
+        startAt={room.startAt}
         onCancelReady={isPlayer && isCurrentUserReady ? () => handleReady(false) : undefined}
         isReadyPending={isReadyPending}
       />
