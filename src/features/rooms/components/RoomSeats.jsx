@@ -8,7 +8,6 @@ export function RoomSeats({ room, onSeatChange }) {
   if (!room) return null;
 
   const { white, black, host, status } = room;
-  const _isHost = currentUser?.id === host?.id;
   const isWaiting = status === 'WAITING';
 
   const isUserWhite = currentUser && white && currentUser.id === white.id;
@@ -35,7 +34,11 @@ export function RoomSeats({ room, onSeatChange }) {
         {/* PLAYER AVATAR & INFO */}
         <div className="my-2 space-y-2 flex flex-col items-center">
           <div className="relative">
-            <div className="w-16 h-16 rounded-2xl bg-[#1a1d24] border-2 border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-inner overflow-hidden">
+            <div className={`w-16 h-16 rounded-2xl bg-[#1a1d24] border-2 flex items-center justify-center text-[#d4af37] shadow-inner overflow-hidden ${
+              (side === 'WHITE' ? room.whiteReady : room.blackReady) 
+                ? 'border-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.3)]' 
+                : 'border-[#d4af37]/40'
+            }`}>
               {isOccupied && player.avatarUrl ? (
                 <img src={player.avatarUrl} alt={player.username} className="w-full h-full object-cover" />
               ) : isOccupied ? (
@@ -46,6 +49,12 @@ export function RoomSeats({ room, onSeatChange }) {
             </div>
             {isOccupied && (
               <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#10b981] border-2 border-[#13161c] rounded-full" />
+            )}
+            
+            {isOccupied && (side === 'WHITE' ? room.whiteReady : room.blackReady) && (
+              <div className="absolute -top-2 -right-2 bg-[#10b981] text-[#0d0e12] text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border-2 border-[#13161c] z-10 shadow-sm animate-pulse">
+                Ready
+              </div>
             )}
           </div>
 

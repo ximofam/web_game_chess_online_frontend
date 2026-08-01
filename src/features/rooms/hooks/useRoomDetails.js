@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '../services/roomService';
@@ -17,6 +17,11 @@ export function useRoomDetails(roomId, options = {}) {
   const queryClient = useQueryClient();
   const { subscribe, unsubscribe, connectionStatus } = useSocket();
   const { t } = useTranslation(['room']);
+
+  const onRoomDeletedRef = useRef(onRoomDeleted);
+  useEffect(() => {
+    onRoomDeletedRef.current = onRoomDeleted;
+  }, [onRoomDeleted]);
 
   const query = useQuery({
     queryKey: ['room', roomId],
@@ -104,11 +109,46 @@ export function useRoomDetails(roomId, options = {}) {
               return { ...oldRoom, spectators: updatedSpectators };
             }
 
-            return { ...oldRoom, [role]: null };
+            return { ...oldRoom, [role]: null, [`${role}Ready`]: false };
           });
           if (window.location.pathname !== `/room/${roomId}` && userId !== currentUser?.id) {
             showToast(t('room:playerLeft', 'A player left the room'), 'info');
           }
+        }
+
+        if (event.type === 'PLAYER_READY') {
+          const { role, isReady } = event.data || {};
+          if (role === 'white' || role === 'black') {
+            queryClient.setQueryData(['room', roomId], (oldRoom) => {
+              if (!oldRoom) return oldRoom;
+              return { ...oldRoom, [`${role}Ready`]: isReady };
+            });
+          }
+        }
+
+        if (event.type === 'COUNTDOWN_STARTED') {
+          const { startAt } = event.data || {};
+          if (startAt) {
+            queryClient.setQueryData(['room', roomId], (oldRoom) => {
+              if (!oldRoom) return oldRoom;
+              return { ...oldRoom, status: 'COUNTDOWN', startAt };
+            });
+          }
+        }
+
+        if (event.type === 'COUNTDOWN_CANCELLED') {
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return { ...oldRoom, status: 'WAITING', startAt: null };
+          });
+        }
+
+        if (event.type === 'GAME_STARTED') {
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return { ...oldRoom, status: 'IN_PROGRESS', startAt: null };
+          });
+          navigate(`/game/${roomId}`);
         }
 
         if (event.type === 'CHAT_MESSAGE') {
@@ -121,8 +161,8 @@ export function useRoomDetails(roomId, options = {}) {
         if (event.type === 'ROOM_DELETED') {
           queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
           showToast(t('room:roomDeletedMsg', 'Room was deleted by host.'), 'error');
-          if (onRoomDeleted) {
-            onRoomDeleted();
+          if (onRoomDeletedRef.current) {
+            onRoomDeletedRef.current();
           } else {
             navigate('/dashboard');
           }
@@ -135,7 +175,7 @@ export function useRoomDetails(roomId, options = {}) {
     return () => {
       if (subId) unsubscribe(subId);
     };
-  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast, currentUser?.id, onRoomDeleted, t]);
+  }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast, currentUser?.id, t]);
 
   return {
     room: query.data,

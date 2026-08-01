@@ -121,5 +121,9 @@
   "leaveRoomBtn": "Rời khỏi phòng",
   "leavePageConfirm": "Bạn đang rời khỏi trang",
   "leavePageDesc": "Bạn muốn làm gì với phòng chờ hiện tại?",
-  "leaveRoom": "Rời phòng"
+  "leaveRoom": "Rời phòng",
+  "readyError": "Lỗi cập nhật trạng thái sẵn sàng",
+  "cancelReady": "Huỷ Sẵn Sàng",
+  "gameStartsIn": "Trận đấu bắt đầu sau",
+  "getReady": "Chuẩn bị nhé!"
 }

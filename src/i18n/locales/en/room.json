@@ -121,5 +121,9 @@
   "leaveRoomBtn": "Leave Room",
   "leavePageConfirm": "You are leaving the page",
   "leavePageDesc": "What do you want to do with the current waiting room?",
-  "leaveRoom": "Leave"
+  "leaveRoom": "Leave",
+  "readyError": "Failed to update ready state",
+  "cancelReady": "Cancel Ready",
+  "gameStartsIn": "Game starts in",
+  "getReady": "Get ready!"
 }

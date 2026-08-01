@@ -20,3 +20,9 @@ For any task involving new UI, pages, or visual/design decisions, read **DESIGN.
 
 1. **Reusable Utilities**: Any utility function with high reusability potential (e.g., date/time formatting, string manipulation, calculation helpers) MUST NOT be defined inline within components. Instead, extract them and place them in the `src/shared/utils/` directory.
 2. Import these shared utilities wherever needed to avoid code duplication and keep components focused purely on UI and state logic.
+
+# Spec-Driven Development Rules
+
+When using or instructed to use the `/agent-skills:spec-driven-development` skill, you MUST adhere to the following constraints for generating the specification file:
+1. Always create the specification document inside the `./tasks/` directory. Create this directory if it doesn't exist.
+2. Use the naming convention `spec-<feature>.md` (e.g., `spec-rooms.md` for a room feature).

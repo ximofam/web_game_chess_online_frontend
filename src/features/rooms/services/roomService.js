@@ -61,5 +61,14 @@ export const roomService = {
     const response = await authClient.get(`/api/rooms/${roomId}/chat`);
     return response.data;
   },
+
+  /**
+   * Đánh dấu người chơi sẵn sàng hoặc huỷ sẵn sàng
+   * POST /api/games/:roomId/ready?isReady=true
+   */
+  ready: async (roomId, isReady) => {
+    const response = await authClient.post(`/api/games/${roomId}/ready?isReady=${isReady}`);
+    return response.data;
+  },
 };
 
