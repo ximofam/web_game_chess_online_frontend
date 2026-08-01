@@ -128,5 +128,11 @@
   "getReady": "Chuẩn bị nhé!",
   "statusWaiting": "Đang chờ",
   "statusCountdown": "Sắp bắt đầu",
-  "statusInProgress": "Đang đấu"
+  "statusInProgress": "Đang đấu",
+  "offerDraw": "Cầu hòa",
+  "resign": "Đầu hàng",
+  "moveHistory": "Lịch sử nước đi",
+  "noMovesYet": "Chưa có nước đi nào",
+  "exportPgn": "Xuất PGN",
+  "copy": "Copy"
 }

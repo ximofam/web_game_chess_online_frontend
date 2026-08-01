@@ -68,7 +68,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
       const result = await roomService.createRoom(payload);
       const createdId = result?.roomId || result?.id || 'room-123';
 
-      // Cập nhật cache để RoomWaitingPage dùng ngay mà không cần gọi getRoomDetails
+      // Cập nhật cache để RoomPage dùng ngay mà không cần gọi getRoomDetails
       queryClient.setQueryData(['room', createdId], result);
 
       showToast(t('room:createRoomSuccess', 'Tạo phòng chơi thành công!'), 'success');

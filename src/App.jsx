@@ -18,7 +18,7 @@ import MyPostsPage from './features/forum/pages/MyPostsPage';
 import LearnOverviewPage from './features/learn/pages/LearnOverviewPage';
 import LessonDetailPage from './features/learn/pages/LessonDetailPage';
 import PlayBotPage from './features/learn/pages/PlayBotPage';
-import RoomWaitingPage from './features/rooms/pages/RoomWaitingPage';
+import RoomPage from './features/rooms/pages/RoomPage';
 import GlobalApiErrorHandler from './shared/errors/components/GlobalApiErrorHandler';
 import NotFoundPage from './shared/errors/pages/NotFoundPage';
 import ForbiddenPage from './shared/errors/pages/ForbiddenPage';
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
           { path: '/', element: <HomeIndex /> },
           { path: '/landing', element: <LandingPage /> },
           { path: '/dashboard', element: <Dashboard /> },
-          { path: '/room/:roomId', element: <RoomWaitingPage /> },
+          { path: '/room/:roomId', element: <RoomPage /> },
           { path: '/learn', element: <LearnOverviewPage /> },
           { path: '/learn/play-bot', element: <PlayBotPage /> },
           { path: '/learn/:lessonId', element: <LessonDetailPage /> },

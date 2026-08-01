@@ -144,11 +144,16 @@ export function useRoomDetails(roomId, options = {}) {
         }
 
         if (event.type === 'GAME_STARTED') {
+          const { whiteId, blackId, turn, fen } = event.data || {};
           queryClient.setQueryData(['room', roomId], (oldRoom) => {
             if (!oldRoom) return oldRoom;
-            return { ...oldRoom, status: 'IN_PROGRESS', startAt: null };
+            return {
+              ...oldRoom,
+              status: 'IN_PROGRESS',
+              startAt: null,
+              gameData: { whiteId, blackId, turn, fen }
+            };
           });
-          navigate(`/game/${roomId}`);
         }
 
         if (event.type === 'CHAT_MESSAGE') {

@@ -128,5 +128,11 @@
   "getReady": "Get ready!",
   "statusWaiting": "Waiting",
   "statusCountdown": "Starting soon",
-  "statusInProgress": "Playing"
+  "statusInProgress": "Playing",
+  "offerDraw": "Offer Draw",
+  "resign": "Resign",
+  "moveHistory": "Move History",
+  "noMovesYet": "No moves yet",
+  "exportPgn": "Export PGN",
+  "copy": "Copy"
 }

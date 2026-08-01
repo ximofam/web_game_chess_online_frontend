@@ -1,20 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useBlocker } from 'react-router-dom';
-import { LogOut, Loader2, AlertCircle, ShieldAlert, Minimize2, X, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ShieldAlert, Minimize2, X, Loader2, LogOut, Copy, Check } from 'lucide-react';
 import { useRoomDetails } from '../hooks/useRoomDetails';
-import { RoomHeader } from '../components/RoomHeader';
-import { RoomSeats } from '../components/RoomSeats';
-import { RoomSpectators } from '../components/RoomSpectators';
-import { RoomChat } from '../components/RoomChat';
-import { CountdownOverlay } from '../components/CountdownOverlay';
+
+import { RoomWaiting } from '../components/RoomWaiting';
+import { RoomPlaying } from '../components/RoomPlaying';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { activeRoomManager } from '../services/activeRoomManager';
 import { useQueryClient } from '@tanstack/react-query';
-
 import { useTranslation } from 'react-i18next';
 
-export function RoomWaitingPage() {
+export function RoomPage() {
   const { t } = useTranslation(['room']);
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -27,9 +24,17 @@ export function RoomWaitingPage() {
     }
   });
 
-
   const [isReadyPending, setIsReadyPending] = useState(false);
+  const [copied, setCopied] = useState(false);
   const bypassBlockerRef = useRef(false);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/room/${roomId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    showToast(t('room:copyLinkSuccess', 'Đã sao chép liên kết phòng!'), 'success');
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Blocker to intercept navigation attempts (Back button, links, etc.)
   const blocker = useBlocker(
@@ -116,11 +121,11 @@ export function RoomWaitingPage() {
     );
   }
 
-  const isHost = currentUser?.id === room.host?.id;
-  const isUserWhite = currentUser?.id === room.white?.id;
-  const isUserBlack = currentUser?.id === room.black?.id;
+  const isHost = String(currentUser?.id) === String(room?.host?.id);
+  const isUserWhite = String(currentUser?.id) === String(room?.white?.id);
+  const isUserBlack = String(currentUser?.id) === String(room?.black?.id);
   const isPlayer = isUserWhite || isUserBlack;
-  const isCurrentUserReady = isUserWhite ? room.whiteReady : room.blackReady;
+  const isCurrentUserReady = isUserWhite ? room.whiteReady : (isUserBlack ? room.blackReady : false);
 
   const hostReady = isHost && isPlayer && isCurrentUserReady;
   const showLeaveRoomButton = !hostReady;
@@ -143,78 +148,46 @@ export function RoomWaitingPage() {
 
   return (
     <>
-      <CountdownOverlay
-        startAt={room.startAt}
-        onCancelReady={isPlayer && isCurrentUserReady ? () => handleReady(false) : undefined}
-        isReadyPending={isReadyPending}
-      />
-      <div className="container mx-auto px-4 py-6 max-w-6xl space-y-6 relative">
-        {/* ROOM HEADER */}
-        <RoomHeader room={room} onMinimize={handleConfirmMinimize} />
+      <div className="container mx-auto px-4 max-w-6xl flex flex-col min-h-[calc(100vh-140px)] py-4">
+        {/* TOP MINI ACTIONS */}
+        <div className="flex items-center justify-end gap-2 py-3 shrink-0">
+          <button
+            type="button"
+            onClick={handleConfirmMinimize}
+            className="flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#f3f4f6] border border-[#2d323f] px-3 py-1.5 rounded-lg font-semibold text-xs transition-all cursor-pointer shadow-sm"
+          >
+            <Minimize2 className="w-4 h-4 text-[#d4af37]" />
+            <span className="hidden sm:inline">{t('room:minimize', 'Thu nhỏ')}</span>
+          </button>
 
-        {/* ACTION BUTTONS (READY & LEAVE ROOM) MOVED TO TOP */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          {isPlayer ? (
-            isCurrentUserReady ? (
-              <button
-                type="button"
-                onClick={() => handleReady(false)}
-                disabled={isReadyPending}
-                className="flex-1 bg-[#ef4444]/15 hover:bg-[#ef4444] text-[#ef4444] hover:text-[#f3f4f6] border border-[#ef4444]/40 font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isReadyPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <X className="w-5 h-5" />}
-                <span>{t('room:cancelReady', 'Cancel Ready')}</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleReady(true)}
-                disabled={isReadyPending}
-                className="flex-1 bg-[#10b981]/15 hover:bg-[#10b981] text-[#10b981] hover:text-[#f3f4f6] border border-[#10b981]/40 font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isReadyPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-                <span>{t('room:ready', 'Ready')}</span>
-              </button>
-            )
-          ) : (
-            <div className="flex-1 p-3 bg-[#13161c] border border-[#2d323f] rounded-xl text-center text-xs text-[#9ca3af] flex items-center justify-center gap-2 shadow-lg">
-              <AlertCircle className="w-4 h-4 text-[#d4af37]" />
-              <span>{t('room:waitingPlayer', 'Waiting for player...')}</span>
-            </div>
-          )}
-
-          {showLeaveRoomButton && (
-            <button
-              type="button"
-              onClick={handleConfirmLeave}
-              className="sm:w-auto w-full bg-[#13161c] border border-[#2d323f] hover:bg-[#ef4444]/10 hover:border-[#ef4444]/40 hover:text-[#ef4444] text-[#9ca3af] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>{t('room:leaveRoomSuccess', 'Leave room').replace('Left the', 'Leave')}</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="flex items-center gap-1.5 bg-[#d4af37]/15 hover:bg-[#d4af37]/25 text-[#d4af37] border border-[#d4af37]/40 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer shadow-sm"
+          >
+            {copied ? <Check className="w-4 h-4 text-[#10b981]" /> : <Copy className="w-4 h-4" />}
+            <span className="hidden sm:inline">{copied ? t('room:copied', 'Đã chép') : t('room:copyLink', 'Sao chép link')}</span>
+          </button>
         </div>
 
         {/* MAIN CONTENT WORKSPACE */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* SEATS & SPECTATORS SECTION (LEFT) */}
-          <div className="lg:col-span-5 space-y-6 flex flex-col h-full">
-            {/* SEATS (WHITE vs BLACK) */}
-            <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg space-y-4">
-              <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider border-b border-[#2d323f] pb-2">
-                {t('room:playerList', 'Player List')}
-              </h3>
-              <RoomSeats room={room} onSeatChange={handleSeatChange} />
-            </div>
-
-            {/* SPECTATORS LIST */}
-            <RoomSpectators spectators={room.spectators || []} />
-          </div>
-
-          {/* CHAT SECTION (RIGHT) */}
-          <div className="lg:col-span-7 h-full min-h-[500px]">
-            <RoomChat roomId={roomId} room={room} />
-          </div>
+        <div className="flex-1 min-h-0 relative flex flex-col">
+          {room.status === 'IN_PROGRESS' ? (
+            <RoomPlaying room={room} roomId={roomId} />
+          ) : (
+            <RoomWaiting
+              room={room}
+              roomId={roomId}
+              t={t}
+              isPlayer={isPlayer}
+              isCurrentUserReady={isCurrentUserReady}
+              isReadyPending={isReadyPending}
+              handleReady={handleReady}
+              handleSeatChange={handleSeatChange}
+              showLeaveRoomButton={showLeaveRoomButton}
+              handleConfirmLeave={handleConfirmLeave}
+            />
+          )}
         </div>
       </div>
 
@@ -264,4 +237,4 @@ export function RoomWaitingPage() {
   );
 }
 
-export default RoomWaitingPage;
+export default RoomPage;
