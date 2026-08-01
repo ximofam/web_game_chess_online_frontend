@@ -125,5 +125,8 @@
   "readyError": "Lỗi cập nhật trạng thái sẵn sàng",
   "cancelReady": "Huỷ Sẵn Sàng",
   "gameStartsIn": "Trận đấu bắt đầu sau",
-  "getReady": "Chuẩn bị nhé!"
+  "getReady": "Chuẩn bị nhé!",
+  "statusWaiting": "Đang chờ",
+  "statusCountdown": "Sắp bắt đầu",
+  "statusInProgress": "Đang đấu"
 }

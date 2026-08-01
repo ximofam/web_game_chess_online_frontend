@@ -133,12 +133,19 @@ export function useLobbyRooms(size = 20, searchTerm = '') {
             }
 
             if (event.type === 'ROOM_UPDATED') {
-              const { roomId, role, user } = event.data || {};
-              if (!roomId || !role) return pageData;
+              const { roomId, role, user, status } = event.data || {};
+              if (!roomId) return pageData;
 
               const updatedItems = currentItems.map((r) => {
                 if (r.roomId === roomId) {
-                  return { ...r, [role]: user };
+                  const updatedRoom = { ...r };
+                  if (role !== undefined) {
+                    updatedRoom[role] = user;
+                  }
+                  if (status !== undefined) {
+                    updatedRoom.status = status;
+                  }
+                  return updatedRoom;
                 }
                 return r;
               });

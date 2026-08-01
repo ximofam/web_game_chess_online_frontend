@@ -273,9 +273,26 @@ export function LobbyList({ onCreateRoomClick }) {
                           <span className="block font-semibold text-[#f3f4f6] group-hover:text-[#d4af37] transition-colors truncate">
                             {name || t('room:chessRoomPrefixWithId', 'Phòng Cờ #{{id}}', { id: roomId?.slice(0, 8) })}
                           </span>
-                          <span className="text-[10px] text-[#9ca3af]">
-                            {t('room:host', 'Host: ')}{host?.username || 'Player'}
-                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-[#9ca3af]">
+                              {t('room:host', 'Host: ')}{host?.username || 'Player'}
+                            </span>
+                            {status === 'COUNTDOWN' && (
+                              <span className="inline-flex items-center text-[8px] font-bold px-1.5 py-0.5 rounded border border-orange-500/40 text-orange-400 bg-orange-500/10 animate-pulse uppercase">
+                                {t('room:statusCountdown', 'Sắp bắt đầu')}
+                              </span>
+                            )}
+                            {status === 'IN_PROGRESS' && (
+                              <span className="inline-flex items-center text-[8px] font-bold px-1.5 py-0.5 rounded border border-[#38bdf8]/40 text-[#38bdf8] bg-[#38bdf8]/10 uppercase">
+                                {t('room:statusInProgress', 'Đang đấu')}
+                              </span>
+                            )}
+                            {status === 'WAITING' && (
+                              <span className="inline-flex items-center text-[8px] font-bold px-1.5 py-0.5 rounded border border-[#10b981]/40 text-[#10b981] bg-[#10b981]/10 uppercase">
+                                {t('room:statusWaiting', 'Đang chờ')}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>

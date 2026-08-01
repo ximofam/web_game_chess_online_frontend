@@ -125,5 +125,8 @@
   "readyError": "Failed to update ready state",
   "cancelReady": "Cancel Ready",
   "gameStartsIn": "Game starts in",
-  "getReady": "Get ready!"
+  "getReady": "Get ready!",
+  "statusWaiting": "Waiting",
+  "statusCountdown": "Starting soon",
+  "statusInProgress": "Playing"
 }
