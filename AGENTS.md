@@ -13,6 +13,10 @@ Whenever creating or modifying any user interface, you MUST follow these rules:
 
 Unless explicitly instructed otherwise, always provide translations for both **English (`en`)** and **Vietnamese (`vi`)**.
 
+# Project Architecture
+
+1. Before making structural changes, creating new features, or when you need to understand the project setup, you MUST read **ARCHITECTURE.md** to understand the established Feature-Driven architecture and data flow.
+
 # Frontend design work
  
 For any task involving new UI, pages, or visual/design decisions, read **DESIGN.md** first and follow it.
