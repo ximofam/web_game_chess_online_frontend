@@ -1,18 +1,74 @@
-
+import { useState, useMemo, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 import { useAuth } from '../../auth/context/AuthContext';
 import { User, Clock, Flag, Handshake } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { AnnotationBuilder } from '../../learn/engine/annotations/AnnotationBuilder';
 
 export function ChessGameUI({ room }) {
   const { currentUser } = useAuth();
   const { t } = useTranslation(['room']);
+  const [selectedSquare, setSelectedSquare] = useState(null);
 
   const { gameData, white, black, settings } = room;
   const currentUserId = String(currentUser?.id);
 
+  // Initialize local chess instance for legal moves
+  const chess = useMemo(() => {
+    try {
+      return new Chess(gameData?.fen || 'start');
+    } catch {
+      return new Chess();
+    }
+  }, [gameData?.fen]);
+
+  // Compute legal move highlights
+  const legalMoveSquares = useMemo(() => {
+    if (!selectedSquare) return [];
+    try {
+      const moves = chess.moves({ square: selectedSquare, verbose: true });
+      return moves.map(m => ({
+        square: m.to,
+        isCapture: Boolean(m.captured || m.flags.includes('c') || m.flags.includes('e'))
+      }));
+    } catch {
+      return [];
+    }
+  }, [chess, selectedSquare]);
+
+  const squareStyles = useMemo(() => {
+    return AnnotationBuilder.buildSquareStyles({
+      highlightSquares: legalMoveSquares,
+      selectedSquare,
+      // You can add lastMove highlight here later if backend provides it
+    });
+  }, [legalMoveSquares, selectedSquare]);
+
+  // Handlers for selection
+  const handlePieceClick = useCallback(({ square }) => {
+    setSelectedSquare(prev => prev === square ? null : square);
+  }, []);
+
+  const handlePieceDrag = useCallback(({ square }) => {
+    setSelectedSquare(square);
+  }, []);
+
+  const handleSquareMouseDown = useCallback(({ square }) => {
+    setSelectedSquare(square);
+  }, []);
+
+  const handleSquareClick = useCallback(({ square }) => {
+    if (selectedSquare && selectedSquare !== square) {
+      // Future: send move via websocket if valid
+      setSelectedSquare(null);
+    } else {
+      setSelectedSquare(square);
+    }
+  }, [selectedSquare]);
+
   // Determine board orientation
-  const isBlack = currentUserId === String(black?.id);
+  const isBlack = currentUserId === String(black?.id) || currentUserId === String(gameData?.blackId);
   const boardOrientation = isBlack ? 'black' : 'white';
 
   // Determine players for top and bottom displays
@@ -67,17 +123,25 @@ export function ChessGameUI({ room }) {
 
         <div className="w-full max-w-[500px] aspect-square relative z-10 drop-shadow-2xl">
           <Chessboard
-            id="RoomChessboard"
-            position={gameData?.fen || 'start'}
-            boardOrientation={boardOrientation}
-            customDarkSquareStyle={{ backgroundColor: '#4b5563' }}
-            customLightSquareStyle={{ backgroundColor: '#9ca3af' }}
-            customBoardStyle={{
-              borderRadius: '8px',
-              boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
+            key={`board-${boardOrientation}`}
+            options={{
+              id: "RoomChessboard",
+              position: gameData?.fen || 'start',
+              boardOrientation: boardOrientation,
+              darkSquareStyle: { backgroundColor: '#4b5563' },
+              lightSquareStyle: { backgroundColor: '#9ca3af' },
+              boardStyle: {
+                borderRadius: '8px',
+                boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
+              },
+              animationDurationInMs: 300,
+              allowDragging: true,
+              squareStyles,
+              onPieceClick: handlePieceClick,
+              onPieceDrag: handlePieceDrag,
+              onSquareMouseDown: handleSquareMouseDown,
+              onSquareClick: handleSquareClick,
             }}
-            animationDuration={300}
-            arePiecesDraggable={false} // Temporarily disabled until moves are implemented
           />
         </div>
       </div>
