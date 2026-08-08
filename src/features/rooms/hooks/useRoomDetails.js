@@ -151,7 +151,51 @@ export function useRoomDetails(roomId, options = {}) {
               ...oldRoom,
               status: 'IN_PROGRESS',
               startAt: null,
-              gameData: { whiteId, blackId, turn, fen }
+              gameData: { 
+                whiteId, 
+                blackId, 
+                turn: turn || 'white', 
+                fen: fen || 'start',
+                initialFen: event.data?.initialFen || fen || 'start',
+                moves: event.data?.moves || [],
+                // Server should eventually pass initial clock here, fallback to settings if not provided
+                whiteRemainingMillis: event.data?.whiteRemainingMillis || (oldRoom.settings?.timeMinutes * 60 * 1000),
+                blackRemainingMillis: event.data?.blackRemainingMillis || (oldRoom.settings?.timeMinutes * 60 * 1000),
+              }
+            };
+          });
+        }
+
+        if (event.type === 'MOVE_MADE') {
+          const { move, newTurn, newFen, whiteRemainingMillis, blackRemainingMillis } = event.data || {};
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return {
+              ...oldRoom,
+              gameData: {
+                ...oldRoom.gameData,
+                turn: newTurn,
+                fen: newFen,
+                moves: move ? [...(oldRoom.gameData?.moves || []), move] : (oldRoom.gameData?.moves || []),
+                whiteRemainingMillis,
+                blackRemainingMillis,
+              }
+            };
+          });
+        }
+
+        if (event.type === 'GAME_OVER') {
+          const { winner, reason } = event.data || {};
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return {
+              ...oldRoom,
+              status: 'FINISHED',
+              gameData: {
+                ...oldRoom.gameData,
+                winner,
+                gameOverReason: reason
+              }
             };
           });
         }

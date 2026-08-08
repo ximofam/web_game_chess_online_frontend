@@ -172,8 +172,14 @@ export function RoomPage() {
 
         {/* MAIN CONTENT WORKSPACE */}
         <div className="flex-1 min-h-0 relative flex flex-col">
-          {room.status === 'IN_PROGRESS' ? (
-            <RoomPlaying room={room} roomId={roomId} />
+          {room.status === 'IN_PROGRESS' || room.status === 'FINISHED' ? (
+            <RoomPlaying
+              room={room}
+              roomId={roomId}
+              handleReady={handleReady}
+              handleConfirmLeave={handleConfirmLeave}
+              isReadyPending={isReadyPending}
+            />
           ) : (
             <RoomWaiting
               room={room}

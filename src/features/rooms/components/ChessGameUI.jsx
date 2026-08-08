@@ -1,18 +1,53 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useSocket } from '../../../shared/socket/useSocket';
 import { User, Clock, Flag, Handshake } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AnnotationBuilder } from '../../learn/engine/annotations/AnnotationBuilder';
 
-export function ChessGameUI({ room }) {
+export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPending }) {
   const { currentUser } = useAuth();
+  const { send } = useSocket();
   const { t } = useTranslation(['room']);
   const [selectedSquare, setSelectedSquare] = useState(null);
 
-  const { gameData, white, black, settings } = room;
+  const { gameData, white, black, settings, roomId, status } = room;
   const currentUserId = String(currentUser?.id);
+
+  // Timers
+  const initialTimeMillis = (settings?.timeMinutes || 5) * 60 * 1000;
+  const [whiteRemaining, setWhiteRemaining] = useState(gameData?.whiteRemainingMillis ?? initialTimeMillis);
+  const [blackRemaining, setBlackRemaining] = useState(gameData?.blackRemainingMillis ?? initialTimeMillis);
+
+  useEffect(() => {
+    if (gameData?.whiteRemainingMillis !== undefined) setWhiteRemaining(gameData.whiteRemainingMillis);
+    if (gameData?.blackRemainingMillis !== undefined) setBlackRemaining(gameData.blackRemainingMillis);
+  }, [gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis]);
+
+  const [showGameOverModal, setShowGameOverModal] = useState(true);
+
+  useEffect(() => {
+    if (status === 'FINISHED') setShowGameOverModal(true);
+  }, [status]);
+
+  useEffect(() => {
+    const activeTurn = gameData?.turn || 'white';
+    if (status !== 'IN_PROGRESS') return;
+    const interval = setInterval(() => {
+      if (activeTurn === 'white') setWhiteRemaining(prev => Math.max(0, prev - 100));
+      else setBlackRemaining(prev => Math.max(0, prev - 100));
+    }, 100);
+    return () => clearInterval(interval);
+  }, [status, gameData?.turn]);
+
+  const formatTime = (millis) => {
+    const totalSeconds = Math.max(0, Math.ceil(millis / 1000));
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
 
   // Initialize local chess instance for legal moves
   const chess = useMemo(() => {
@@ -23,9 +58,25 @@ export function ChessGameUI({ room }) {
     }
   }, [gameData?.fen]);
 
+  // Determine board orientation and permissions
+  const isBlack = currentUserId === String(black?.id) || currentUserId === String(gameData?.blackId);
+  const isWhite = currentUserId === String(white?.id) || currentUserId === String(gameData?.whiteId);
+  const isPlayer = isWhite || isBlack;
+  const myColor = isWhite ? 'white' : isBlack ? 'black' : null;
+  const currentTurn = gameData?.turn || 'white';
+  const isMyTurn = myColor === currentTurn && status === 'IN_PROGRESS';
+  const boardOrientation = isBlack ? 'black' : 'white';
+
+  const onStay = () => setShowGameOverModal(false);
+
+  const topPlayer = isBlack ? white : black;
+  const bottomPlayer = isBlack ? black : white;
+  const topPlayerIsWhite = isBlack;
+  const bottomPlayerIsWhite = !isBlack;
+
   // Compute legal move highlights
   const legalMoveSquares = useMemo(() => {
-    if (!selectedSquare) return [];
+    if (!selectedSquare || !isMyTurn) return [];
     try {
       const moves = chess.moves({ square: selectedSquare, verbose: true });
       return moves.map(m => ({
@@ -35,7 +86,7 @@ export function ChessGameUI({ room }) {
     } catch {
       return [];
     }
-  }, [chess, selectedSquare]);
+  }, [chess, selectedSquare, isMyTurn]);
 
   const squareStyles = useMemo(() => {
     return AnnotationBuilder.buildSquareStyles({
@@ -46,39 +97,51 @@ export function ChessGameUI({ room }) {
   }, [legalMoveSquares, selectedSquare]);
 
   // Handlers for selection
+  const handleMove = useCallback((sourceSquare, targetSquare) => {
+    if (!isMyTurn) return false;
+    try {
+      const move = chess.move({ from: sourceSquare, to: targetSquare, promotion: 'q' });
+      if (move) {
+        const uciMove = move.from + move.to + (move.promotion || '');
+        send(`/app/room.${roomId}.move`, { move: uciMove });
+        // Spec: do not optimistically update fen. Revert the local move.
+        chess.undo();
+        setSelectedSquare(null);
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  }, [isMyTurn, chess, send, roomId]);
+
   const handlePieceClick = useCallback(({ square }) => {
-    setSelectedSquare(prev => prev === square ? null : square);
-  }, []);
+    if (isMyTurn) setSelectedSquare(prev => prev === square ? null : square);
+  }, [isMyTurn]);
 
   const handlePieceDrag = useCallback(({ square }) => {
-    setSelectedSquare(square);
-  }, []);
+    if (isMyTurn) setSelectedSquare(square);
+  }, [isMyTurn]);
 
   const handleSquareMouseDown = useCallback(({ square }) => {
-    setSelectedSquare(square);
-  }, []);
+    if (isMyTurn) setSelectedSquare(square);
+  }, [isMyTurn]);
 
   const handleSquareClick = useCallback(({ square }) => {
+    if (!isMyTurn) return;
     if (selectedSquare && selectedSquare !== square) {
-      // Future: send move via websocket if valid
-      setSelectedSquare(null);
+      handleMove(selectedSquare, square);
     } else {
       setSelectedSquare(square);
     }
-  }, [selectedSquare]);
+  }, [selectedSquare, handleMove, isMyTurn]);
 
-  // Determine board orientation
-  const isBlack = currentUserId === String(black?.id) || currentUserId === String(gameData?.blackId);
-  const boardOrientation = isBlack ? 'black' : 'white';
+  const onPieceDrop = useCallback(({ sourceSquare, targetSquare }) => {
+    return handleMove(sourceSquare, targetSquare);
+  }, [handleMove]);
 
-  // Determine players for top and bottom displays
-  const topPlayer = isBlack ? white : black;
-  const bottomPlayer = isBlack ? black : white;
-
-  // Timers (Using initial static settings for now)
-  const initialTimeMinutes = settings?.timeMinutes || 5;
-
-  const renderPlayerInfo = (player, isTop) => {
+  const renderPlayerInfo = (player, isTop, isPlayerWhite) => {
+    const remainingMillis = isPlayerWhite ? whiteRemaining : blackRemaining;
     return (
       <div className={`flex items-center justify-between bg-[#1a1d24] border border-[#2d323f] p-3 rounded-xl shadow-sm ${isTop ? 'mb-4' : 'mt-4'}`}>
         <div className="flex items-center gap-3">
@@ -104,17 +167,29 @@ export function ChessGameUI({ room }) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 bg-[#13161c] border border-[#2d323f] px-4 py-2 rounded-lg font-mono text-lg font-bold text-[#f3f4f6] shadow-inner">
             <Clock className="w-4 h-4 text-[#9ca3af]" />
-            {String(initialTimeMinutes).padStart(2, '0')}:00
+            {formatTime(remainingMillis)}
           </div>
         </div>
       </div>
     );
   };
 
+  // Game over overlay UI mapping
+  const getGameOverReasonUI = (reason) => {
+    const mapping = {
+      'checkmate': t('room:checkmate', 'Checkmate'),
+      'timeout': t('room:timeout', 'Time out'),
+      'resign': t('room:resignation', 'Resignation'),
+      'stalemate': t('room:stalemate', 'Stalemate'),
+      'draw': t('room:draw', 'Draw')
+    };
+    return mapping[reason] || reason;
+  };
+
   return (
     <div className="flex flex-col h-full animate-in fade-in zoom-in-95 duration-300">
       {/* Top Player (Opponent) */}
-      {renderPlayerInfo(topPlayer, true)}
+      {renderPlayerInfo(topPlayer, true, topPlayerIsWhite)}
 
       {/* Chess Board Area */}
       <div className="flex-1 flex items-center justify-center bg-[#13161c] rounded-2xl border border-[#2d323f] p-4 shadow-xl relative overflow-hidden">
@@ -135,19 +210,51 @@ export function ChessGameUI({ room }) {
                 boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
               },
               animationDurationInMs: 300,
-              allowDragging: true,
+              allowDragging: isMyTurn,
               squareStyles,
               onPieceClick: handlePieceClick,
               onPieceDrag: handlePieceDrag,
               onSquareMouseDown: handleSquareMouseDown,
               onSquareClick: handleSquareClick,
+              onPieceDrop: onPieceDrop,
             }}
           />
+
+          {/* Game Over Overlay */}
+          {status === 'FINISHED' && showGameOverModal && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0d0e12]/80 backdrop-blur-sm rounded-lg animate-in fade-in zoom-in-95 duration-300">
+              <div className="text-center p-6 bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-2xl min-w-[280px]">
+                <h3 className="text-2xl font-black mb-1 text-[#f3f4f6]">
+                  {!isPlayer
+                    ? (gameData?.winner === 'draw' ? t('room:gameDraw', 'Draw') : gameData?.winner === 'white' ? t('room:whiteWon', 'White won') : t('room:blackWon', 'Black won'))
+                    : (gameData?.winner === myColor ? t('room:youWon', 'You won') : gameData?.winner === 'draw' ? t('room:gameDraw', 'Draw') : t('room:youLost', 'You lost'))
+                  }
+                </h3>
+                <p className="text-[#9ca3af] uppercase tracking-wider text-sm font-semibold mb-6">
+                  {getGameOverReasonUI(gameData?.gameOverReason)}
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={handleConfirmLeave} className="flex-1 py-2 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] text-xs font-bold rounded-xl transition-all cursor-pointer">
+                    {t('room:leave', 'Thoát')}
+                  </button>
+                  {isPlayer ? (
+                    <button onClick={() => { handleReady(true); setShowGameOverModal(false); }} disabled={isReadyPending} className="flex-1 py-2 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer">
+                      {isReadyPending ? '...' : t('room:rematch', 'Chơi lại')}
+                    </button>
+                  ) : (
+                    <button onClick={onStay} className="flex-1 py-2 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-xl transition-all cursor-pointer">
+                      {t('room:stay', 'Ở lại')}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Bottom Player (Current User) */}
-      {renderPlayerInfo(bottomPlayer, false)}
+      {renderPlayerInfo(bottomPlayer, false, bottomPlayerIsWhite)}
 
       {/* Game Actions (Resign, Draw) */}
       <div className="flex items-center justify-center gap-3 mt-4">

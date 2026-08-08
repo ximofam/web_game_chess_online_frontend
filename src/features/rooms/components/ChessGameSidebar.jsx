@@ -1,11 +1,91 @@
+import { useMemo, useEffect, useRef } from 'react';
 import { ScrollText, Move } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Chess } from 'chess.js';
 
-export function ChessGameSidebar({ room: _room }) {
+export function ChessGameSidebar({ room }) {
   const { t } = useTranslation(['room']);
+  const scrollRef = useRef(null);
   
-  // Later, we can extract move history from room.gameData.pgn or room.gameData.moves
-  const moves = [];
+  const { gameData } = room || {};
+  const initialFen = gameData?.initialFen || 'start';
+
+  const moveHistory = useMemo(() => {
+    const movesUci = gameData?.moves || [];
+    try {
+      const chess = new Chess(initialFen);
+      const history = [];
+      for (const m of movesUci) {
+        if (!m) continue;
+        // UCI format e.g. e2e4, e7e8q
+        const from = m.slice(0, 2);
+        const to = m.slice(2, 4);
+        const promotion = m.length > 4 ? m[4] : undefined;
+        try {
+          const result = chess.move({ from, to, promotion });
+          if (result) {
+            history.push(result.san);
+          } else {
+            history.push(m);
+          }
+        } catch {
+          history.push(m); // fallback if chess.js throws
+        }
+      }
+      return history;
+    } catch {
+      return gameData?.moves || []; // ultimate fallback
+    }
+  }, [gameData?.moves, initialFen]);
+
+  const movePairs = useMemo(() => {
+    const pairs = [];
+    for (let i = 0; i < moveHistory.length; i += 2) {
+      pairs.push({
+        white: moveHistory[i],
+        black: moveHistory[i + 1]
+      });
+    }
+    return pairs;
+  }, [moveHistory]);
+
+  const [displayCount, setDisplayCount] = useState(20);
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
+  const previousScrollHeight = useRef(0);
+  const prevMoveCount = useRef(movePairs.length);
+
+  const movePairsToDisplay = useMemo(() => {
+    if (movePairs.length <= displayCount) return movePairs;
+    return movePairs.slice(movePairs.length - displayCount);
+  }, [movePairs, displayCount]);
+
+  const startingIndex = Math.max(0, movePairs.length - displayCount);
+
+  const handleScroll = (e) => {
+    if (e.target.scrollTop === 0 && displayCount < movePairs.length) {
+      previousScrollHeight.current = e.target.scrollHeight;
+      setIsLoadingOlder(true);
+      setDisplayCount(prev => prev + 20);
+    }
+  };
+
+  // Restore scroll position after loading older moves
+  useEffect(() => {
+    if (isLoadingOlder && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight - previousScrollHeight.current;
+      setIsLoadingOlder(false);
+    }
+  }, [displayCount, isLoadingOlder]);
+
+  // Auto-scroll to bottom when new moves arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      if (movePairs.length > prevMoveCount.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }
+    prevMoveCount.current = movePairs.length;
+  }, [movePairs.length]);
 
   return (
     <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg flex flex-col h-full min-h-[500px]">
@@ -16,29 +96,47 @@ export function ChessGameSidebar({ room: _room }) {
         </h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin flex flex-col">
-        {moves.length === 0 ? (
+      <div 
+        ref={scrollRef} 
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto pr-2 scrollbar-thin flex flex-col"
+      >
+        {movePairsToDisplay.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-[#6b7280] space-y-3">
             <Move className="w-8 h-8 opacity-50" />
             <p className="text-xs font-semibold">{t('room:noMovesYet', 'No moves yet')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-            {/* Example of how moves would be rendered */}
-            {/* 
-            <div className="flex items-center gap-2 px-2 py-1 bg-[#13161c] rounded">
-              <span className="text-[#6b7280] text-xs font-mono w-4">1.</span>
-              <span className="text-[#f3f4f6] font-semibold">e4</span>
-            </div>
-            <div className="flex items-center gap-2 px-2 py-1 bg-[#13161c] rounded">
-              <span className="text-[#f3f4f6] font-semibold">e5</span>
-            </div>
-            */}
+          <div className="grid grid-cols-[30px_1fr_1fr] gap-x-2 gap-y-1 text-sm font-mono">
+            {displayCount < movePairs.length && (
+              <div className="col-span-3 text-center text-xs text-[#9ca3af] py-2 italic opacity-50">
+                {t('room:loadingOlderMoves', 'Loading older moves...')}
+              </div>
+            )}
+            {movePairsToDisplay.map((pair, idx) => {
+              const globalIdx = startingIndex + idx;
+              return (
+                <div key={globalIdx} className="contents group">
+                  <div className="flex items-center justify-end pr-2 text-[#6b7280] text-xs">
+                    {globalIdx + 1}.
+                  </div>
+                  <div className="flex items-center px-2 py-1 bg-[#13161c] rounded text-[#f3f4f6] group-hover:bg-[#2d323f] transition-colors">
+                    {pair.white}
+                  </div>
+                  {pair.black ? (
+                    <div className="flex items-center px-2 py-1 bg-[#13161c] rounded text-[#f3f4f6] group-hover:bg-[#2d323f] transition-colors">
+                      {pair.black}
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Optional: PGN Export or related action buttons can go here at the bottom */}
       <div className="mt-4 pt-4 border-t border-[#2d323f]">
         <button className="w-full py-2 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#d4af37] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm">
           {t('room:exportPgn', 'Export PGN')}

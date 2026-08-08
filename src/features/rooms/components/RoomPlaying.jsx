@@ -3,7 +3,7 @@ import { RoomChat } from './RoomChat';
 import { RoomSpectators } from './RoomSpectators';
 import { ChessGameSidebar } from './ChessGameSidebar';
 
-export function RoomPlaying({ room, roomId }) {
+export function RoomPlaying({ room, roomId, handleReady, handleConfirmLeave, isReadyPending }) {
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0 pb-4">
       {/* LEFT COLUMN: Spectators + Chat */}
@@ -22,7 +22,12 @@ export function RoomPlaying({ room, roomId }) {
       {/* CENTER COLUMN: Chess Board */}
       <div className="lg:col-span-6 h-full flex flex-col items-center justify-center">
         <div className="w-full max-w-[550px]">
-          <ChessGameUI room={room} />
+          <ChessGameUI 
+            room={room} 
+            handleReady={handleReady} 
+            handleConfirmLeave={handleConfirmLeave} 
+            isReadyPending={isReadyPending} 
+          />
         </div>
       </div>
 
