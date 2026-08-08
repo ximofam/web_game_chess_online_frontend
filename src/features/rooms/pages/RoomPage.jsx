@@ -155,7 +155,7 @@ export function RoomPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 max-w-6xl flex flex-col min-h-[calc(100vh-140px)] lg:h-[calc(100vh-140px)] lg:max-h-[calc(100vh-140px)] py-4">
+      <div className="container mx-auto px-4 max-w-6xl flex flex-col h-full min-h-[500px] py-4">
         {/* TOP MINI ACTIONS */}
         <div className="flex items-center justify-end gap-2 py-3 shrink-0">
           <button
