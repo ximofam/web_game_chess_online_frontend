@@ -7,7 +7,7 @@ import { User, Clock, Flag, Handshake } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AnnotationBuilder } from '../../learn/engine/annotations/AnnotationBuilder';
 
-export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPending }) {
+export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPending, onAcknowledgeGameOver }) {
   const { currentUser } = useAuth();
   const { send } = useSocket();
   const { t } = useTranslation(['room']);
@@ -27,10 +27,27 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   }, [gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis]);
 
   const [showGameOverModal, setShowGameOverModal] = useState(true);
+  const [countdown, setCountdown] = useState(15);
+  
+  const isPostGame = status === 'WAITING' && gameData?.winner;
 
   useEffect(() => {
-    if (status === 'FINISHED') setShowGameOverModal(true);
-  }, [status]);
+    if (isPostGame) {
+      setShowGameOverModal(true);
+      setCountdown(15);
+    }
+  }, [isPostGame]);
+
+  useEffect(() => {
+    if (isPostGame && showGameOverModal) {
+      if (countdown <= 0) {
+        handleConfirmLeave();
+        return;
+      }
+      const timer = setTimeout(() => setCountdown(prev => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isPostGame, showGameOverModal, countdown, handleConfirmLeave]);
 
   useEffect(() => {
     const activeTurn = gameData?.turn || 'white';
@@ -67,7 +84,16 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   const isMyTurn = myColor === currentTurn && status === 'IN_PROGRESS';
   const boardOrientation = isBlack ? 'black' : 'white';
 
-  const onStay = () => setShowGameOverModal(false);
+  const onStay = () => {
+    setShowGameOverModal(false);
+    if (onAcknowledgeGameOver) onAcknowledgeGameOver();
+  };
+
+  const onRematch = () => {
+    handleReady(true);
+    setShowGameOverModal(false);
+    if (onAcknowledgeGameOver) onAcknowledgeGameOver();
+  };
 
   const topPlayer = isBlack ? white : black;
   const bottomPlayer = isBlack ? black : white;
@@ -177,11 +203,11 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   // Game over overlay UI mapping
   const getGameOverReasonUI = (reason) => {
     const mapping = {
-      'checkmate': t('room:checkmate', 'Checkmate'),
-      'timeout': t('room:timeout', 'Time out'),
-      'resign': t('room:resignation', 'Resignation'),
-      'stalemate': t('room:stalemate', 'Stalemate'),
-      'draw': t('room:draw', 'Draw')
+      'CHECKMATE': t('room:reasonCheckmate', 'Checkmate'),
+      'TIMEOUT': t('room:reasonTimeout', 'Time out'),
+      'RESIGN': t('room:reasonResignation', 'Resignation'),
+      'STALEMATE': t('room:reasonStalemate', 'Stalemate'),
+      'DRAW': t('room:reasonDraw', 'Draw')
     };
     return mapping[reason] || reason;
   };
@@ -221,24 +247,25 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
           />
 
           {/* Game Over Overlay */}
-          {status === 'FINISHED' && showGameOverModal && (
+          {isPostGame && showGameOverModal && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0d0e12]/80 backdrop-blur-sm rounded-lg animate-in fade-in zoom-in-95 duration-300">
               <div className="text-center p-6 bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-2xl min-w-[280px]">
                 <h3 className="text-2xl font-black mb-1 text-[#f3f4f6]">
                   {!isPlayer
-                    ? (gameData?.winner === 'draw' ? t('room:gameDraw', 'Draw') : gameData?.winner === 'white' ? t('room:whiteWon', 'White won') : t('room:blackWon', 'Black won'))
-                    : (gameData?.winner === myColor ? t('room:youWon', 'You won') : gameData?.winner === 'draw' ? t('room:gameDraw', 'Draw') : t('room:youLost', 'You lost'))
+                    ? (gameData?.winner === 'DRAW' ? t('room:gameDraw', 'Draw') : gameData?.winner === 'WHITE_WIN' ? t('room:whiteWon', 'White won') : t('room:blackWon', 'Black won'))
+                    : (gameData?.winner === (myColor === 'white' ? 'WHITE_WIN' : 'BLACK_WIN') ? t('room:youWon', 'You won') : gameData?.winner === 'DRAW' ? t('room:gameDraw', 'Draw') : t('room:youLost', 'You lost'))
                   }
                 </h3>
                 <p className="text-[#9ca3af] uppercase tracking-wider text-sm font-semibold mb-6">
                   {getGameOverReasonUI(gameData?.gameOverReason)}
                 </p>
                 <div className="flex gap-3">
-                  <button onClick={handleConfirmLeave} className="flex-1 py-2 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] text-xs font-bold rounded-xl transition-all cursor-pointer">
-                    {t('room:leave', 'Thoát')}
+                  <button onClick={handleConfirmLeave} className="flex-1 flex flex-col items-center justify-center py-2 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] text-xs font-bold rounded-xl transition-all cursor-pointer">
+                    <span>{t('room:leave', 'Thoát')}</span>
+                    <span className="text-[10px] font-normal opacity-70">({countdown}s)</span>
                   </button>
                   {isPlayer ? (
-                    <button onClick={() => { handleReady(true); setShowGameOverModal(false); }} disabled={isReadyPending} className="flex-1 py-2 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer">
+                    <button onClick={onRematch} disabled={isReadyPending} className="flex-1 py-2 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer">
                       {isReadyPending ? '...' : t('room:rematch', 'Chơi lại')}
                     </button>
                   ) : (

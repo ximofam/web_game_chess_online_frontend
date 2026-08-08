@@ -133,6 +133,17 @@
   "resign": "Resign",
   "moveHistory": "Move History",
   "noMovesYet": "No moves yet",
+  "loadingOlderMoves": "Loading older moves...",
   "exportPgn": "Export PGN",
-  "copy": "Copy"
+  "copy": "Copy",
+  "reasonCheckmate": "Checkmate",
+  "reasonTimeout": "Time out",
+  "reasonResignation": "Resignation",
+  "reasonStalemate": "Stalemate",
+  "reasonDraw": "Draw",
+  "whiteWon": "White won",
+  "blackWon": "Black won",
+  "youWon": "You won!",
+  "youLost": "You lost!",
+  "gameDraw": "Draw"
 }

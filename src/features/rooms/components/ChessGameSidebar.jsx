@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { ScrollText, Move } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Chess } from 'chess.js';
@@ -6,7 +6,7 @@ import { Chess } from 'chess.js';
 export function ChessGameSidebar({ room }) {
   const { t } = useTranslation(['room']);
   const scrollRef = useRef(null);
-  
+
   const { gameData } = room || {};
   const initialFen = gameData?.initialFen || 'start';
 
@@ -88,7 +88,7 @@ export function ChessGameSidebar({ room }) {
   }, [movePairs.length]);
 
   return (
-    <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg flex flex-col h-full min-h-[500px]">
+    <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg flex flex-col h-full min-h-[300px] lg:min-h-0 overflow-hidden">
       <div className="flex items-center gap-2 border-b border-[#2d323f] pb-3 mb-4">
         <ScrollText className="w-4 h-4 text-[#d4af37]" />
         <h3 className="text-sm font-bold text-[#f3f4f6] uppercase tracking-wider">
@@ -96,8 +96,8 @@ export function ChessGameSidebar({ room }) {
         </h3>
       </div>
 
-      <div 
-        ref={scrollRef} 
+      <div
+        ref={scrollRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto pr-2 scrollbar-thin flex flex-col"
       >

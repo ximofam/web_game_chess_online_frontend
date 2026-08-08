@@ -26,7 +26,14 @@ export function RoomPage() {
 
   const [isReadyPending, setIsReadyPending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [postGameAcknowledged, setPostGameAcknowledged] = useState(false);
   const bypassBlockerRef = useRef(false);
+
+  useEffect(() => {
+    if (room?.status === 'IN_PROGRESS') {
+      setPostGameAcknowledged(false);
+    }
+  }, [room?.status]);
 
   const handleCopyLink = () => {
     const url = `${window.location.origin}/room/${roomId}`;
@@ -148,7 +155,7 @@ export function RoomPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 max-w-6xl flex flex-col min-h-[calc(100vh-140px)] py-4">
+      <div className="container mx-auto px-4 max-w-6xl flex flex-col min-h-[calc(100vh-140px)] lg:h-[calc(100vh-140px)] lg:max-h-[calc(100vh-140px)] py-4">
         {/* TOP MINI ACTIONS */}
         <div className="flex items-center justify-end gap-2 py-3 shrink-0">
           <button
@@ -172,13 +179,14 @@ export function RoomPage() {
 
         {/* MAIN CONTENT WORKSPACE */}
         <div className="flex-1 min-h-0 relative flex flex-col">
-          {room.status === 'IN_PROGRESS' || room.status === 'FINISHED' ? (
+          {(room.status === 'IN_PROGRESS' || (room.status === 'WAITING' && room.gameData?.winner && !postGameAcknowledged)) ? (
             <RoomPlaying
               room={room}
               roomId={roomId}
               handleReady={handleReady}
               handleConfirmLeave={handleConfirmLeave}
               isReadyPending={isReadyPending}
+              onAcknowledgeGameOver={() => setPostGameAcknowledged(true)}
             />
           ) : (
             <RoomWaiting

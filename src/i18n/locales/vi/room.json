@@ -133,6 +133,17 @@
   "resign": "Đầu hàng",
   "moveHistory": "Lịch sử nước đi",
   "noMovesYet": "Chưa có nước đi nào",
+  "loadingOlderMoves": "Đang tải thêm nước đi cũ...",
   "exportPgn": "Xuất PGN",
-  "copy": "Copy"
+  "copy": "Copy",
+  "reasonCheckmate": "Chiếu hết",
+  "reasonTimeout": "Hết giờ",
+  "reasonResignation": "Đầu hàng",
+  "reasonStalemate": "Hòa (Cờ bí)",
+  "reasonDraw": "Hòa cờ",
+  "whiteWon": "Trắng thắng",
+  "blackWon": "Đen thắng",
+  "youWon": "Bạn đã thắng!",
+  "youLost": "Bạn đã thua!",
+  "gameDraw": "Hòa cờ"
 }

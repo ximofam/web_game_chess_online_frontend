@@ -190,7 +190,7 @@ export function useRoomDetails(roomId, options = {}) {
             if (!oldRoom) return oldRoom;
             return {
               ...oldRoom,
-              status: 'FINISHED',
+              status: 'WAITING',
               gameData: {
                 ...oldRoom.gameData,
                 winner,
