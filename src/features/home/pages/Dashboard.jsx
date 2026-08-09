@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/context/AuthContext';
-import { User, Shield, LogIn, Sparkles } from 'lucide-react';
+import { User, Shield, LogIn, Sparkles, ArrowRight } from 'lucide-react';
+import { usePresence } from '../../presence/hooks/usePresence';
 import { PlayModeCards } from '../../rooms/components/PlayModeCards';
 import { CreateRoomModal } from '../../rooms/components/CreateRoomModal';
 import { MatchmakingModal } from '../../rooms/components/MatchmakingModal';
@@ -11,6 +12,9 @@ import { LobbyList } from '../../rooms/components/LobbyList';
 export default function Dashboard() {
   const { t } = useTranslation(['home']);
   const { currentUser, isGuest } = useAuth();
+  const { isInRoom, isPlaying, roomId } = usePresence();
+  
+  const isBusy = isInRoom || isPlaying;
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -47,7 +51,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
           {/* LEFT / MAIN COLUMN: REALTIME LOBBY TABLE (lg:col-span-8) */}
-          <div className="lg:col-span-8 h-full">
+          <div className={`lg:col-span-8 h-full ${isBusy ? 'opacity-50 pointer-events-none' : ''}`}>
             <LobbyList onCreateRoomClick={() => setIsCreateModalOpen(true)} />
           </div>
 
@@ -91,13 +95,33 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 3 ACTION BUTTONS (PLAY MODE STACK) */}
+            {/* 3 ACTION BUTTONS OR BUSY BANNER */}
             <div className="bg-[#1a1d24] border border-[#2d323f] p-4.5 rounded-2xl shadow-md">
-              <h3 className="font-playfair text-base font-bold text-[#f3f4f6] mb-3">{t('home:play_modes_title')}</h3>
-              <PlayModeCards
-                onCreateRoomClick={() => setIsCreateModalOpen(true)}
-                onMatchmakingClick={() => setIsMatchmakingModalOpen(true)}
-              />
+              {isBusy ? (
+                <div className="flex flex-col items-center text-center py-2">
+                  <h3 className="font-playfair text-lg font-bold text-[#d4af37] mb-2">
+                    {isPlaying ? t('home:status_playing', 'You are playing a game') : t('home:status_in_room', 'You are in a room')}
+                  </h3>
+                  <p className="text-xs text-[#9ca3af] mb-5">
+                    {t('home:status_busy_desc', 'Please return to your active session.')}
+                  </p>
+                  <Link
+                    to={`/room/${roomId}`}
+                    className="w-full bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] font-bold py-2.5 rounded-xl flex justify-center items-center gap-2 transition-colors"
+                  >
+                    <span>{isPlaying ? t('home:return_game', 'Return to Game') : t('home:return_room', 'Return to Room')}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <h3 className="font-playfair text-base font-bold text-[#f3f4f6] mb-3">{t('home:play_modes_title')}</h3>
+                  <PlayModeCards
+                    onCreateRoomClick={() => setIsCreateModalOpen(true)}
+                    onMatchmakingClick={() => setIsMatchmakingModalOpen(true)}
+                  />
+                </>
+              )}
             </div>
           </div>
 

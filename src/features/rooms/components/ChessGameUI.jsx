@@ -3,9 +3,24 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../shared/socket/useSocket';
-import { User, Clock, Flag, Handshake } from 'lucide-react';
+import { User, Clock, Flag, Handshake, Wifi, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useUserPresence } from '../../presence/hooks/useUserPresence';
 import { AnnotationBuilder } from '../../learn/engine/annotations/AnnotationBuilder';
+
+const ConnectionIndicator = ({ userId }) => {
+  const { isOffline, loading } = useUserPresence(userId);
+  if (!userId || loading) return null;
+  return isOffline ? (
+    <div className="flex items-center text-[#ef4444] bg-[#ef4444]/10 rounded-full p-0.5 ml-2" title="Disconnected">
+      <WifiOff className="w-3 h-3" />
+    </div>
+  ) : (
+    <div className="flex items-center text-[#10b981] bg-[#10b981]/10 rounded-full p-0.5 ml-2" title="Connected">
+      <Wifi className="w-3 h-3" />
+    </div>
+  );
+};
 
 export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPending, onAcknowledgeGameOver }) {
   const { currentUser } = useAuth();
@@ -185,6 +200,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
             <div className="font-bold text-[#f3f4f6] text-sm flex items-center gap-2">
               {player?.username || t('room:waitingPlayer', 'Waiting...')}
               <span className="text-[10px] bg-[#2d323f] text-[#9ca3af] px-1.5 py-0.5 rounded font-mono">1500?</span>
+              <ConnectionIndicator userId={player?.id} />
             </div>
             {/* Placeholder for captured pieces */}
             <div className="text-xs text-[#9ca3af] mt-0.5 min-h-[16px]">

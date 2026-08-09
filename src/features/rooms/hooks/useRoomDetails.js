@@ -30,7 +30,10 @@ export function useRoomDetails(roomId, options = {}) {
       try {
         return await roomService.getRoomDetails(roomId);
       } catch (err) {
-        // Mock fallback if API endpoint is not live or 404
+        if (err?.response?.status === 404) {
+          throw err;
+        }
+        // Mock fallback if API endpoint is not live or other errors
         console.warn(`[useRoomDetails] Failed to fetch room ${roomId}, using fallback mock data.`, err);
         return {
           roomId,

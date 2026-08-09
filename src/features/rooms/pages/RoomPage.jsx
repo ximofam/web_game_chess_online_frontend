@@ -46,7 +46,7 @@ export function RoomPage() {
   // Blocker to intercept navigation attempts (Back button, links, etc.)
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
-      currentLocation.pathname !== nextLocation.pathname && !bypassBlockerRef.current
+      !isError && !!room && currentLocation.pathname !== nextLocation.pathname && !bypassBlockerRef.current
   );
 
   const handleConfirmLeave = async () => {

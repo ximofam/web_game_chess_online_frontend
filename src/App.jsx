@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-rou
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
 import { SocketProvider } from './shared/socket/SocketProvider';
+import { PresenceProvider } from './features/presence/context/PresenceContext';
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
 import PublicLayout from './layouts/PublicLayout';
 import ProtectedLayout from './layouts/ProtectedLayout';
@@ -46,10 +47,12 @@ const router = createBrowserRouter([
     element: (
       <AuthProvider>
         <SocketProvider>
-          <NotificationProvider>
-            <GlobalApiErrorHandler />
-            <Outlet />
-          </NotificationProvider>
+          <PresenceProvider>
+            <NotificationProvider>
+              <GlobalApiErrorHandler />
+              <Outlet />
+            </NotificationProvider>
+          </PresenceProvider>
         </SocketProvider>
       </AuthProvider>
     ),
