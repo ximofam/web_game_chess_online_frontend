@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/context/AuthContext';
-import { User, Shield, LogIn, Sparkles, ArrowRight } from 'lucide-react';
+import { User, Shield, LogIn, Sparkles, ArrowRight, LogOut, Flag } from 'lucide-react';
 import { usePresence } from '../../presence/hooks/usePresence';
+import { roomService } from '../../rooms/services/roomService';
+import { useQueryClient } from '@tanstack/react-query';
 import { PlayModeCards } from '../../rooms/components/PlayModeCards';
 import { CreateRoomModal } from '../../rooms/components/CreateRoomModal';
 import { MatchmakingModal } from '../../rooms/components/MatchmakingModal';
@@ -11,10 +13,31 @@ import { LobbyList } from '../../rooms/components/LobbyList';
 
 export default function Dashboard() {
   const { t } = useTranslation(['home']);
-  const { currentUser, isGuest } = useAuth();
+  const { currentUser, isGuest, showToast } = useAuth();
   const { isInRoom, isPlaying, roomId } = usePresence();
-  
+  const queryClient = useQueryClient();
+
   const isBusy = isInRoom || isPlaying;
+  const [isActionPending, setIsActionPending] = useState(false);
+
+  const handleAction = async () => {
+    if (!roomId || isActionPending) return;
+    setIsActionPending(true);
+    try {
+      if (isPlaying) {
+        await roomService.resign(roomId);
+        showToast(t('home:resign_success', 'Đã đầu hàng ván cờ'), 'success');
+      } else {
+        await roomService.leaveRoom(roomId);
+        showToast(t('home:leave_room_success', 'Đã rời phòng'), 'success');
+      }
+      queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
+    } catch (err) {
+      showToast(t('home:action_error', 'Có lỗi xảy ra: ') + (err.response?.data?.message || err.message), 'error');
+    } finally {
+      setIsActionPending(false);
+    }
+  };
 
   // Modals state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -105,13 +128,24 @@ export default function Dashboard() {
                   <p className="text-xs text-[#9ca3af] mb-5">
                     {t('home:status_busy_desc', 'Please return to your active session.')}
                   </p>
-                  <Link
-                    to={`/room/${roomId}`}
-                    className="w-full bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] font-bold py-2.5 rounded-xl flex justify-center items-center gap-2 transition-colors"
-                  >
-                    <span>{isPlaying ? t('home:return_game', 'Return to Game') : t('home:return_room', 'Return to Room')}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <div className="w-full flex items-center gap-2">
+                    <button
+                      onClick={handleAction}
+                      disabled={isActionPending}
+                      className="flex-1 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] font-bold py-2.5 rounded-xl flex justify-center items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer text-xs"
+                    >
+                      {isPlaying ? <Flag className="w-4 h-4" /> : <LogOut className="w-4 h-4" />}
+                      <span>{isPlaying ? t('home:resign', 'Đầu hàng') : t('home:leave_room', 'Thoát phòng')}</span>
+                    </button>
+
+                    <Link
+                      to={`/room/${roomId}`}
+                      className="flex-1 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] font-bold py-2.5 rounded-xl flex justify-center items-center gap-1.5 transition-colors text-xs"
+                    >
+                      <span>{isPlaying ? t('home:return_game', 'Return to Game') : t('home:return_room', 'Return to Room')}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <>

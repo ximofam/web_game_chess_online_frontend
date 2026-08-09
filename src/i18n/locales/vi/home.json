@@ -28,5 +28,15 @@
   "stats_wins": "Thắng",
   "stats_draws": "Hòa",
   "stats_losses": "Thua",
-  "play_modes_title": "Chế Độ Thi Đấu"
+  "play_modes_title": "Chế Độ Thi Đấu",
+  "status_playing": "Bạn đang thi đấu",
+  "status_in_room": "Bạn đang ở trong phòng chờ",
+  "status_busy_desc": "Vui lòng trở lại phiên làm việc hiện tại.",
+  "return_game": "Trở lại Ván cờ",
+  "return_room": "Trở lại Phòng",
+  "resign": "Đầu hàng",
+  "leave_room": "Thoát phòng",
+  "resign_success": "Đã đầu hàng ván cờ",
+  "leave_room_success": "Đã rời phòng",
+  "action_error": "Có lỗi xảy ra: "
 }

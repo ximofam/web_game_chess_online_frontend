@@ -28,5 +28,15 @@
   "stats_wins": "Wins",
   "stats_draws": "Draws",
   "stats_losses": "Losses",
-  "play_modes_title": "Play Modes"
+  "play_modes_title": "Play Modes",
+  "status_playing": "You are playing a game",
+  "status_in_room": "You are in a room",
+  "status_busy_desc": "Please return to your active session.",
+  "return_game": "Return to Game",
+  "return_room": "Return to Room",
+  "resign": "Resign",
+  "leave_room": "Leave Room",
+  "resign_success": "Resigned successfully",
+  "leave_room_success": "Left room successfully",
+  "action_error": "An error occurred: "
 }
