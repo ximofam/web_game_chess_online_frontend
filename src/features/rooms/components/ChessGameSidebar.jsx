@@ -107,24 +107,26 @@ export function ChessGameSidebar({ room }) {
             <p className="text-xs font-semibold">{t('room:noMovesYet', 'No moves yet')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-[30px_1fr_1fr] gap-x-2 gap-y-1 text-sm font-mono">
+          <div className="grid grid-cols-[30px_1fr_1fr] gap-x-2 gap-y-0.5 text-xs font-mono">
             {displayCount < movePairs.length && (
-              <div className="col-span-3 text-center text-xs text-[#9ca3af] py-2 italic opacity-50">
+              <div className="col-span-3 text-center text-[#9ca3af] py-1 italic opacity-50">
                 {t('room:loadingOlderMoves', 'Loading older moves...')}
               </div>
             )}
             {movePairsToDisplay.map((pair, idx) => {
               const globalIdx = startingIndex + idx;
+              const isLatestWhite = !pair.black && globalIdx === movePairs.length - 1;
+              const isLatestBlack = pair.black && globalIdx === movePairs.length - 1;
               return (
                 <div key={globalIdx} className="contents group">
-                  <div className="flex items-center justify-end pr-2 text-[#6b7280] text-xs">
+                  <div className="flex items-center justify-end pr-2 text-[#6b7280]">
                     {globalIdx + 1}.
                   </div>
-                  <div className="flex items-center px-2 py-1 bg-[#13161c] rounded text-[#f3f4f6] group-hover:bg-[#2d323f] transition-colors">
+                  <div className={`flex items-center px-2 py-0.5 rounded transition-colors ${isLatestWhite ? 'bg-[#d4af37] text-[#0d0e12] font-bold' : 'bg-[#13161c] text-[#f3f4f6] group-hover:bg-[#2d323f]'}`}>
                     {pair.white}
                   </div>
                   {pair.black ? (
-                    <div className="flex items-center px-2 py-1 bg-[#13161c] rounded text-[#f3f4f6] group-hover:bg-[#2d323f] transition-colors">
+                    <div className={`flex items-center px-2 py-0.5 rounded transition-colors ${isLatestBlack ? 'bg-[#d4af37] text-[#0d0e12] font-bold' : 'bg-[#13161c] text-[#f3f4f6] group-hover:bg-[#2d323f]'}`}>
                       {pair.black}
                     </div>
                   ) : (

@@ -21,7 +21,7 @@ export function RoomPlaying({ room, roomId, handleReady, handleConfirmLeave, isR
 
       {/* CENTER COLUMN: Chess Board */}
       <div className="lg:col-span-6 h-full flex flex-col items-center justify-center min-h-0">
-        <div className="w-full max-w-[550px]">
+        <div className="w-full max-w-[750px]">
           <ChessGameUI 
             room={room} 
             handleReady={handleReady} 

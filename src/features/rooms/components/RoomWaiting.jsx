@@ -30,8 +30,8 @@ export function RoomWaiting({
         {/* SEATS & SPECTATORS SECTION (LEFT) */}
         <div className="lg:col-span-5 flex flex-col gap-6 h-full min-h-0">
           {/* SEATS (WHITE vs BLACK) */}
-          <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-5 shadow-lg space-y-4 shrink-0">
-            <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider border-b border-[#2d323f] pb-2">
+          <div className="space-y-4 shrink-0">
+            <h3 className="text-sm font-bold text-[#f3f4f6] uppercase tracking-wider">
               {t('room:playerList', 'Player List')}
             </h3>
             <RoomSeats room={room} onSeatChange={handleSeatChange} />

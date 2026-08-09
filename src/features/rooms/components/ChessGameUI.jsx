@@ -168,10 +168,13 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
 
   const renderPlayerInfo = (player, isTop, isPlayerWhite) => {
     const remainingMillis = isPlayerWhite ? whiteRemaining : blackRemaining;
+    const isPlayerTurn = isPlayerWhite ? currentTurn === 'white' : currentTurn === 'black';
+    const isLowTime = remainingMillis <= 30000 && remainingMillis > 0; // <= 30s
+    
     return (
-      <div className={`flex items-center justify-between bg-[#1a1d24] border border-[#2d323f] p-3 rounded-xl shadow-sm ${isTop ? 'mb-4' : 'mt-4'}`}>
+      <div className={`flex items-center justify-between bg-[#1a1d24] border border-[#2d323f] p-3 rounded-xl shadow-sm ${isTop ? 'mb-4' : 'mt-4'} ${isPlayerTurn ? 'border-[#d4af37]/50 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'opacity-80'}`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#13161c] border border-[#2d323f] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+          <div className={`w-10 h-10 rounded-xl bg-[#13161c] border flex items-center justify-center overflow-hidden shrink-0 shadow-inner ${isPlayerTurn ? 'border-[#d4af37]/50' : 'border-[#2d323f]'}`}>
             {player?.avatarUrl ? (
               <img src={player.avatarUrl} alt={player.username} className="w-full h-full object-cover" />
             ) : (
@@ -191,8 +194,14 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 bg-[#13161c] border border-[#2d323f] px-4 py-2 rounded-lg font-mono text-lg font-bold text-[#f3f4f6] shadow-inner">
-            <Clock className="w-4 h-4 text-[#9ca3af]" />
+          <div className={`flex items-center gap-1.5 border px-4 py-2 rounded-lg font-mono text-lg font-bold shadow-inner transition-colors ${
+            isLowTime 
+              ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse' 
+              : isPlayerTurn 
+                ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]' 
+                : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
+          }`}>
+            <Clock className="w-4 h-4" />
             {formatTime(remainingMillis)}
           </div>
         </div>
@@ -222,7 +231,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
         {/* Subtle background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#d4af37]/5 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="w-full max-w-[500px] aspect-square relative z-10 drop-shadow-2xl">
+        <div className="w-full max-w-full aspect-square relative z-10 drop-shadow-2xl flex justify-center items-center">
           <Chessboard
             key={`board-${boardOrientation}`}
             options={{
@@ -284,16 +293,18 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
       {renderPlayerInfo(bottomPlayer, false, bottomPlayerIsWhite)}
 
       {/* Game Actions (Resign, Draw) */}
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <button className="flex items-center gap-2 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
-          <Handshake className="w-4 h-4" />
-          <span>{t('room:offerDraw', 'Offer Draw')}</span>
-        </button>
-        <button className="flex items-center gap-2 bg-[#13161c] hover:bg-[#ef4444]/10 border border-[#2d323f] hover:border-[#ef4444]/40 text-[#9ca3af] hover:text-[#ef4444] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
-          <Flag className="w-4 h-4" />
-          <span>{t('room:resign', 'Resign')}</span>
-        </button>
-      </div>
+      {status === 'IN_PROGRESS' && isPlayer && (
+        <div className="flex items-center justify-center gap-3 mt-4">
+          <button className="flex items-center gap-2 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
+            <Handshake className="w-4 h-4" />
+            <span>{t('room:offerDraw', 'Offer Draw')}</span>
+          </button>
+          <button className="flex items-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
+            <Flag className="w-4 h-4" />
+            <span>{t('room:resign', 'Resign')}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
