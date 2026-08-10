@@ -148,5 +148,10 @@
   "gameDraw": "Draw",
   "resignConfirmTitle": "Confirm Resignation",
   "resignConfirmDesc": "Are you sure you want to resign this game?",
-  "confirmResign": "Resign"
+  "confirmResign": "Resign",
+  "drawOfferWaiting": "Waiting for opponent...",
+  "acceptDraw": "Accept Draw",
+  "declineDraw": "Decline",
+  "drawDeclinedToast": "Opponent declined the draw offer.",
+  "drawAgreement": "Draw by agreement"
 }

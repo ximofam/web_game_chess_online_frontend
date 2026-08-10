@@ -184,6 +184,35 @@ export function useRoomDetails(roomId, options = {}) {
                 whiteRemainingMillis,
                 blackRemainingMillis,
                 turnStartedAt,
+                drawOfferBy: null, // Xóa offer khi có nước đi
+              }
+            };
+          });
+        }
+
+        if (event.type === 'DRAW_OFFERED') {
+          const { offeredBy } = event.data || {};
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return {
+              ...oldRoom,
+              gameData: {
+                ...oldRoom.gameData,
+                drawOfferBy: offeredBy
+              }
+            };
+          });
+        }
+
+        if (event.type === 'DRAW_DECLINED') {
+          showToast(t('room:drawDeclinedToast', 'Opponent declined the draw offer.'), 'info');
+          queryClient.setQueryData(['room', roomId], (oldRoom) => {
+            if (!oldRoom) return oldRoom;
+            return {
+              ...oldRoom,
+              gameData: {
+                ...oldRoom.gameData,
+                drawOfferBy: null
               }
             };
           });
@@ -199,7 +228,8 @@ export function useRoomDetails(roomId, options = {}) {
               gameData: {
                 ...oldRoom.gameData,
                 winner,
-                gameOverReason: reason
+                gameOverReason: reason,
+                drawOfferBy: null // Xóa offer khi kết thúc
               }
             };
           });

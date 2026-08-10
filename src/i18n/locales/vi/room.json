@@ -148,5 +148,10 @@
   "gameDraw": "Hòa cờ",
   "resignConfirmTitle": "Xác nhận đầu hàng",
   "resignConfirmDesc": "Bạn có chắc chắn muốn đầu hàng ván đấu này không?",
-  "confirmResign": "Đầu hàng"
+  "confirmResign": "Đầu hàng",
+  "drawOfferWaiting": "Đang chờ đối thủ phản hồi...",
+  "acceptDraw": "Chấp nhận hòa",
+  "declineDraw": "Từ chối",
+  "drawDeclinedToast": "Đối thủ đã từ chối đề nghị hòa.",
+  "drawAgreement": "Hòa theo thỏa thuận"
 }

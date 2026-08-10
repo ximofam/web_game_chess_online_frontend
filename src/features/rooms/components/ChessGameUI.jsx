@@ -147,6 +147,18 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     send(`/app/room.${roomId}.resign`, {});
   };
 
+  const handleOfferDraw = () => {
+    send(`/app/room.${roomId}.draw.offer`, {});
+  };
+
+  const handleAcceptDraw = () => {
+    send(`/app/room.${roomId}.draw.accept`, {});
+  };
+
+  const handleDeclineDraw = () => {
+    send(`/app/room.${roomId}.draw.decline`, {});
+  };
+
   const topPlayer = isBlack ? white : black;
   const bottomPlayer = isBlack ? black : white;
   const topPlayerIsWhite = isBlack;
@@ -346,15 +358,47 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
 
       {/* Game Actions (Resign, Draw) */}
       {status === 'IN_PROGRESS' && isPlayer && (
-        <div className="flex items-center justify-center gap-3 mt-4">
-          <button className="flex items-center gap-2 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
-            <Handshake className="w-4 h-4" />
-            <span>{t('room:offerDraw', 'Offer Draw')}</span>
-          </button>
-          <button onClick={handleResign} className="flex items-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
-            <Flag className="w-4 h-4" />
-            <span>{t('room:resign', 'Resign')}</span>
-          </button>
+        <div className="flex flex-col items-center justify-center gap-3 mt-4">
+          
+          {/* Incoming Draw Offer Modal/Banner */}
+          {gameData?.drawOfferBy && gameData.drawOfferBy !== myColor && (
+            <div className="bg-[#d4af37]/10 border border-[#d4af37]/40 rounded-xl p-3 w-full animate-in fade-in zoom-in-95 duration-200">
+              <p className="text-sm font-bold text-[#d4af37] mb-2 text-center">
+                {t('room:opponent_offers_draw', 'Opponent offers a draw')}
+              </p>
+              <div className="flex gap-2">
+                <button onClick={handleDeclineDraw} className="flex-1 py-1.5 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] text-xs font-bold rounded-lg transition-all cursor-pointer">
+                  {t('room:declineDraw', 'Decline')}
+                </button>
+                <button onClick={handleAcceptDraw} className="flex-1 py-1.5 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-lg transition-all cursor-pointer">
+                  {t('room:acceptDraw', 'Accept Draw')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-3 w-full">
+            <button 
+              onClick={handleOfferDraw}
+              disabled={!!gameData?.drawOfferBy}
+              className={`flex-1 flex items-center justify-center gap-2 border px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                gameData?.drawOfferBy === myColor 
+                  ? 'bg-[#13161c] border-[#2d323f] text-[#d4af37] opacity-80 cursor-not-allowed'
+                  : 'bg-[#13161c] hover:bg-[#2d323f] border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] cursor-pointer'
+              }`}
+            >
+              <Handshake className="w-4 h-4" />
+              <span>
+                {gameData?.drawOfferBy === myColor 
+                  ? t('room:drawOfferWaiting', 'Waiting for opponent...')
+                  : t('room:offerDraw', 'Offer Draw')}
+              </span>
+            </button>
+            <button onClick={handleResign} className="flex-1 flex items-center justify-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
+              <Flag className="w-4 h-4" />
+              <span>{t('room:resign', 'Resign')}</span>
+            </button>
+          </div>
         </div>
       )}
 
