@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Chess } from 'chess.js';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../auth/context/AuthContext';
 import LessonBoard from '../components/LessonBoard';
 import BotSelector from '../components/BotSelector';
 import { RandomBot } from '../engine/bots/RandomBot';
@@ -11,6 +12,7 @@ import { ArrowLeft, RotateCcw, Eye } from 'lucide-react';
 
 const PlayBotPage = () => {
   const { t } = useTranslation(['learn']);
+  const { showToast } = useAuth();
   const [strategyType, setStrategyType] = useState('random');
   const [difficulty, setDifficulty] = useState(1);
   const [playerColor, setPlayerColor] = useState('white');
@@ -86,17 +88,24 @@ const PlayBotPage = () => {
 
       const runBotMove = async () => {
         setIsBotThinking(true);
-        const move = await botInstance.getMoveAsync(chess);
-        if (isSubscribed && move) {
-          try {
-            const executed = chess.move(move);
-            if (executed) {
-              setBoardFen(chess.fen());
-              setLastMove({ from: executed.from, to: executed.to });
-              updateGameStatus(chess);
+        try {
+          const move = await botInstance.getMoveAsync(chess);
+          if (isSubscribed && move) {
+            try {
+              const executed = chess.move(move);
+              if (executed) {
+                setBoardFen(chess.fen());
+                setLastMove({ from: executed.from, to: executed.to });
+                updateGameStatus(chess);
+              }
+            } catch {
+              // Ignore move error
             }
-          } catch {
-            // Ignore move error
+          }
+        } catch (err) {
+          if (isSubscribed) {
+            console.error('Bot Error:', err);
+            showToast(err.message || t('learn:bot_error', 'Bot encountered an error'), 'error');
           }
         }
         if (isSubscribed) {
@@ -165,11 +174,10 @@ const PlayBotPage = () => {
                 {/* Toggle Show Legal Moves Button */}
                 <button
                   onClick={() => setShowLegalMoves((prev) => !prev)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all border cursor-pointer ${
-                    showLegalMoves
-                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
-                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
-                  }`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all border cursor-pointer ${showLegalMoves
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
+                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
+                    }`}
                   title={showLegalMoves ? t('learn:hide_legal_moves') : t('learn:show_legal_moves')}
                 >
                   <Eye className="w-3.5 h-3.5" />
