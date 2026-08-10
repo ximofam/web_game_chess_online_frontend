@@ -16,14 +16,22 @@ export function RoomPage() {
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
-  const { activeRoomId, setActiveRoomId, room, isLoading, isError, refetch, clearRoom } = useRoomContext();
+  const { activeRoomId, setActiveRoomId, room, isLoading, isError, deletedRoomId, refetch, clearRoom } = useRoomContext();
 
   // Set active room when entering the page
   useEffect(() => {
-    if (roomId && roomId !== activeRoomId) {
+    if (roomId && roomId !== activeRoomId && !bypassBlockerRef.current && deletedRoomId !== roomId) {
       setActiveRoomId(roomId);
     }
-  }, [roomId, activeRoomId, setActiveRoomId]);
+  }, [roomId, activeRoomId, setActiveRoomId, deletedRoomId]);
+
+  // Navigate away automatically if the room is deleted
+  useEffect(() => {
+    if (deletedRoomId && deletedRoomId === roomId) {
+      bypassBlockerRef.current = true;
+      navigate('/dashboard', { replace: true });
+    }
+  }, [deletedRoomId, roomId, navigate]);
 
   const [isReadyPending, setIsReadyPending] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -47,7 +55,7 @@ export function RoomPage() {
   // Blocker to intercept navigation attempts (Back button, links, etc.)
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
-      !isError && !!room && currentLocation.pathname !== nextLocation.pathname && !bypassBlockerRef.current
+      deletedRoomId !== roomId && !isError && !!room && currentLocation.pathname !== nextLocation.pathname && !bypassBlockerRef.current
   );
 
   const handleConfirmLeave = async () => {
@@ -59,8 +67,8 @@ export function RoomPage() {
       showToast(t('room:leaveRoomError', 'Error leaving room: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     }
-    clearRoom();
     bypassBlockerRef.current = true;
+    clearRoom();
     if (blocker.state === 'blocked') {
       blocker.proceed();
     } else {

@@ -1,10 +1,11 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRoomDetails } from '../hooks/useRoomDetails';
 
 const RoomContext = createContext(null);
 
 export function RoomProvider({ children }) {
+  const navigate = useNavigate();
   const [activeRoomId, setActiveRoomId] = useState(() => {
     try {
       return sessionStorage.getItem('minimized_active_room_id') || null;
@@ -12,6 +13,7 @@ export function RoomProvider({ children }) {
       return null;
     }
   });
+  const [deletedRoomId, setDeletedRoomId] = useState(null);
 
   useEffect(() => {
     try {
@@ -27,7 +29,10 @@ export function RoomProvider({ children }) {
 
   // Global room query that stays alive as long as activeRoomId is set
   const { room, isLoading, isError, refetch } = useRoomDetails(activeRoomId, {
-    onRoomDeleted: () => setActiveRoomId(null)
+    onRoomDeleted: () => {
+      setDeletedRoomId(activeRoomId);
+      setActiveRoomId(null);
+    }
   });
 
   // Clear active room if it failed to load (e.g. deleted while offline)
@@ -45,6 +50,7 @@ export function RoomProvider({ children }) {
     room,
     isLoading,
     isError,
+    deletedRoomId,
     refetch,
     clearRoom
   };

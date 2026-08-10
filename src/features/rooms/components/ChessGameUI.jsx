@@ -37,23 +37,33 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   const [blackRemaining, setBlackRemaining] = useState(gameData?.blackRemainingMillis ?? initialTimeMillis);
 
   useEffect(() => {
-    let whiteTime = gameData?.whiteRemainingMillis;
-    let blackTime = gameData?.blackRemainingMillis;
+    const wTime = gameData?.whiteRemainingMillis ?? initialTimeMillis;
+    const bTime = gameData?.blackRemainingMillis ?? initialTimeMillis;
 
-    if (whiteTime !== undefined && blackTime !== undefined) {
-      if (status === 'IN_PROGRESS' && gameData?.turnStartedAt) {
-        // Adjust for the time elapsed since the server started the turn
-        const elapsed = Math.max(0, Date.now() - gameData.turnStartedAt);
-        if (gameData.turn === 'white') {
-          whiteTime = Math.max(0, whiteTime - elapsed);
-        } else if (gameData.turn === 'black') {
-          blackTime = Math.max(0, blackTime - elapsed);
-        }
-      }
-      setWhiteRemaining(whiteTime);
-      setBlackRemaining(blackTime);
+    if (status !== 'IN_PROGRESS') {
+      setWhiteRemaining(wTime);
+      setBlackRemaining(bTime);
+      return;
     }
-  }, [gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis, gameData?.turnStartedAt, gameData?.turn, status]);
+
+    const activeTurn = gameData?.turn || 'white';
+    const turnStartedAt = gameData?.turnStartedAt || Date.now();
+
+    const updateTimers = () => {
+      const elapsed = Math.max(0, Date.now() - turnStartedAt);
+      if (activeTurn === 'white') {
+        setWhiteRemaining(Math.max(0, wTime - elapsed));
+        setBlackRemaining(bTime);
+      } else {
+        setWhiteRemaining(wTime);
+        setBlackRemaining(Math.max(0, bTime - elapsed));
+      }
+    };
+
+    updateTimers(); // Immediate update
+    const interval = setInterval(updateTimers, 100);
+    return () => clearInterval(interval);
+  }, [status, gameData?.turn, gameData?.turnStartedAt, gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis, initialTimeMillis]);
 
   const [showGameOverModal, setShowGameOverModal] = useState(true);
   const [countdown, setCountdown] = useState(15);
@@ -78,15 +88,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     }
   }, [isPostGame, showGameOverModal, countdown, handleConfirmLeave]);
 
-  useEffect(() => {
-    const activeTurn = gameData?.turn || 'white';
-    if (status !== 'IN_PROGRESS') return;
-    const interval = setInterval(() => {
-      if (activeTurn === 'white') setWhiteRemaining(prev => Math.max(0, prev - 100));
-      else setBlackRemaining(prev => Math.max(0, prev - 100));
-    }, 100);
-    return () => clearInterval(interval);
-  }, [status, gameData?.turn]);
+
 
   const formatTime = (millis) => {
     const totalSeconds = Math.max(0, Math.ceil(millis / 1000));

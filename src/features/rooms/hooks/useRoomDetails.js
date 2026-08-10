@@ -154,10 +154,10 @@ export function useRoomDetails(roomId, options = {}) {
               ...oldRoom,
               status: 'IN_PROGRESS',
               startAt: null,
-              gameData: { 
-                whiteId, 
-                blackId, 
-                turn: turn || 'white', 
+              gameData: {
+                whiteId,
+                blackId,
+                turn: turn || 'white',
                 fen: fen || 'start',
                 initialFen: event.data?.initialFen || fen || 'start',
                 moves: event.data?.moves || [],
