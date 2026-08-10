@@ -7,7 +7,7 @@ import { User, Settings, LogOut, Shield, FileText, UserPlus } from 'lucide-react
  * AvatarDropdown displays profile information and options.
  * It listens for clicks outside and Escape keystrokes to close.
  */
-export const AvatarDropdown = ({ user, onClose, onLogout }) => {
+export const AvatarDropdown = ({ user, onClose, onLogout, className = "absolute right-0 top-full mt-2" }) => {
   const { t } = useTranslation(['nav', 'profile', 'auth', 'common']);
   const dropdownRef = useRef(null);
 
@@ -42,7 +42,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout }) => {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-2 w-64 bg-[#1a1d24] border border-[#2d323f] rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in text-left"
+      className={`${className} w-64 bg-[#1a1d24] border border-[#2d323f] rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in text-left`}
       role="menu"
       aria-label="User profile dropdown"
     >

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
-  Home, MessageSquare, BookOpen, LogIn, UserPlus, 
+import {
+  Home, MessageSquare, BookOpen, LogIn, UserPlus,
   UserCheck, Loader2, ChevronLeft, ChevronRight, X
 } from 'lucide-react';
 import { useAuth } from '../../../features/auth/context/AuthContext';
@@ -73,14 +73,14 @@ export const Sidebar = ({ isOpen, onClose }) => {
     <>
       {/* Mobile Backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-[#0d0e12]/80 z-40 lg:hidden backdrop-blur-sm"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar Container */}
-      <aside 
+      <aside
         className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-[#13161c] border-r border-[#2d323f] shadow-2xl transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarWidth} lg:shrink-0`}
       >
         {/* Header / Brand */}
@@ -97,7 +97,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           </a>
 
           {/* Mobile Close Button */}
-          <button 
+          <button
             className="lg:hidden text-[#9ca3af] hover:text-[#f3f4f6] transition-colors"
             onClick={onClose}
           >
@@ -112,11 +112,10 @@ export const Sidebar = ({ isOpen, onClose }) => {
               key={item.to}
               to={item.to}
               title={!isExpanded ? item.label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${
-                item.active
-                  ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
-                  : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] border border-transparent'
-              } ${!isExpanded ? 'justify-center px-0' : ''}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${item.active
+                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
+                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] border border-transparent'
+                } ${!isExpanded ? 'justify-center px-0' : ''}`}
             >
               <item.icon className="w-5 h-5 shrink-0" />
               {isExpanded && <span className="whitespace-nowrap">{item.label}</span>}
@@ -127,7 +126,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
         {/* Bottom Section (User & Actions) */}
         <div className="p-3 border-t border-[#2d323f] flex flex-col gap-3 shrink-0">
           {/* Desktop Toggle Button */}
-          <button 
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="hidden lg:flex items-center justify-center p-1.5 w-full text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] rounded-lg transition-colors border border-transparent"
             title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
@@ -137,14 +136,14 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
           {/* Auth Section */}
           {isAuthenticated ? (
-            <div className={`relative flex items-center ${isExpanded ? 'gap-3' : 'justify-center'} bg-[#1a1d24] p-2 rounded-xl border border-[#2d323f]`}>
+            <div className={`relative z-50 flex items-center ${isExpanded ? 'gap-3' : 'justify-center'} bg-[#1a1d24] p-2 rounded-xl border border-[#2d323f]`}>
               <NavbarAvatar
                 src={currentUser?.avatarUrl}
                 username={currentUser?.username}
                 isOnline={connectionStatus === 'CONNECTED'}
                 onClick={() => setIsExpanded(true) || setIsDropdownOpen(!isDropdownOpen)}
               />
-              
+
               {isExpanded && (
                 <div className="flex-1 min-w-0 flex flex-col justify-center cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                   <span className="text-sm font-semibold text-[#f3f4f6] truncate block w-full">
@@ -157,13 +156,12 @@ export const Sidebar = ({ isOpen, onClose }) => {
               )}
 
               {isDropdownOpen && isExpanded && (
-                <div className="absolute bottom-full left-0 mb-2 w-full min-w-[200px]">
-                  <AvatarDropdown
-                    user={currentUser}
-                    onClose={() => setIsDropdownOpen(false)}
-                    onLogout={logout}
-                  />
-                </div>
+                <AvatarDropdown
+                  user={currentUser}
+                  onClose={() => setIsDropdownOpen(false)}
+                  onLogout={logout}
+                  className="absolute bottom-full left-0 mb-2 z-[60]"
+                />
               )}
             </div>
           ) : (
@@ -186,7 +184,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
                 <LogIn className="w-5 h-5 text-[#d4af37] shrink-0" />
                 {isExpanded && <span className="whitespace-nowrap">{t('nav:login')}</span>}
               </Link>
-              
+
               {isExpanded && (
                 <Link
                   to="/register"
