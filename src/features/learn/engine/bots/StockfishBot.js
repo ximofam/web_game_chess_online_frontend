@@ -66,14 +66,14 @@ export class StockfishBot extends ChessBot {
 
       this.engine.onmessage = messageHandler;
 
-      // Timeout safety net (3 seconds max)
+      // Timeout safety net (15 seconds max to allow deep calculations)
       setTimeout(() => {
         if (!resolved) {
           resolved = true;
           this.engine.onmessage = null;
           reject(new Error('Stockfish engine calculation timed out.'));
         }
-      }, 3000);
+      }, 15000);
 
       try {
         this.engine.postMessage('ucinewgame');
