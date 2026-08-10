@@ -1,11 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { useRoomDetails } from '../hooks/useRoomDetails';
 
 const RoomContext = createContext(null);
 
 export function RoomProvider({ children }) {
-  const navigate = useNavigate();
   const [activeRoomId, setActiveRoomId] = useState(() => {
     try {
       return sessionStorage.getItem('minimized_active_room_id') || null;
@@ -58,6 +57,7 @@ export function RoomProvider({ children }) {
   return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRoomContext() {
   const context = useContext(RoomContext);
   if (!context) {

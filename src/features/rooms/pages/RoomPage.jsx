@@ -17,6 +17,7 @@ export function RoomPage() {
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
   const { activeRoomId, setActiveRoomId, room, isLoading, isError, deletedRoomId, refetch, clearRoom } = useRoomContext();
+  const bypassBlockerRef = useRef(false);
 
   // Set active room when entering the page
   useEffect(() => {
@@ -36,7 +37,6 @@ export function RoomPage() {
   const [isReadyPending, setIsReadyPending] = useState(false);
   const [copied, setCopied] = useState(false);
   const [postGameAcknowledged, setPostGameAcknowledged] = useState(false);
-  const bypassBlockerRef = useRef(false);
 
   useEffect(() => {
     if (room?.status === 'IN_PROGRESS') {
