@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
 import { SocketProvider } from './shared/socket/SocketProvider';
 import { PresenceProvider } from './features/presence/context/PresenceContext';
 import { NotificationProvider } from './features/notifications/context/NotificationContext';
+import { RoomProvider } from './features/rooms/context/RoomContext';
 import PublicLayout from './layouts/PublicLayout';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -49,8 +50,10 @@ const router = createBrowserRouter([
         <SocketProvider>
           <PresenceProvider>
             <NotificationProvider>
-              <GlobalApiErrorHandler />
-              <Outlet />
+              <RoomProvider>
+                <GlobalApiErrorHandler />
+                <Outlet />
+              </RoomProvider>
             </NotificationProvider>
           </PresenceProvider>
         </SocketProvider>

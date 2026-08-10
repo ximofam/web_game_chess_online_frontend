@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Maximize2, X, Clock, Users, Sparkles } from 'lucide-react';
-import { activeRoomManager } from '../services/activeRoomManager';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRoomDetails } from '../hooks/useRoomDetails';
+import { useRoomContext } from '../context/RoomContext';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -14,42 +12,18 @@ import { useTranslation } from 'react-i18next';
  */
 export function FloatingRoomWidget() {
   const { t } = useTranslation(['room']);
-  const [activeRoom, setActiveRoom] = useState(() => activeRoomManager.getRoom());
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useAuth();
   const queryClient = useQueryClient();
+  const { activeRoomId, room, clearRoom } = useRoomContext();
 
-  useEffect(() => {
-    return activeRoomManager.subscribe((room) => {
-      setActiveRoom(room);
-    });
-  }, []);
+  const displayRoom = room;
 
-  const isCurrentlyInRoom = activeRoom?.roomId && location.pathname === `/room/${activeRoom.roomId}`;
-
-  const { room: fetchedRoom, isError } = useRoomDetails(
-    isCurrentlyInRoom ? null : activeRoom?.roomId, 
-    {
-      onRoomDeleted: () => {
-        activeRoomManager.clearRoom();
-      }
-    }
-  );
-
-  // Clear room on error (e.g., room deleted while offline)
-  useEffect(() => {
-    if (isError && activeRoom) {
-      activeRoomManager.clearRoom();
-    }
-  }, [isError, activeRoom]);
-
-  const displayRoom = fetchedRoom || activeRoom;
-
-  if (!displayRoom) return null;
+  if (!displayRoom || !activeRoomId) return null;
 
   // Don't display widget when user is already inside the full room page
-  if (location.pathname === `/room/${displayRoom.roomId}`) {
+  if (location.pathname === `/room/${activeRoomId}`) {
     return null;
   }
 
@@ -67,11 +41,11 @@ export function FloatingRoomWidget() {
       await roomService.leaveRoom(roomId);
       showToast(t('room:leftRoom', 'Đã rời khỏi phòng chơi'), 'info');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
-      activeRoomManager.clearRoom();
+      clearRoom();
     } catch (err) {
       showToast(t('room:leaveRoomError', 'Lỗi khi rời phòng: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
-      activeRoomManager.clearRoom(); // fallback in case room is already gone
+      clearRoom(); // fallback in case room is already gone
     }
   };
 

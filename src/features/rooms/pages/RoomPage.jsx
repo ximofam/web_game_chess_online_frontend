@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useBlocker } from 'react-router-dom';
 import { AlertCircle, ShieldAlert, Minimize2, X, Loader2, LogOut, Copy, Check } from 'lucide-react';
-import { useRoomDetails } from '../hooks/useRoomDetails';
+import { useRoomContext } from '../context/RoomContext';
 
 import { RoomWaiting } from '../components/RoomWaiting';
 import { RoomPlaying } from '../components/RoomPlaying';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
-import { activeRoomManager } from '../services/activeRoomManager';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -17,12 +16,14 @@ export function RoomPage() {
   const navigate = useNavigate();
   const { currentUser, showToast } = useAuth();
   const queryClient = useQueryClient();
-  const { room, isLoading, isError, refetch } = useRoomDetails(roomId, {
-    onRoomDeleted: () => {
-      bypassBlockerRef.current = true;
-      navigate('/dashboard');
+  const { activeRoomId, setActiveRoomId, room, isLoading, isError, refetch, clearRoom } = useRoomContext();
+
+  // Set active room when entering the page
+  useEffect(() => {
+    if (roomId && roomId !== activeRoomId) {
+      setActiveRoomId(roomId);
     }
-  });
+  }, [roomId, activeRoomId, setActiveRoomId]);
 
   const [isReadyPending, setIsReadyPending] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -58,7 +59,7 @@ export function RoomPage() {
       showToast(t('room:leaveRoomError', 'Error leaving room: ') + (err.response?.data?.message || err.message), 'error');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     }
-    // eslint-disable-next-line react-hooks/immutability
+    clearRoom();
     bypassBlockerRef.current = true;
     if (blocker.state === 'blocked') {
       blocker.proceed();
@@ -68,9 +69,8 @@ export function RoomPage() {
   };
 
   const handleConfirmMinimize = () => {
-    activeRoomManager.setRoom(room);
+    // Context already tracks activeRoomId, just navigate away
     showToast(t('room:minimizeSuccess', 'Room minimized to screen corner!'), 'info');
-    // eslint-disable-next-line react-hooks/immutability
     bypassBlockerRef.current = true;
     if (blocker.state === 'blocked') {
       blocker.proceed();
@@ -87,11 +87,11 @@ export function RoomPage() {
 
   // Cleanup bypass flag on mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     bypassBlockerRef.current = false;
   }, []);
 
-  if (isLoading) {
+  // If context hasn't synced the active room yet, show loader
+  if (isLoading || roomId !== activeRoomId) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 space-y-4 text-center">
         <Loader2 className="w-10 h-10 animate-spin text-[#d4af37]" />
