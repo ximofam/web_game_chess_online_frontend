@@ -16,6 +16,7 @@ Unless explicitly instructed otherwise, always provide translations for both **E
 # Project Architecture
 
 1. Before making structural changes, creating new features, or when you need to understand the project setup, you MUST read **ARCHITECTURE.md** to understand the established Feature-Driven architecture and data flow.
+2. Whenever you make project-level updates (such as adding new features, contexts, removing modules, or modifying global configurations), you MUST update **ARCHITECTURE.md** to reflect these changes accurately.
 
 # Frontend design work
  

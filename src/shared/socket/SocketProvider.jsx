@@ -2,13 +2,11 @@
 import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { stompClientManager } from './stompClient';
-import { mockSocketManager } from './mockSocket';
 import { useTranslation } from 'react-i18next';
 
 export const SocketContext = createContext(null);
 
-const isMockMode = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true';
-const activeManager = isMockMode ? mockSocketManager : stompClientManager;
+const activeManager = stompClientManager;
 
 export const SocketProvider = ({ children }) => {
   const { t } = useTranslation(['common']);

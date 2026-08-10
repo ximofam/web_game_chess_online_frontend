@@ -60,14 +60,14 @@ features/[feature-name]/
 ### 2.2 The `shared/` Directory
 This directory holds generic code used across multiple features to prevent duplication.
 
-- **`components/`**: Reusable UI elements (e.g., `Navbar`, `Footer`, `LanguageSwitcher`).
+- **`components/`**: Reusable UI elements (e.g., `Sidebar`, `Footer`, `LanguageSwitcher`).
 - **`errors/`**: Global error handling, Error Boundaries, and fallback pages (`404 NotFound`, `403 Forbidden`).
 - **`socket/`**: Central WebSocket connection configuration and global providers (`SocketProvider`).
 - **`utils/`**: Generic utility functions (e.g., time formatting, calculation helpers).
 
 ### 2.3 `layouts/`
 Layout components act as shells for the application routing:
-- **`PublicLayout`**: Renders the Navbar/Footer for general, accessible pages.
+- **`PublicLayout`**: Renders the Sidebar/Footer for general, accessible pages.
 - **`ProtectedLayout`**: Enforces authentication; prevents unauthenticated users from accessing private routes (e.g., Profile, Forum Creation).
 
 ---
@@ -81,7 +81,7 @@ Layout components act as shells for the application routing:
    - Handled natively via React Hooks (`useState`, `useReducer`).
    - Form state is managed cleanly using `react-hook-form`.
 3. **Global / Context State:**
-   - Used sparingly for true global needs: Authentication State (`AuthContext`), WebSocket connection instances (`SocketProvider`), and UI Notifications (`NotificationContext`).
+   - Used sparingly for true global needs: Authentication State (`AuthContext`), WebSocket connection instances (`SocketProvider`), UI Notifications (`NotificationContext`), and User Presence (`PresenceContext`).
 4. **Real-Time Data:**
    - `STOMPjs` over `SockJS` connects to the Spring Boot backend. Real-time game moves, presence updates, and instant notifications are dispatched via WS and update the React local state or trigger a TanStack Query invalidation.
 
@@ -99,5 +99,5 @@ The application fully supports multi-language configurations (English `en` and V
 ## 5. Development & Deployment Configuration
 
 - **Development Server (`vite.config.js`):** Configured to proxy HTTP requests (`/api`) and WebSocket connections (`/ws`) to `localhost:8080` (Spring Boot backend) during local development to avoid CORS issues.
-- **Environment Variables:** Handled via `.env` files (`VITE_API_URL`, `VITE_WS_URL`).
+- **Environment Variables:** Handled via `.env` files (`VITE_API_URL`, `VITE_WS_URL`, etc.).
 - **Linting:** Enforced via `eslint.config.js` to ensure consistent code styling across React and React Hooks logic.
