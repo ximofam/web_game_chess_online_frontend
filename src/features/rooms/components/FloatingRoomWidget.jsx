@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Maximize2, X, Clock, Users, Sparkles } from 'lucide-react';
+import { Maximize2, X, Clock, Users, Sparkles, Flag } from 'lucide-react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -49,6 +49,11 @@ export function FloatingRoomWidget() {
     }
   };
 
+  const handleResign = (e) => {
+    e.stopPropagation();
+    navigate(`/room/${roomId}`, { state: { openResignConfirm: true } });
+  };
+
   return (
     <div className="fixed bottom-5 right-5 z-50 animate-bounce-in select-none">
       <div className="bg-[#1a1d24]/95 backdrop-blur-md border border-[#d4af37]/40 shadow-2xl rounded-2xl p-3 sm:p-4 flex items-center gap-3.5 max-w-sm text-[#f3f4f6] hover:border-[#d4af37] transition-all group">
@@ -91,15 +96,26 @@ export function FloatingRoomWidget() {
             <span className="hidden sm:inline">{t('room:expand', 'Phóng to')}</span>
           </button>
 
-          {/* ĐÓNG / RỜI PHÒNG */}
-          <button
-            type="button"
-            onClick={handleLeave}
-            className="p-1.5 rounded-xl text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors cursor-pointer"
-            title={t('room:closeWidgetTooltip', 'Đóng widget phòng')}
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {/* ĐÓNG / RỜI PHÒNG / ĐẦU HÀNG */}
+          {displayRoom.status === 'IN_PROGRESS' ? (
+            <button
+              type="button"
+              onClick={handleResign}
+              className="p-1.5 rounded-xl text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors cursor-pointer"
+              title={t('room:resign', 'Resign')}
+            >
+              <Flag className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleLeave}
+              className="p-1.5 rounded-xl text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors cursor-pointer"
+              title={t('room:closeWidgetTooltip', 'Đóng widget phòng')}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

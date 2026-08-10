@@ -145,5 +145,8 @@
   "blackWon": "Black won",
   "youWon": "You won!",
   "youLost": "You lost!",
-  "gameDraw": "Draw"
+  "gameDraw": "Draw",
+  "resignConfirmTitle": "Confirm Resignation",
+  "resignConfirmDesc": "Are you sure you want to resign this game?",
+  "confirmResign": "Resign"
 }

@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -65,8 +66,19 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     return () => clearInterval(interval);
   }, [status, gameData?.turn, gameData?.turnStartedAt, gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis, initialTimeMillis]);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [showGameOverModal, setShowGameOverModal] = useState(true);
+  const [showResignConfirm, setShowResignConfirm] = useState(location.state?.openResignConfirm || false);
   const [countdown, setCountdown] = useState(15);
+
+  // Clear the state so it doesn't reopen on refresh
+  useEffect(() => {
+    if (location.state?.openResignConfirm) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   const isPostGame = status === 'WAITING' && gameData?.winner;
 
@@ -124,6 +136,15 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     handleReady(true);
     setShowGameOverModal(false);
     if (onAcknowledgeGameOver) onAcknowledgeGameOver();
+  };
+
+  const handleResign = () => {
+    setShowResignConfirm(true);
+  };
+
+  const confirmResign = () => {
+    setShowResignConfirm(false);
+    send(`/app/room.${roomId}.resign`, {});
   };
 
   const topPlayer = isBlack ? white : black;
@@ -330,10 +351,31 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
             <Handshake className="w-4 h-4" />
             <span>{t('room:offerDraw', 'Offer Draw')}</span>
           </button>
-          <button className="flex items-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
+          <button onClick={handleResign} className="flex items-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
             <Flag className="w-4 h-4" />
             <span>{t('room:resign', 'Resign')}</span>
           </button>
+        </div>
+      )}
+
+      {/* Resign Confirmation Modal */}
+      {showResignConfirm && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0d0e12]/80 backdrop-blur-sm rounded-lg animate-in fade-in zoom-in-95 duration-200 p-4">
+          <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+            <div className="w-12 h-12 bg-[#ef4444]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#ef4444]/30">
+              <Flag className="w-6 h-6 text-[#ef4444]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#f3f4f6] mb-2">{t('room:resignConfirmTitle', 'Xác nhận đầu hàng')}</h3>
+            <p className="text-sm text-[#9ca3af] mb-6">{t('room:resignConfirmDesc', 'Bạn có chắc chắn muốn đầu hàng ván đấu này không?')}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowResignConfirm(false)} className="flex-1 py-2.5 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#f3f4f6] text-sm font-bold rounded-xl transition-all cursor-pointer">
+                {t('room:cancel', 'Hủy')}
+              </button>
+              <button onClick={confirmResign} className="flex-1 py-2.5 bg-[#ef4444] hover:bg-[#dc2626] text-white text-sm font-bold rounded-xl transition-all cursor-pointer">
+                {t('room:confirmResign', 'Đầu hàng')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

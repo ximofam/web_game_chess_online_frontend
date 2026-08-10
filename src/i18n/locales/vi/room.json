@@ -29,7 +29,7 @@
   "privacyLabel": "Chế độ phòng",
   "privateTrue": "Phòng Riêng tư",
   "privateFalse": "Hiện ở Sảnh",
-  "cancel": "Hủy bỏ",
+  "cancel": "Hủy",
   "creating": "Đang tạo...",
   "createNow": "TẠO PHÒNG NGAY",
   "leaveRoomSuccess": "Đã rời khỏi phòng chơi",
@@ -145,5 +145,8 @@
   "blackWon": "Đen thắng",
   "youWon": "Bạn đã thắng!",
   "youLost": "Bạn đã thua!",
-  "gameDraw": "Hòa cờ"
+  "gameDraw": "Hòa cờ",
+  "resignConfirmTitle": "Xác nhận đầu hàng",
+  "resignConfirmDesc": "Bạn có chắc chắn muốn đầu hàng ván đấu này không?",
+  "confirmResign": "Đầu hàng"
 }

@@ -70,14 +70,5 @@ export const roomService = {
     const response = await authClient.post(`/api/games/${roomId}/ready?isReady=${isReady}`);
     return response.data;
   },
-
-  /**
-   * Đầu hàng ván cờ
-   * POST /api/games/:roomId/resign
-   */
-  resign: async (roomId) => {
-    const response = await authClient.post(`/api/games/${roomId}/resign`);
-    return response.data;
-  },
 };
 

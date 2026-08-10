@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/context/AuthContext';
 import { User, Shield, LogIn, Sparkles, ArrowRight, LogOut, Flag } from 'lucide-react';
@@ -20,17 +20,20 @@ export default function Dashboard() {
   const isBusy = isInRoom || isPlaying;
   const [isActionPending, setIsActionPending] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleAction = async () => {
     if (!roomId || isActionPending) return;
+
+    if (isPlaying) {
+      navigate(`/room/${roomId}`, { state: { openResignConfirm: true } });
+      return;
+    }
+
     setIsActionPending(true);
     try {
-      if (isPlaying) {
-        await roomService.resign(roomId);
-        showToast(t('home:resign_success', 'Đã đầu hàng ván cờ'), 'success');
-      } else {
-        await roomService.leaveRoom(roomId);
-        showToast(t('home:leave_room_success', 'Đã rời phòng'), 'success');
-      }
+      await roomService.leaveRoom(roomId);
+      showToast(t('home:leave_room_success', 'Đã rời phòng'), 'success');
       queryClient.invalidateQueries({ queryKey: ['rooms', 'lobby'] });
     } catch (err) {
       showToast(t('home:action_error', 'Có lỗi xảy ra: ') + (err.response?.data?.message || err.message), 'error');
