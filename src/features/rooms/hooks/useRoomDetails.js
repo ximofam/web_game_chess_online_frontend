@@ -147,7 +147,7 @@ export function useRoomDetails(roomId, options = {}) {
         }
 
         if (event.type === 'GAME_STARTED') {
-          const { whiteId, blackId, turn, fen } = event.data || {};
+          const { whiteId, blackId, turn, fen, turnStartedAt } = event.data || {};
           queryClient.setQueryData(['room', roomId], (oldRoom) => {
             if (!oldRoom) return oldRoom;
             return {
@@ -164,13 +164,14 @@ export function useRoomDetails(roomId, options = {}) {
                 // Server should eventually pass initial clock here, fallback to settings if not provided
                 whiteRemainingMillis: event.data?.whiteRemainingMillis || (oldRoom.settings?.timeMinutes * 60 * 1000),
                 blackRemainingMillis: event.data?.blackRemainingMillis || (oldRoom.settings?.timeMinutes * 60 * 1000),
+                turnStartedAt,
               }
             };
           });
         }
 
         if (event.type === 'MOVE_MADE') {
-          const { move, newTurn, newFen, whiteRemainingMillis, blackRemainingMillis } = event.data || {};
+          const { move, newTurn, newFen, whiteRemainingMillis, blackRemainingMillis, turnStartedAt } = event.data || {};
           queryClient.setQueryData(['room', roomId], (oldRoom) => {
             if (!oldRoom) return oldRoom;
             return {
@@ -182,6 +183,7 @@ export function useRoomDetails(roomId, options = {}) {
                 moves: move ? [...(oldRoom.gameData?.moves || []), move] : (oldRoom.gameData?.moves || []),
                 whiteRemainingMillis,
                 blackRemainingMillis,
+                turnStartedAt,
               }
             };
           });
@@ -231,10 +233,12 @@ export function useRoomDetails(roomId, options = {}) {
 
   // Tự động refetch lại thông tin phòng khi WebSocket kết nối lại thành công
   // Đảm bảo không bị lỡ mất sự kiện (như xóa phòng) trong lúc rớt mạng
+  const prevConnectionStatus = useRef(connectionStatus);
   useEffect(() => {
-    if (connectionStatus === 'CONNECTED' && roomId) {
+    if (prevConnectionStatus.current !== 'CONNECTED' && connectionStatus === 'CONNECTED' && roomId) {
       queryClient.invalidateQueries({ queryKey: ['room', roomId] });
     }
+    prevConnectionStatus.current = connectionStatus;
   }, [connectionStatus, roomId, queryClient]);
 
   return {

@@ -26,11 +26,16 @@ export function FloatingRoomWidget() {
     });
   }, []);
 
-  const { room: fetchedRoom, isError } = useRoomDetails(activeRoom?.roomId, {
-    onRoomDeleted: () => {
-      activeRoomManager.clearRoom();
+  const isCurrentlyInRoom = activeRoom?.roomId && location.pathname === `/room/${activeRoom.roomId}`;
+
+  const { room: fetchedRoom, isError } = useRoomDetails(
+    isCurrentlyInRoom ? null : activeRoom?.roomId, 
+    {
+      onRoomDeleted: () => {
+        activeRoomManager.clearRoom();
+      }
     }
-  });
+  );
 
   // Clear room on error (e.g., room deleted while offline)
   useEffect(() => {

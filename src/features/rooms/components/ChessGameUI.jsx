@@ -37,9 +37,23 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   const [blackRemaining, setBlackRemaining] = useState(gameData?.blackRemainingMillis ?? initialTimeMillis);
 
   useEffect(() => {
-    if (gameData?.whiteRemainingMillis !== undefined) setWhiteRemaining(gameData.whiteRemainingMillis);
-    if (gameData?.blackRemainingMillis !== undefined) setBlackRemaining(gameData.blackRemainingMillis);
-  }, [gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis]);
+    let whiteTime = gameData?.whiteRemainingMillis;
+    let blackTime = gameData?.blackRemainingMillis;
+
+    if (whiteTime !== undefined && blackTime !== undefined) {
+      if (status === 'IN_PROGRESS' && gameData?.turnStartedAt) {
+        // Adjust for the time elapsed since the server started the turn
+        const elapsed = Math.max(0, Date.now() - gameData.turnStartedAt);
+        if (gameData.turn === 'white') {
+          whiteTime = Math.max(0, whiteTime - elapsed);
+        } else if (gameData.turn === 'black') {
+          blackTime = Math.max(0, blackTime - elapsed);
+        }
+      }
+      setWhiteRemaining(whiteTime);
+      setBlackRemaining(blackTime);
+    }
+  }, [gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis, gameData?.turnStartedAt, gameData?.turn, status]);
 
   const [showGameOverModal, setShowGameOverModal] = useState(true);
   const [countdown, setCountdown] = useState(15);
@@ -211,10 +225,10 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
 
         <div className="flex items-center gap-4">
           <div className={`flex items-center gap-1.5 border px-4 py-2 rounded-lg font-mono text-lg font-bold shadow-inner transition-colors ${isLowTime
-              ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse'
-              : isPlayerTurn
-                ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]'
-                : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
+            ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse'
+            : isPlayerTurn
+              ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]'
+              : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
             }`}>
             <Clock className="w-4 h-4" />
             {formatTime(remainingMillis)}
