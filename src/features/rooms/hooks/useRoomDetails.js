@@ -229,6 +229,14 @@ export function useRoomDetails(roomId, options = {}) {
     };
   }, [roomId, connectionStatus, subscribe, unsubscribe, queryClient, navigate, showToast, currentUser?.id, t]);
 
+  // Tự động refetch lại thông tin phòng khi WebSocket kết nối lại thành công
+  // Đảm bảo không bị lỡ mất sự kiện (như xóa phòng) trong lúc rớt mạng
+  useEffect(() => {
+    if (connectionStatus === 'CONNECTED' && roomId) {
+      queryClient.invalidateQueries({ queryKey: ['room', roomId] });
+    }
+  }, [connectionStatus, roomId, queryClient]);
+
   return {
     room: query.data,
     isLoading: query.isLoading,
