@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { getLessonById } from '../data/lessons';
 import LessonBoard from '../components/LessonBoard';
 import StepControls from '../components/StepControls';
-import { LessonValidator } from '../engine/lesson/LessonValidator';
-import { ProgressTracker } from '../engine/lesson/ProgressTracker';
+import { validateMove } from '../engine/lesson/LessonValidator';
+import { saveStepProgress, markLessonComplete } from '../engine/lesson/ProgressTracker';
 import { ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 const LessonDetailPage = () => {
@@ -55,7 +55,7 @@ const LessonDetailPage = () => {
   const handleMove = (moveCandidate) => {
     if (!chessInstance || isStepCompleted) return false;
 
-    const result = LessonValidator.validateMove(chessInstance, moveCandidate, currentStep);
+    const result = validateMove(chessInstance, moveCandidate, currentStep);
 
     if (result.success && result.move) {
       chessInstance.move(result.move);
@@ -64,10 +64,10 @@ const LessonDetailPage = () => {
       setIsStepCompleted(true);
       setFeedback({ type: 'success', text: t(`learn:lesson_${lesson.id}_step_${currentStepIndex}_success`, currentStep.successMessage) || t('learn:great_move') });
 
-      ProgressTracker.saveStepProgress(lesson.id, currentStepIndex);
+      saveStepProgress(lesson.id, currentStepIndex);
 
       if (currentStepIndex + 1 >= lesson.steps.length) {
-        ProgressTracker.markLessonComplete(lesson.id);
+        markLessonComplete(lesson.id);
       }
       return true;
     } else {
@@ -147,11 +147,10 @@ const LessonDetailPage = () => {
               {/* Feedback Alert Toast */}
               {feedback && (
                 <div
-                  className={`p-4 rounded-xl border flex items-start gap-3 transition-all animate-fade-in ${
-                    feedback.type === 'success'
+                  className={`p-4 rounded-xl border flex items-start gap-3 transition-all animate-fade-in ${feedback.type === 'success'
                       ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
                       : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
-                  }`}
+                    }`}
                 >
                   {feedback.type === 'success' ? (
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />

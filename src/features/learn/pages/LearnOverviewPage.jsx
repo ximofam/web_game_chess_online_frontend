@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ALL_LESSONS } from '../data/lessons';
 import LessonCard from '../components/LessonCard';
-import { ProgressTracker } from '../engine/lesson/ProgressTracker';
+import { getProgress, resetProgress } from '../engine/lesson/ProgressTracker';
 import { BookOpen, Trophy, Bot, Sparkles, RotateCcw } from 'lucide-react';
 
 const LearnOverviewPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(['learn']);
-  const [completedMap, setCompletedMap] = useState(() => ProgressTracker.getProgress().completedLessons || {});
+  const [completedMap, setCompletedMap] = useState(() => getProgress().completedLessons || {});
 
   const handleResetProgress = () => {
     if (window.confirm(t('learn:confirm_reset_progress'))) {
-      ProgressTracker.resetProgress();
+      resetProgress();
       setCompletedMap({});
     }
   };

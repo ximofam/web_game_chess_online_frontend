@@ -1,22 +1,12 @@
 /**
  * Utility to generate react-chessboard annotation props (squareStyles and arrows).
  */
-export class AnnotationBuilder {
-  /**
-   * Builds squareStyles object for react-chessboard
-   * @param {Object} options
-   * @param {Array<string|Object>} [options.highlightSquares] - List of square coordinates or config objects
-   * @param {Object} [options.squareStyles] - Custom key-value map of square styles
-   * @param {string} [options.selectedSquare] - Selected square string
-   * @param {{ from: string, to: string }} [options.lastMove] - Last move squares
-   * @returns {Object} Square styles map
-   */
-  static buildSquareStyles({
+export const buildSquareStyles = ({
     highlightSquares = [],
     squareStyles = {},
     selectedSquare = null,
     lastMove = null,
-  } = {}) {
+  } = {}) => {
     const styles = { ...squareStyles };
 
     // Add last move highlights
@@ -63,14 +53,14 @@ export class AnnotationBuilder {
     });
 
     return styles;
-  }
+  };
 
   /**
    * Builds arrows array for react-chessboard v5 ({ startSquare, endSquare, color })
    * @param {Array} arrows - Array of arrow configs
    * @returns {Array<{ startSquare: string, endSquare: string, color: string }>} Array of Arrow objects
    */
-  static buildArrows(arrows = []) {
+  export const buildArrows = (arrows = []) => {
     if (!Array.isArray(arrows)) return [];
 
     return arrows
@@ -92,5 +82,4 @@ export class AnnotationBuilder {
         return null;
       })
       .filter(Boolean);
-  }
-}
+  };

@@ -6,7 +6,7 @@ import { useSocket } from '../../../shared/socket/useSocket';
 import { User, Clock, Flag, Handshake, Wifi, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserPresence } from '../../presence/hooks/useUserPresence';
-import { AnnotationBuilder } from '../../learn/engine/annotations/AnnotationBuilder';
+import { buildSquareStyles } from '../../learn/engine/annotations/AnnotationBuilder';
 
 const ConnectionIndicator = ({ userId }) => {
   const { isOffline, loading } = useUserPresence(userId);
@@ -43,7 +43,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
 
   const [showGameOverModal, setShowGameOverModal] = useState(true);
   const [countdown, setCountdown] = useState(15);
-  
+
   const isPostGame = status === 'WAITING' && gameData?.winner;
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   }, [chess, selectedSquare, isMyTurn]);
 
   const squareStyles = useMemo(() => {
-    return AnnotationBuilder.buildSquareStyles({
+    return buildSquareStyles({
       highlightSquares: legalMoveSquares,
       selectedSquare,
       // You can add lastMove highlight here later if backend provides it
@@ -185,7 +185,7 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     const remainingMillis = isPlayerWhite ? whiteRemaining : blackRemaining;
     const isPlayerTurn = isPlayerWhite ? currentTurn === 'white' : currentTurn === 'black';
     const isLowTime = remainingMillis <= 30000 && remainingMillis > 0; // <= 30s
-    
+
     return (
       <div className={`flex items-center justify-between bg-[#1a1d24] border border-[#2d323f] p-3 rounded-xl shadow-sm ${isTop ? 'mb-4' : 'mt-4'} ${isPlayerTurn ? 'border-[#d4af37]/50 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'opacity-80'}`}>
         <div className="flex items-center gap-3">
@@ -210,13 +210,12 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
         </div>
 
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-1.5 border px-4 py-2 rounded-lg font-mono text-lg font-bold shadow-inner transition-colors ${
-            isLowTime 
-              ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse' 
-              : isPlayerTurn 
-                ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]' 
+          <div className={`flex items-center gap-1.5 border px-4 py-2 rounded-lg font-mono text-lg font-bold shadow-inner transition-colors ${isLowTime
+              ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse'
+              : isPlayerTurn
+                ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]'
                 : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
-          }`}>
+            }`}>
             <Clock className="w-4 h-4" />
             {formatTime(remainingMillis)}
           </div>

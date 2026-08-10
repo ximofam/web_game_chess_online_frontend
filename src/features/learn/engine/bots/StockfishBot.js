@@ -1,5 +1,5 @@
 import { ChessBot } from './ChessBot.js';
-import STOCKFISH from 'stockfish.js';
+import StockfishWorker from 'stockfish.js/stockfish.js?worker';
 
 /**
  * Strategy: StockfishBot
@@ -19,13 +19,9 @@ export class StockfishBot extends ChessBot {
 
   initEngine() {
     try {
-      if (typeof STOCKFISH === 'function') {
-        const eng = STOCKFISH();
-        if (eng && typeof eng.postMessage === 'function') {
-          this.engine = eng;
-        }
-      }
-    } catch {
+      this.engine = new StockfishWorker();
+    } catch (err) {
+      console.error('Failed to initialize Stockfish worker:', err);
       this.engine = null;
     }
   }
@@ -39,11 +35,10 @@ export class StockfishBot extends ChessBot {
 
     // Fallback if Stockfish worker fails to instantiate
     if (!this.engine) {
-      const moves = chessInstance.moves({ verbose: true });
-      return moves[Math.floor(Math.random() * moves.length)];
+      throw new Error('Stockfish engine failed to load or initialize.');
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let resolved = false;
 
       const messageHandler = (event) => {
@@ -64,8 +59,7 @@ export class StockfishBot extends ChessBot {
           } else if (!resolved) {
             resolved = true;
             this.engine.onmessage = null;
-            const moves = chessInstance.moves({ verbose: true });
-            resolve(moves[Math.floor(Math.random() * moves.length)]);
+            reject(new Error('Stockfish returned invalid or no bestmove.'));
           }
         }
       };
@@ -77,8 +71,7 @@ export class StockfishBot extends ChessBot {
         if (!resolved) {
           resolved = true;
           this.engine.onmessage = null;
-          const moves = chessInstance.moves({ verbose: true });
-          resolve(moves[Math.floor(Math.random() * moves.length)]);
+          reject(new Error('Stockfish engine calculation timed out.'));
         }
       }, 3000);
 
@@ -86,12 +79,11 @@ export class StockfishBot extends ChessBot {
         this.engine.postMessage('ucinewgame');
         this.engine.postMessage(`position fen ${chessInstance.fen()}`);
         this.engine.postMessage(`go depth ${this.depth}`);
-      } catch {
+      } catch (err) {
         if (!resolved) {
           resolved = true;
           this.engine.onmessage = null;
-          const moves = chessInstance.moves({ verbose: true });
-          resolve(moves[Math.floor(Math.random() * moves.length)]);
+          reject(new Error('Stockfish engine postMessage failed: ' + err.message));
         }
       }
     });

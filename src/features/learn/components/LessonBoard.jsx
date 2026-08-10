@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, memo } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { AnnotationBuilder } from '../engine/annotations/AnnotationBuilder';
+import { buildSquareStyles, buildArrows } from '../engine/annotations/AnnotationBuilder';
 
 const LessonBoard = memo(
   ({
@@ -37,7 +37,7 @@ const LessonBoard = memo(
     }, [highlightSquares, legalMoveSquares]);
 
     const squareStyles = useMemo(() => {
-      return AnnotationBuilder.buildSquareStyles({
+      return buildSquareStyles({
         highlightSquares: combinedHighlightSquares,
         selectedSquare,
         lastMove,
@@ -45,7 +45,7 @@ const LessonBoard = memo(
     }, [combinedHighlightSquares, selectedSquare, lastMove]);
 
     const formattedArrows = useMemo(() => {
-      return AnnotationBuilder.buildArrows(arrows);
+      return buildArrows(arrows);
     }, [arrows]);
 
     const handlePieceDrop = useCallback(
