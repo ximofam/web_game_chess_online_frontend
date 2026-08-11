@@ -93,7 +93,7 @@ export function RoomWaiting({
 
           {/* SPECTATORS LIST */}
           <div className="flex-1 min-h-0">
-            <RoomSpectators spectators={room.spectators || []} />
+            <RoomSpectators spectators={room.spectators || []} hostId={room.host?.id} />
           </div>
         </div>
 

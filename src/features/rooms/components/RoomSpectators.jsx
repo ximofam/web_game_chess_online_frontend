@@ -1,7 +1,7 @@
-import { Eye } from 'lucide-react';
+import { Eye, Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export function RoomSpectators({ spectators = [] }) {
+export function RoomSpectators({ spectators = [], hostId }) {
   const { t } = useTranslation(['room']);
   return (
     <div className="bg-[#13161c] border border-[#2d323f] rounded-2xl p-3 space-y-2">
@@ -30,6 +30,9 @@ export function RoomSpectators({ spectators = [] }) {
                 {spec.username?.[0]?.toUpperCase() || 'U'}
               </div>
               <span className="font-semibold">{spec.username}</span>
+              {String(spec.id) === String(hostId) && (
+                <Crown className="w-3 h-3 text-[#d4af37] ml-0.5" />
+              )}
             </div>
           ))}
         </div>

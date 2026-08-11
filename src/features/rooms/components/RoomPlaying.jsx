@@ -10,7 +10,7 @@ export function RoomPlaying({ room, roomId, handleReady, handleConfirmLeave, isR
       <div className="lg:col-span-3 flex flex-col gap-6 h-full min-h-0">
         {/* Spectators */}
         <div className="flex-none">
-          <RoomSpectators spectators={room.spectators || []} />
+          <RoomSpectators spectators={room.spectators || []} hostId={room.host?.id} />
         </div>
         
         {/* Chat */}
