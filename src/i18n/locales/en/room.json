@@ -8,6 +8,7 @@
   "createRoomSubtitle": "Set up match rules & time controls",
   "roomNameLabel": "Room Name",
   "roomNamePlaceholder": "e.g., Player's room",
+  "playAs": "Play as",
   "quickTimePresetsLabel": "Quick Time Presets",
   "timeMinutesLabel": "Time (Minutes)",
   "incrementSecondsLabel": "Increment / Move",

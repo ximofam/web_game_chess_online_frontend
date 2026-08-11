@@ -21,6 +21,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
   const [variant] = useState('STANDARD');
   const [rated, setRated] = useState(true);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [isWhite, setIsWhite] = useState(true); // ponytail: simple toggle, default White
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Set default name when modal opens
@@ -28,7 +29,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
     if (isOpen) {
       // Just to satisfy linter or avoid setting state, wait, actually setting state in effect is fine if we suppress it or handle it better.
       // Let's use eslint-disable-next-line
-       
+
       setName(currentUser?.username ? `${currentUser.username}\'s room` : "Player\'s room");
     }
   }, [isOpen, currentUser]);
@@ -56,6 +57,7 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
     try {
       const payload = {
         name: trimmedName,
+        white: isWhite,
         settings: {
           timeMinutes: Number(timeMinutes),
           incrementSeconds: Number(incrementSeconds),
@@ -137,6 +139,29 @@ export function CreateRoomModal({ isOpen, onClose, onCreated }) {
               placeholder={t('room:roomNamePlaceholder', "VD: Player's room")}
               className="w-full bg-[#13161c] border border-[#2d323f] focus:border-[#d4af37] text-[#f3f4f6] text-sm rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all placeholder-[#4b5563]"
             />
+          </div>
+
+          {/* COLOR SELECTION */}
+          <div>
+            <label className="block text-xs font-semibold text-[#f3f4f6] uppercase tracking-wider mb-2">
+              {t('room:playAs', 'Chơi quân')}
+            </label>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setIsWhite(true)}
+                className={`flex-1 p-2.5 rounded-xl border flex items-center justify-center font-bold text-xs transition-all cursor-pointer ${isWhite ? 'bg-[#f3f4f6] border-[#f3f4f6] text-[#0d0e12]' : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6]'}`}
+              >
+                {t('room:whiteSide', 'Quân Trắng')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsWhite(false)}
+                className={`flex-1 p-2.5 rounded-xl border flex items-center justify-center font-bold text-xs transition-all cursor-pointer ${!isWhite ? 'bg-[#3b3f46] border-[#4b5563] text-[#f3f4f6]' : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6]'}`}
+              >
+                {t('room:blackSide', 'Quân Đen')}
+              </button>
+            </div>
           </div>
 
           {/* QUICK PRESETS */}
