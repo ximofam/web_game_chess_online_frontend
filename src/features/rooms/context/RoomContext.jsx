@@ -34,12 +34,9 @@ export function RoomProvider({ children }) {
     }
   });
 
-  // Clear active room if it failed to load (e.g. deleted while offline)
-  useEffect(() => {
-    if (isError) {
-      setActiveRoomId(null);
-    }
-  }, [isError]);
+  // ponytail: Removed automatic activeRoomId(null) on isError.
+  // It causes an infinite loop with RoomPage.jsx which constantly re-sets activeRoomId if it's null on its route.
+  // The widget will handle isError gracefully instead.
 
   const clearRoom = () => setActiveRoomId(null);
 

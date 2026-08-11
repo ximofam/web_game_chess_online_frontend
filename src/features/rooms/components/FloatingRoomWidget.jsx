@@ -16,11 +16,11 @@ export function FloatingRoomWidget() {
   const navigate = useNavigate();
   const { showToast } = useAuth();
   const queryClient = useQueryClient();
-  const { activeRoomId, room, clearRoom } = useRoomContext();
+  const { activeRoomId, room, isError, clearRoom } = useRoomContext();
 
   const displayRoom = room;
 
-  if (!displayRoom || !activeRoomId) return null;
+  if (isError || !displayRoom || !activeRoomId) return null;
 
   // Don't display widget when user is already inside the full room page
   if (location.pathname === `/room/${activeRoomId}`) {

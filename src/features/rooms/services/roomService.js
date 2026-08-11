@@ -36,6 +36,16 @@ export const roomService = {
   },
 
   /**
+   * Đổi ghế
+   * POST /api/rooms/:roomId/switch-seat
+   * Body: { role: "white" | "black" | "spectator" }
+   */
+  switchSeat: async (roomId, role) => {
+    const response = await authClient.post(`/api/rooms/${roomId}/switch-seat`, { role });
+    return response.data;
+  },
+
+  /**
    * Lấy chi tiết thông tin một phòng chơi
    * GET /api/rooms/:roomId
    */

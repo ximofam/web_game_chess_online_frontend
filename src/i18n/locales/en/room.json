@@ -54,6 +54,7 @@
   "quickMatch": "Quick Match",
   "playWithBot": "Play vs Bot",
   "chatTitle": "Chat",
+  "becomeSpectator": "Spectate",
   "noMessages": "No messages yet.",
   "chatLocked": "Chat is locked in this room",
   "typeMessage": "Type a message...",

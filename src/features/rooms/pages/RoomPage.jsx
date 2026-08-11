@@ -157,8 +157,14 @@ export function RoomPage() {
     }
   };
 
-  const handleSeatChange = () => {
-    showToast(t('room:sitWhite', 'Sit as White'), 'success');
+  const handleSeatChange = async (side) => {
+    if (isReadyPending) return;
+    const role = side === 'WHITE' ? 'white' : side === 'BLACK' ? 'black' : 'spectator';
+    try {
+      await roomService.switchSeat(roomId, role);
+    } catch (err) {
+      showToast(err.response?.data?.message || t('room:joinRoomError', 'Error joining seat'), 'error');
+    }
   };
 
   return (

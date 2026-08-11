@@ -65,6 +65,11 @@ export function useRoomDetails(roomId, options = {}) {
     },
     enabled: Boolean(roomId),
     staleTime: 5000,
+    retry: (failureCount, error) => {
+      // Không retry nếu lỗi là 404 (Phòng không tồn tại)
+      if (error?.response?.status === 404) return false;
+      return failureCount < 3;
+    },
   });
 
   // Đăng ký WebSocket lắng nghe sự kiện của phòng
@@ -125,6 +130,40 @@ export function useRoomDetails(roomId, options = {}) {
             queryClient.setQueryData(['room', roomId], (oldRoom) => {
               if (!oldRoom) return oldRoom;
               return { ...oldRoom, [`${role}Ready`]: isReady };
+            });
+          }
+        }
+
+        if (event.type === 'SEAT_SWITCHED') {
+          const { fromRole, toRole, user } = event.data || {};
+          if (fromRole && toRole && user) {
+            queryClient.setQueryData(['room', roomId], (oldRoom) => {
+              if (!oldRoom) return oldRoom;
+              let nextRoom = { ...oldRoom };
+
+              if (fromRole === 'spectator') {
+                nextRoom.spectators = (nextRoom.spectators || []).filter(s => String(s.id) !== String(user.id));
+              } else {
+                nextRoom[fromRole] = null;
+                nextRoom[`${fromRole}Ready`] = false;
+              }
+
+              if (toRole === 'spectator') {
+                nextRoom.spectators = [user, ...(nextRoom.spectators || [])];
+              } else {
+                nextRoom[toRole] = user;
+              }
+              return nextRoom;
+            });
+          }
+        }
+
+        if (event.type === 'HOST_TRANSFERRED') {
+          const { newHostId, newHost } = event.data || {};
+          if (newHost) {
+            queryClient.setQueryData(['room', roomId], (oldRoom) => {
+              if (!oldRoom) return oldRoom;
+              return { ...oldRoom, hostId: newHostId, host: newHost };
             });
           }
         }
@@ -202,6 +241,13 @@ export function useRoomDetails(roomId, options = {}) {
               }
             };
           });
+          // ponytail: server auto-expires after 30s without event, so we clear it locally
+          setTimeout(() => {
+            queryClient.setQueryData(['room', roomId], (oldRoom) => {
+              if (!oldRoom || oldRoom.gameData?.drawOfferBy !== offeredBy) return oldRoom;
+              return { ...oldRoom, gameData: { ...oldRoom.gameData, drawOfferBy: null } };
+            });
+          }, 30000);
         }
 
         if (event.type === 'DRAW_DECLINED') {

@@ -1,4 +1,4 @@
-import { Loader2, X, CheckCircle2, AlertCircle, LogOut } from 'lucide-react';
+import { Loader2, X, CheckCircle2, AlertCircle, LogOut, Users } from 'lucide-react';
 import { RoomSeats } from './RoomSeats';
 import { RoomSpectators } from './RoomSpectators';
 import { RoomChat } from './RoomChat';
@@ -51,15 +51,26 @@ export function RoomWaiting({
                   <span>{t('room:cancelReady', 'Cancel Ready')}</span>
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => handleReady(true)}
-                  disabled={isReadyPending}
-                  className="flex-1 bg-[#10b981]/15 hover:bg-[#10b981] text-[#10b981] hover:text-[#f3f4f6] border border-[#10b981]/40 font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isReadyPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-                  <span>{t('room:ready', 'Ready')}</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleSeatChange('SPECTATOR')}
+                    disabled={isReadyPending}
+                    className="flex-1 bg-[#374151]/30 hover:bg-[#374151] text-[#9ca3af] hover:text-[#f3f4f6] border border-[#4b5563]/40 font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Users className="w-5 h-5" />
+                    <span className="truncate">{t('room:becomeSpectator', 'Khán giả')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleReady(true)}
+                    disabled={isReadyPending}
+                    className="flex-1 bg-[#10b981]/15 hover:bg-[#10b981] text-[#10b981] hover:text-[#f3f4f6] border border-[#10b981]/40 font-bold text-sm py-3.5 px-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isReadyPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                    <span>{t('room:ready', 'Ready')}</span>
+                  </button>
+                </>
               )
             ) : (
               <div className="flex-1 p-3 bg-[#13161c] border border-[#2d323f] rounded-xl text-center text-xs text-[#9ca3af] flex items-center justify-center gap-2 shadow-lg">
