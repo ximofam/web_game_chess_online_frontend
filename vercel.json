@@ -2,9 +2,8 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://webgamechessonline-production.up.railway.app/api/:path*"
+      "destination": "https://web-game-chess-online.onrender.com/api/:path*"
     },
-
     {
       "source": "/(.*)",
       "destination": "/index.html"
