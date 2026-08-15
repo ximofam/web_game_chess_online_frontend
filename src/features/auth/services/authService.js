@@ -1,4 +1,5 @@
 import { authClient } from '../api/authClient';
+import { setGuestToken, getGuestToken } from '../../../shared/utils/guestToken';
 
 /**
  * Authentication service communicating with the backend auth endpoints.
@@ -30,19 +31,35 @@ export const authService = {
    */
   registerGuest: async () => {
     const response = await authClient.post('/api/auth/register/guest');
+    if (response.data?.guestToken) {
+      setGuestToken(response.data.guestToken);
+    }
     return response.data;
   },
 
   /**
-   * Login as guest using guestToken cookie → returns accessToken.
+   * Login as guest using guestToken cookie or fallback from localStorage → returns accessToken.
    */
   loginGuest: async () => {
-    const response = await authClient.post('/api/auth/login/guest');
+    const payload = {};
+    const guestToken = getGuestToken();
+    if (guestToken) {
+      payload.guestToken = guestToken;
+    }
+    const response = await authClient.post('/api/auth/login/guest', payload);
     return response.data;
   },
 
   refreshGuestToken: async () => {
-    const response = await authClient.post('/api/auth/refresh/guest-token');
+    const payload = {};
+    const guestToken = getGuestToken();
+    if (guestToken) {
+      payload.guestToken = guestToken;
+    }
+    const response = await authClient.post('/api/auth/refresh/guest-token', payload);
+    if (response.data?.guestToken) {
+      setGuestToken(response.data.guestToken);
+    }
     return response.data;
   },
 
