@@ -1,27 +1,10 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useSocket } from '../../../shared/socket/useSocket';
-import { User, Clock, Flag, Handshake, Wifi, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useUserPresence } from '../../presence/hooks/useUserPresence';
 import { buildSquareStyles } from '../../learn/engine/annotations/AnnotationBuilder';
-
-const ConnectionIndicator = ({ userId }) => {
-  const { isOffline, loading } = useUserPresence(userId);
-  if (!userId || loading) return null;
-  return isOffline ? (
-    <div className="flex items-center text-[#ef4444] bg-[#ef4444]/10 rounded-full p-0.5 ml-2" title="Disconnected">
-      <WifiOff className="w-3 h-3" />
-    </div>
-  ) : (
-    <div className="flex items-center text-[#10b981] bg-[#10b981]/10 rounded-full p-0.5 ml-2" title="Connected">
-      <Wifi className="w-3 h-3" />
-    </div>
-  );
-};
 
 export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPending, onAcknowledgeGameOver }) {
   const { currentUser } = useAuth();
@@ -29,56 +12,11 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   const { t } = useTranslation(['room']);
   const [selectedSquare, setSelectedSquare] = useState(null);
 
-  const { gameData, white, black, settings, roomId, status } = room;
+  const { gameData, white, black, roomId, status } = room;
   const currentUserId = String(currentUser?.id);
 
-  // Timers
-  const initialTimeMillis = (settings?.timeMinutes || 5) * 60 * 1000;
-  const [whiteRemaining, setWhiteRemaining] = useState(gameData?.whiteRemainingMillis ?? initialTimeMillis);
-  const [blackRemaining, setBlackRemaining] = useState(gameData?.blackRemainingMillis ?? initialTimeMillis);
-
-  useEffect(() => {
-    const wTime = gameData?.whiteRemainingMillis ?? initialTimeMillis;
-    const bTime = gameData?.blackRemainingMillis ?? initialTimeMillis;
-
-    if (status !== 'IN_PROGRESS') {
-      setWhiteRemaining(wTime);
-      setBlackRemaining(bTime);
-      return;
-    }
-
-    const activeTurn = gameData?.turn || 'white';
-    const turnStartedAt = gameData?.turnStartedAt || Date.now();
-
-    const updateTimers = () => {
-      const elapsed = Math.max(0, Date.now() - turnStartedAt);
-      if (activeTurn === 'white') {
-        setWhiteRemaining(Math.max(0, wTime - elapsed));
-        setBlackRemaining(bTime);
-      } else {
-        setWhiteRemaining(wTime);
-        setBlackRemaining(Math.max(0, bTime - elapsed));
-      }
-    };
-
-    updateTimers(); // Immediate update
-    const interval = setInterval(updateTimers, 100);
-    return () => clearInterval(interval);
-  }, [status, gameData?.turn, gameData?.turnStartedAt, gameData?.whiteRemainingMillis, gameData?.blackRemainingMillis, initialTimeMillis]);
-
-  const location = useLocation();
-  const navigate = useNavigate();
-
   const [showGameOverModal, setShowGameOverModal] = useState(true);
-  const [showResignConfirm, setShowResignConfirm] = useState(location.state?.openResignConfirm || false);
   const [countdown, setCountdown] = useState(15);
-
-  // Clear the state so it doesn't reopen on refresh
-  useEffect(() => {
-    if (location.state?.openResignConfirm) {
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location, navigate]);
 
   const isPostGame = status === 'WAITING' && gameData?.winner;
 
@@ -100,15 +38,6 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     }
   }, [isPostGame, showGameOverModal, countdown, handleConfirmLeave]);
 
-
-
-  const formatTime = (millis) => {
-    const totalSeconds = Math.max(0, Math.ceil(millis / 1000));
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-  };
-
   // Initialize local chess instance for legal moves
   const chess = useMemo(() => {
     try {
@@ -121,11 +50,11 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   // Determine board orientation and permissions
   const isBlack = currentUserId === String(black?.id) || currentUserId === String(gameData?.blackId);
   const isWhite = currentUserId === String(white?.id) || currentUserId === String(gameData?.whiteId);
-  const isPlayer = isWhite || isBlack;
   const myColor = isWhite ? 'white' : isBlack ? 'black' : null;
   const currentTurn = gameData?.turn || 'white';
   const isMyTurn = myColor === currentTurn && status === 'IN_PROGRESS';
   const boardOrientation = isBlack ? 'black' : 'white';
+  const isPlayer = isWhite || isBlack;
 
   const onStay = () => {
     setShowGameOverModal(false);
@@ -137,32 +66,6 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     setShowGameOverModal(false);
     if (onAcknowledgeGameOver) onAcknowledgeGameOver();
   };
-
-  const handleResign = () => {
-    setShowResignConfirm(true);
-  };
-
-  const confirmResign = () => {
-    setShowResignConfirm(false);
-    send(`/app/room.${roomId}.resign`, {});
-  };
-
-  const handleOfferDraw = () => {
-    send(`/app/room.${roomId}.draw.offer`, {});
-  };
-
-  const handleAcceptDraw = () => {
-    send(`/app/room.${roomId}.draw.accept`, {});
-  };
-
-  const handleDeclineDraw = () => {
-    send(`/app/room.${roomId}.draw.decline`, {});
-  };
-
-  const topPlayer = isBlack ? white : black;
-  const bottomPlayer = isBlack ? black : white;
-  const topPlayerIsWhite = isBlack;
-  const bottomPlayerIsWhite = !isBlack;
 
   // Compute legal move highlights
   const legalMoveSquares = useMemo(() => {
@@ -230,49 +133,6 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
     return handleMove(sourceSquare, targetSquare);
   }, [handleMove]);
 
-  const renderPlayerInfo = (player, isTop, isPlayerWhite) => {
-    const remainingMillis = isPlayerWhite ? whiteRemaining : blackRemaining;
-    const isPlayerTurn = isPlayerWhite ? currentTurn === 'white' : currentTurn === 'black';
-    const isLowTime = remainingMillis <= 30000 && remainingMillis > 0; // <= 30s
-
-    return (
-      <div className={`flex items-center justify-between bg-[#1a1d24] border border-[#2d323f] p-3 rounded-xl shadow-sm ${isTop ? 'mb-4' : 'mt-4'} ${isPlayerTurn ? 'border-[#d4af37]/50 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'opacity-80'}`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl bg-[#13161c] border flex items-center justify-center overflow-hidden shrink-0 shadow-inner ${isPlayerTurn ? 'border-[#d4af37]/50' : 'border-[#2d323f]'}`}>
-            {player?.avatarUrl ? (
-              <img src={player.avatarUrl} alt={player.username} className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-5 h-5 text-[#9ca3af]" />
-            )}
-          </div>
-          <div>
-            <div className="font-bold text-[#f3f4f6] text-sm flex items-center gap-2">
-              {player?.username || t('room:waitingPlayer', 'Waiting...')}
-              <span className="text-[10px] bg-[#2d323f] text-[#9ca3af] px-1.5 py-0.5 rounded font-mono">1500?</span>
-              <ConnectionIndicator userId={player?.id} />
-            </div>
-            {/* Placeholder for captured pieces */}
-            <div className="text-xs text-[#9ca3af] mt-0.5 min-h-[16px]">
-              {/* Captured pieces will go here */}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-1.5 border px-4 py-2 rounded-lg font-mono text-lg font-bold shadow-inner transition-colors ${isLowTime
-            ? 'bg-[#ef4444]/20 border-[#ef4444]/50 text-[#ef4444] animate-pulse'
-            : isPlayerTurn
-              ? 'bg-[#13161c] border-[#d4af37]/50 text-[#d4af37]'
-              : 'bg-[#13161c] border-[#2d323f] text-[#9ca3af]'
-            }`}>
-            <Clock className="w-4 h-4" />
-            {formatTime(remainingMillis)}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // Game over overlay UI mapping
   const getGameOverReasonUI = (reason) => {
     const mapping = {
@@ -286,19 +146,20 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   };
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in zoom-in-95 duration-300">
-      {/* Top Player (Opponent) */}
-      {renderPlayerInfo(topPlayer, true, topPlayerIsWhite)}
-
+    <div className="flex flex-col h-full w-full animate-in fade-in zoom-in-95 duration-300">
       {/* Chess Board Area */}
-      <div className="flex-1 flex items-center justify-center bg-[#13161c] rounded-2xl border border-[#2d323f] p-4 shadow-xl relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#d4af37]/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="flex-1 flex items-center justify-center min-h-0 w-full relative py-1 sm:py-2">
+        <div 
+          className="bg-[#13161c] rounded-2xl border border-[#2d323f] p-2 sm:p-3 shadow-xl relative overflow-hidden flex items-center justify-center"
+          style={{ height: '100%', maxWidth: '100%', aspectRatio: '1 / 1' }}
+        >
+          {/* Subtle background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#d4af37]/5 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="w-full max-w-full aspect-square relative z-10 drop-shadow-2xl flex justify-center items-center">
-          <Chessboard
-            key={`board-${boardOrientation}`}
-            options={{
+          <div className="w-full h-full relative z-10 drop-shadow-2xl">
+            <Chessboard
+              key={`board-${boardOrientation}`}
+              options={{
               id: "RoomChessboard",
               position: gameData?.fen || 'start',
               boardOrientation: boardOrientation,
@@ -350,78 +211,9 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
-
-      {/* Bottom Player (Current User) */}
-      {renderPlayerInfo(bottomPlayer, false, bottomPlayerIsWhite)}
-
-      {/* Game Actions (Resign, Draw) */}
-      {status === 'IN_PROGRESS' && isPlayer && (
-        <div className="flex flex-col items-center justify-center gap-3 mt-4">
-          
-          {/* Incoming Draw Offer Modal/Banner */}
-          {gameData?.drawOfferBy && gameData.drawOfferBy !== myColor && (
-            <div className="bg-[#d4af37]/10 border border-[#d4af37]/40 rounded-xl p-3 w-full animate-in fade-in zoom-in-95 duration-200">
-              <p className="text-sm font-bold text-[#d4af37] mb-2 text-center">
-                {t('room:opponent_offers_draw', 'Opponent offers a draw')}
-              </p>
-              <div className="flex gap-2">
-                <button onClick={handleDeclineDraw} className="flex-1 py-1.5 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] text-xs font-bold rounded-lg transition-all cursor-pointer">
-                  {t('room:declineDraw', 'Decline')}
-                </button>
-                <button onClick={handleAcceptDraw} className="flex-1 py-1.5 bg-[#d4af37] hover:bg-[#b59226] text-[#0d0e12] text-xs font-bold rounded-lg transition-all cursor-pointer">
-                  {t('room:acceptDraw', 'Accept Draw')}
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-3 w-full">
-            <button 
-              onClick={handleOfferDraw}
-              disabled={!!gameData?.drawOfferBy}
-              className={`flex-1 flex items-center justify-center gap-2 border px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
-                gameData?.drawOfferBy === myColor 
-                  ? 'bg-[#13161c] border-[#2d323f] text-[#d4af37] opacity-80 cursor-not-allowed'
-                  : 'bg-[#13161c] hover:bg-[#2d323f] border-[#2d323f] text-[#9ca3af] hover:text-[#f3f4f6] cursor-pointer'
-              }`}
-            >
-              <Handshake className="w-4 h-4" />
-              <span>
-                {gameData?.drawOfferBy === myColor 
-                  ? t('room:drawOfferWaiting', 'Waiting for opponent...')
-                  : t('room:offerDraw', 'Offer Draw')}
-              </span>
-            </button>
-            <button onClick={handleResign} className="flex-1 flex items-center justify-center gap-2 bg-[#ef4444]/10 hover:bg-[#ef4444] border border-[#ef4444]/40 text-[#ef4444] hover:text-[#0d0e12] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
-              <Flag className="w-4 h-4" />
-              <span>{t('room:resign', 'Resign')}</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Resign Confirmation Modal */}
-      {showResignConfirm && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0d0e12]/80 backdrop-blur-sm rounded-lg animate-in fade-in zoom-in-95 duration-200 p-4">
-          <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-            <div className="w-12 h-12 bg-[#ef4444]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#ef4444]/30">
-              <Flag className="w-6 h-6 text-[#ef4444]" />
-            </div>
-            <h3 className="text-xl font-bold text-[#f3f4f6] mb-2">{t('room:resignConfirmTitle', 'Xác nhận đầu hàng')}</h3>
-            <p className="text-sm text-[#9ca3af] mb-6">{t('room:resignConfirmDesc', 'Bạn có chắc chắn muốn đầu hàng ván đấu này không?')}</p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowResignConfirm(false)} className="flex-1 py-2.5 bg-[#13161c] hover:bg-[#2d323f] border border-[#2d323f] text-[#f3f4f6] text-sm font-bold rounded-xl transition-all cursor-pointer">
-                {t('room:cancel', 'Hủy')}
-              </button>
-              <button onClick={confirmResign} className="flex-1 py-2.5 bg-[#ef4444] hover:bg-[#dc2626] text-white text-sm font-bold rounded-xl transition-all cursor-pointer">
-                {t('room:confirmResign', 'Đầu hàng')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

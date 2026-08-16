@@ -26,9 +26,9 @@ export function RoomWaiting({
 
 
       {/* MAIN CONTENT WORKSPACE */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-6 h-full min-h-0 pb-4">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-4 h-full min-h-0 pb-0">
         {/* SEATS & SPECTATORS SECTION (LEFT) */}
-        <div className="lg:col-span-5 flex flex-col gap-6 min-h-0">
+        <div className="lg:col-span-5 flex flex-col gap-4 min-h-0">
           {/* SEATS (WHITE vs BLACK) */}
           <div className="space-y-4 shrink-0">
             <h3 className="text-sm font-bold text-[#f3f4f6] uppercase tracking-wider">

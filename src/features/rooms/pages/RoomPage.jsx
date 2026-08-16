@@ -5,6 +5,7 @@ import { useRoomContext } from '../context/RoomContext';
 
 import { RoomWaiting } from '../components/RoomWaiting';
 import { RoomPlaying } from '../components/RoomPlaying';
+import { RoomHeader } from '../components/RoomHeader';
 import { useAuth } from '../../auth/context/AuthContext';
 import { roomService } from '../services/roomService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -169,27 +170,9 @@ export function RoomPage() {
 
   return (
     <>
-      <div className="container mx-auto px-4 max-w-6xl flex flex-col flex-1 h-full min-h-[500px] py-4">
-        {/* TOP MINI ACTIONS */}
-        <div className="flex items-center justify-end gap-2 py-3 shrink-0">
-          <button
-            type="button"
-            onClick={handleConfirmMinimize}
-            className="flex items-center gap-1.5 bg-[#13161c] hover:bg-[#2d323f] text-[#f3f4f6] border border-[#2d323f] px-3 py-1.5 rounded-lg font-semibold text-xs transition-all cursor-pointer shadow-sm"
-          >
-            <Minimize2 className="w-4 h-4 text-[#d4af37]" />
-            <span className="hidden sm:inline">{t('room:minimize', 'Thu nhỏ')}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            className="flex items-center gap-1.5 bg-[#d4af37]/15 hover:bg-[#d4af37]/25 text-[#d4af37] border border-[#d4af37]/40 px-3 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer shadow-sm"
-          >
-            {copied ? <Check className="w-4 h-4 text-[#10b981]" /> : <Copy className="w-4 h-4" />}
-            <span className="hidden sm:inline">{copied ? t('room:copied', 'Đã chép') : t('room:copyLink', 'Sao chép link')}</span>
-          </button>
-        </div>
+      <div className="container mx-auto px-2 sm:px-4 max-w-[1400px] flex flex-col h-[calc(100dvh-64px)] overflow-hidden py-2 sm:py-4 gap-4">
+        {/* ROOM HEADER */}
+        <RoomHeader room={room} onMinimize={handleConfirmMinimize} />
 
         {/* MAIN CONTENT WORKSPACE */}
         <div className="flex-1 min-h-0 relative flex flex-col">
