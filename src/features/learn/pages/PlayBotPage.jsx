@@ -122,7 +122,7 @@ const PlayBotPage = () => {
         clearTimeout(timer);
       };
     }
-  }, [chess, boardFen, playerColor, botInstance, updateGameStatus]);
+  }, [chess, boardFen, playerColor, botInstance, updateGameStatus, showToast, t]);
 
   const handleMove = (moveCandidate) => {
     const playerTurnColor = playerColor === 'white' ? 'w' : 'b';

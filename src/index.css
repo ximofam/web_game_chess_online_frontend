@@ -9,7 +9,7 @@
   --color-chess-text: #f3f4f6;
   --color-chess-muted: #9ca3af;
   --color-chess-border: #2d323f;
-  
+
   --font-playfair: "Playfair Display", serif;
   --font-inter: "Inter", sans-serif;
 }
@@ -66,16 +66,23 @@
   }
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 h1,
@@ -89,20 +96,24 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
+
   @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
+
   @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -126,6 +137,7 @@ code {
   from {
     width: 100%;
   }
+
   to {
     width: 0%;
   }
@@ -136,15 +148,17 @@ code {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #13161c;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #2d323f;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #d4af37;
 }
-

@@ -26,9 +26,9 @@ export function RoomWaiting({
 
 
       {/* MAIN CONTENT WORKSPACE */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0 pb-4">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-6 h-full min-h-0 pb-4">
         {/* SEATS & SPECTATORS SECTION (LEFT) */}
-        <div className="lg:col-span-5 flex flex-col gap-6 h-full min-h-0">
+        <div className="lg:col-span-5 flex flex-col gap-6 min-h-0">
           {/* SEATS (WHITE vs BLACK) */}
           <div className="space-y-4 shrink-0">
             <h3 className="text-sm font-bold text-[#f3f4f6] uppercase tracking-wider">
@@ -80,7 +80,7 @@ export function RoomWaiting({
             )}
 
             {showLeaveRoomButton && (
-              <button
+               <button
                 type="button"
                 onClick={handleConfirmLeave}
                 className="sm:w-auto w-full bg-[#13161c] border border-[#2d323f] hover:bg-[#ef4444]/10 hover:border-[#ef4444]/40 hover:text-[#ef4444] text-[#9ca3af] font-semibold text-xs py-2.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
@@ -98,7 +98,7 @@ export function RoomWaiting({
         </div>
 
         {/* CHAT SECTION (RIGHT) */}
-        <div className="lg:col-span-7 flex flex-col h-full min-h-[300px]">
+        <div className="lg:col-span-7 flex flex-col h-[400px] lg:h-auto min-h-[300px]">
           <RoomChat roomId={roomId} room={room} />
         </div>
       </div>

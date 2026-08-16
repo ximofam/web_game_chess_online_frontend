@@ -23,11 +23,22 @@ export function RoomChat({ roomId, room }) {
     staleTime: 1000 * 60, // 1 minute
   });
 
+  // Reset messages when room changes
+  useEffect(() => {
+    setMessages([]);
+  }, [roomId]);
+
   // Sync query data to local state for appending new messages
   useEffect(() => {
     if (history && Array.isArray(history)) {
-
-      setMessages(history);
+      setMessages((prev) => {
+        const merged = [...history];
+        const historyIds = new Set(history.map((m) => m.id));
+        prev.forEach((m) => {
+          if (!historyIds.has(m.id)) merged.push(m);
+        });
+        return merged.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
+      });
     }
   }, [history]);
 
@@ -61,7 +72,7 @@ export function RoomChat({ roomId, room }) {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!inputValue.trim() || chatLocked) return;
+    if (!inputValue.trim() || chatLocked || connectionStatus !== 'CONNECTED') return;
 
     try {
       send(`/app/room.${roomId}.chat`, { message: inputValue.trim() });
@@ -73,13 +84,14 @@ export function RoomChat({ roomId, room }) {
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col w-full bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
-      <div className="flex items-center gap-2 p-3 border-b border-[#2d323f] bg-[#1a1d24]">
+    <div className="flex-1 min-h-0 flex flex-col w-full h-full bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
+      <div className="flex items-center gap-2 p-3 border-b border-[#2d323f] bg-[#1a1d24] shrink-0">
         <MessageSquare className="w-4 h-4 text-[#d4af37]" />
         <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider">{t('room:chat', 'Trò chuyện')}</h3>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto p-4 pr-2 space-y-3 bg-[#0d0e12]/30 scrollbar-thin flex flex-col">
+      <div className="flex-1 min-h-0 relative bg-[#0d0e12]/30">
+        <div className="absolute inset-0 overflow-y-auto p-4 pr-2 space-y-3 scrollbar-thin block">
         {isLoading ? (
           <div className="flex justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-[#d4af37]" />
@@ -90,11 +102,11 @@ export function RoomChat({ roomId, room }) {
           </div>
         ) : (
           <>
-            {messages.map((msg, idx) => {
+            {messages.map((msg) => {
               const isMe = msg.sender?.id === currentUser?.id;
 
               return (
-                <div key={idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                <div key={msg.id ?? `${msg.sender?.id}-${msg.sentAt}`} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                   <span className="text-[10px] text-[#9ca3af] mb-1 px-1 flex items-center gap-1">
                     {msg.sender?.username || 'Unknown'}
                     {msg.sentAt && (
@@ -119,9 +131,10 @@ export function RoomChat({ roomId, room }) {
           </>
         )}
         <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      <div className="p-3 bg-[#1a1d24] border-t border-[#2d323f]">
+      <div className="p-3 bg-[#1a1d24] border-t border-[#2d323f] shrink-0">
         {chatLocked ? (
           <div className="flex items-center justify-center gap-2 text-xs text-[#ef4444] py-2 bg-[#ef4444]/10 rounded-xl">
             <Lock className="w-3.5 h-3.5" />
