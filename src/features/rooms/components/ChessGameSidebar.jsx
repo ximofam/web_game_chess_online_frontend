@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ScrollText, Move } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Chess } from 'chess.js';
@@ -94,7 +95,16 @@ export function ChessGameSidebar({ room }) {
   const { currentUser } = useAuth();
   const { whiteRemaining, blackRemaining } = useChessTimer(room);
 
-  const [showResignConfirm, setShowResignConfirm] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [showResignConfirm, setShowResignConfirm] = useState(location.state?.openResignConfirm || false);
+
+  useEffect(() => {
+    if (location.state?.openResignConfirm) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   // Player and role logic
   const currentUserId = String(currentUser?.id);

@@ -109,25 +109,46 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   }, [isMyTurn, chess, send, roomId]);
 
   const handlePieceClick = useCallback(({ square }) => {
-    if (isMyTurn) setSelectedSquare(prev => prev === square ? null : square);
-  }, [isMyTurn]);
+    if (!isMyTurn) return;
+    const chess = new Chess(gameData?.fen || 'start');
+    const pieceObj = chess.get(square);
+    if (pieceObj && pieceObj.color === myColor.charAt(0)) {
+      setSelectedSquare(prev => prev === square ? null : square);
+    }
+  }, [isMyTurn, gameData?.fen, myColor]);
 
   const handlePieceDrag = useCallback(({ square }) => {
-    if (isMyTurn) setSelectedSquare(square);
-  }, [isMyTurn]);
-
-  const handleSquareMouseDown = useCallback(({ square }) => {
-    if (isMyTurn) setSelectedSquare(square);
-  }, [isMyTurn]);
+    if (!isMyTurn) return;
+    const chess = new Chess(gameData?.fen || 'start');
+    const pieceObj = chess.get(square);
+    if (pieceObj && pieceObj.color === myColor.charAt(0)) {
+      setSelectedSquare(square);
+    }
+  }, [isMyTurn, gameData?.fen, myColor]);
 
   const handleSquareClick = useCallback(({ square }) => {
     if (!isMyTurn) return;
     if (selectedSquare && selectedSquare !== square) {
-      handleMove(selectedSquare, square);
+      const moved = handleMove(selectedSquare, square);
+      if (!moved) {
+        // If move was invalid, maybe we clicked another of our own pieces to switch selection
+        const chess = new Chess(gameData?.fen || 'start');
+        const pieceObj = chess.get(square);
+        if (pieceObj && pieceObj.color === myColor.charAt(0)) {
+          setSelectedSquare(square);
+        } else {
+          setSelectedSquare(null);
+        }
+      }
     } else {
-      setSelectedSquare(square);
+      // Nothing selected yet, check if we clicked our piece
+      const chess = new Chess(gameData?.fen || 'start');
+      const pieceObj = chess.get(square);
+      if (pieceObj && pieceObj.color === myColor.charAt(0)) {
+        setSelectedSquare(square);
+      }
     }
-  }, [selectedSquare, handleMove, isMyTurn]);
+  }, [selectedSquare, handleMove, isMyTurn, gameData?.fen, myColor]);
 
   const onPieceDrop = useCallback(({ sourceSquare, targetSquare }) => {
     return handleMove(sourceSquare, targetSquare);
@@ -160,25 +181,24 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
             <Chessboard
               key={`board-${boardOrientation}`}
               options={{
-              id: "RoomChessboard",
-              position: gameData?.fen || 'start',
-              boardOrientation: boardOrientation,
-              darkSquareStyle: { backgroundColor: '#4b5563' },
-              lightSquareStyle: { backgroundColor: '#9ca3af' },
-              boardStyle: {
-                borderRadius: '8px',
-                boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
-              },
-              animationDurationInMs: 300,
-              allowDragging: isMyTurn,
-              squareStyles,
-              onPieceClick: handlePieceClick,
-              onPieceDrag: handlePieceDrag,
-              onSquareMouseDown: handleSquareMouseDown,
-              onSquareClick: handleSquareClick,
-              onPieceDrop: onPieceDrop,
-            }}
-          />
+                id: "RoomChessboard",
+                position: gameData?.fen || 'start',
+                boardOrientation: boardOrientation,
+                darkSquareStyle: { backgroundColor: '#4b5563' },
+                lightSquareStyle: { backgroundColor: '#9ca3af' },
+                boardStyle: {
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
+                },
+                animationDurationInMs: 300,
+                allowDragging: isMyTurn,
+                squareStyles,
+                onPieceClick: handlePieceClick,
+                onPieceDrag: handlePieceDrag,
+                onSquareClick: handleSquareClick,
+                onPieceDrop: onPieceDrop,
+              }}
+            />
 
           {/* Game Over Overlay */}
           {isPostGame && showGameOverModal && (
