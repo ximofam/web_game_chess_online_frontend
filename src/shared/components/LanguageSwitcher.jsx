@@ -12,7 +12,7 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#373d4e] bg-[#1c1f28] hover:bg-[#252a35] hover:border-[#d4af37]/40 transition-colors text-sm font-semibold text-[#9ca3af] hover:text-[#d4af37]"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-chess-border bg-chess-surface hover:bg-chess-border/50 hover:border-chess-gold/40 transition-colors text-sm font-inter font-semibold text-chess-muted hover:text-chess-gold focus:outline-none focus:ring-2 focus:ring-chess-gold focus:ring-offset-2 focus:ring-offset-chess-dark cursor-pointer"
       title={t('common:switch_language')}
     >
       <Globe className="w-4 h-4" />

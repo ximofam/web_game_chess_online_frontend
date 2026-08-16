@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../shared/components/Sidebar/Sidebar';
-import MobileTopBar from '../shared/components/Sidebar/MobileTopBar';
+import Header from '../shared/components/Header';
 import Footer from '../shared/components/Footer';
 import FloatingRoomWidget from '../features/rooms/components/FloatingRoomWidget';
 
@@ -20,7 +20,7 @@ export const PublicLayout = () => {
       />
       
       <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden relative">
-        <MobileTopBar onOpenSidebar={() => setIsMobileSidebarOpen(true)} />
+        <Header onOpenSidebar={() => setIsMobileSidebarOpen(true)} />
         
         <div className="flex-1 overflow-y-auto flex flex-col relative">
           <main className="flex-1 flex flex-col">

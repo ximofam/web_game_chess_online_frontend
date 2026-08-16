@@ -14,13 +14,13 @@ export default function LikeButton({ liked, count, onClick, className = '', size
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-1.5 font-semibold transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${textCls} ${
-        liked ? 'text-[#d4af37]' : 'text-[#9ca3af] hover:text-[#d4af37]'
+      className={`flex items-center gap-1.5 font-inter font-semibold transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${textCls} ${
+        liked ? 'text-chess-gold' : 'text-chess-muted hover:text-chess-gold'
       } ${className}`}
       aria-label={liked ? t('forum:unlike') : t('forum:like')}
       aria-pressed={liked}
     >
-      <Heart className={`${iconCls} transition-transform ${liked ? 'fill-[#d4af37] scale-110' : ''}`} />
+      <Heart className={`${iconCls} transition-transform ${liked ? 'fill-chess-gold scale-110' : ''}`} />
       <span>{count ?? 0}</span>
     </button>
   );

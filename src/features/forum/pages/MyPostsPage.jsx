@@ -70,7 +70,7 @@ export default function MyPostsPage() {
       <div className="mb-6 flex items-center justify-between">
         <Link
           to="/forum"
-          className="inline-flex items-center gap-1.5 text-sm text-[#9ca3af] hover:text-[#d4af37] transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-inter font-semibold text-chess-muted hover:text-chess-text transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> {t('forum:back_to_forum')}
         </Link>
@@ -78,17 +78,17 @@ export default function MyPostsPage() {
         <Link
           id="my-posts-create-btn"
           to="/forum/create"
-          className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-chess-gold text-chess-dark font-inter font-bold text-sm rounded-lg hover:bg-chess-gold-hover transition-colors"
         >
           <Plus className="w-4 h-4" /> {t('forum:write_new_post')}
         </Link>
       </div>
 
       <div className="mb-8">
-        <h1 className="font-playfair text-3xl font-bold text-[#f3f4f6] mb-2 flex items-center gap-3">
-          <FileText className="w-8 h-8 text-[#d4af37]" /> {t('forum:manage_my_posts')}
+        <h1 className="font-playfair text-3xl font-bold text-chess-text mb-2 flex items-center gap-3">
+          <FileText className="w-8 h-8 text-chess-gold" /> {t('forum:manage_my_posts')}
         </h1>
-        <p className="text-sm text-[#9ca3af]">
+        <p className="text-sm font-inter text-chess-muted">
           {t('forum:manage_posts_desc')}
         </p>
       </div>
@@ -96,16 +96,16 @@ export default function MyPostsPage() {
       {/* Filter Tabs & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         {/* Status Tabs */}
-        <div className="flex items-center gap-1 bg-[#161922] p-1.5 rounded-2xl border border-[#2d323f]">
+        <div className="flex items-center gap-1 bg-chess-surface p-1.5 rounded-lg border border-chess-border shadow-sm">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               id={`tab-status-${tab.id.toLowerCase()}`}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-4 py-2 rounded-md font-inter text-xs font-semibold transition-colors focus:outline-none ${
                 activeTab === tab.id
-                  ? 'bg-[#d4af37] text-[#0d0e12] shadow-sm'
-                  : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#252a36]'
+                  ? 'bg-chess-gold text-chess-dark shadow-sm'
+                  : 'text-chess-muted hover:text-chess-text hover:bg-chess-dark'
               }`}
             >
               {tab.label}
@@ -120,9 +120,9 @@ export default function MyPostsPage() {
             placeholder={t('forum:search_by_title')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#161922] border border-[#2d323f] rounded-xl text-sm text-[#f3f4f6] placeholder-[#9ca3af] focus:outline-hidden focus:border-[#d4af37] transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-chess-dark border border-chess-border rounded-lg text-sm font-inter text-chess-text placeholder-chess-muted focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold transition-colors"
           />
-          <Search className="w-4 h-4 text-[#9ca3af] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-chess-muted absolute left-3 top-1/2 -translate-y-1/2" />
         </form>
       </div>
 
@@ -134,18 +134,18 @@ export default function MyPostsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">{t('forum:err_cannot_load_my_posts')}</p>
+        <div className="text-center py-16 font-inter text-chess-muted bg-chess-surface border border-chess-border rounded-lg shadow-md">
+          <p className="text-lg font-semibold mb-2">{t('forum:err_cannot_load_my_posts')}</p>
           <button
             onClick={() => refetch()}
-            className="text-sm text-[#d4af37] hover:underline inline-flex items-center gap-1 mt-2"
+            className="text-sm font-semibold text-chess-gold hover:underline inline-flex items-center gap-1 mt-2 focus:outline-none"
           >
             <RefreshCw className="w-4 h-4" /> {t('forum:try_again')}
           </button>
         </div>
       ) : allMyPosts.length === 0 ? (
-        <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">{t('forum:no_posts_found')}</p>
+        <div className="text-center py-16 font-inter text-chess-muted bg-chess-surface border border-chess-border rounded-lg shadow-md">
+          <p className="text-lg font-semibold mb-2">{t('forum:no_posts_found')}</p>
           <p className="text-sm mb-4">
             {activeTab !== 'ALL'
               ? t('forum:no_posts_in_status', { status: tabs.find((t) => t.id === activeTab)?.label })
@@ -153,7 +153,7 @@ export default function MyPostsPage() {
           </p>
           <Link
             to="/forum/create"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-chess-gold text-chess-dark font-bold text-sm rounded-lg hover:bg-chess-gold-hover transition-colors"
           >
             <Plus className="w-4 h-4" /> {t('forum:create_first_post')}
           </Link>
@@ -176,7 +176,7 @@ export default function MyPostsPage() {
                 id="load-more-my-posts"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="flex items-center gap-2 px-6 py-2.5 border border-[#2d323f] rounded-xl text-sm font-semibold text-[#f3f4f6] hover:border-[#d4af37]/40 hover:text-[#d4af37] transition-all disabled:opacity-60"
+                className="flex items-center gap-2 px-6 py-2.5 border border-chess-border rounded-lg bg-transparent text-sm font-inter font-semibold text-chess-text hover:border-chess-gold hover:text-chess-gold transition-colors disabled:opacity-60 focus:outline-none"
               >
                 {isFetchingNextPage ? (
                   <>
@@ -194,24 +194,24 @@ export default function MyPostsPage() {
       {/* Delete Confirmation Modal */}
       {deletingPost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-[#161922] border border-[#2d323f] rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="p-2 bg-rose-500/10 rounded-xl">
+          <div className="w-full max-w-md bg-chess-surface border border-chess-border rounded-lg p-6 shadow-xl space-y-4">
+            <div className="flex items-center gap-3 text-red-500">
+              <div className="p-2 bg-red-500/10 rounded-lg">
                 <AlertTriangle className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-[#f3f4f6]">{t('forum:confirm_delete_post')}</h3>
+              <h3 className="font-playfair text-lg font-bold text-chess-text">{t('forum:confirm_delete_post')}</h3>
             </div>
 
-            <p className="text-sm text-[#9ca3af]">
+            <p className="text-sm font-inter text-chess-muted">
               {t('forum:are_you_sure_delete_post')}{' '}
-              <span className="text-[#f3f4f6] font-semibold">"{deletingPost.title}"</span>{t('forum:delete_irreversible')}
+              <span className="text-chess-text font-semibold">"{deletingPost.title}"</span>{t('forum:delete_irreversible')}
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-chess-border">
               <button
                 onClick={() => setDeletingPost(null)}
                 disabled={deleteMutation.isPending}
-                className="px-4 py-2 text-sm font-semibold text-[#f3f4f6] bg-[#252a36] hover:bg-[#2d323f] rounded-xl transition-all"
+                className="px-4 py-2 text-sm font-inter font-semibold text-chess-text bg-chess-dark border border-chess-border hover:bg-chess-border/50 rounded-lg transition-colors focus:outline-none"
               >
                 {t('forum:cancel_delete')}
               </button>
@@ -219,7 +219,7 @@ export default function MyPostsPage() {
                 id="confirm-delete-btn"
                 onClick={() => deleteMutation.mutate(deletingPost.id)}
                 disabled={deleteMutation.isPending}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50 focus:outline-none"
               >
                 {deleteMutation.isPending ? (
                   <>

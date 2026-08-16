@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Home, MessageSquare, BookOpen, LogIn, UserPlus,
-  UserCheck, Loader2, ChevronLeft, ChevronRight, X
+  Home, MessageSquare, BookOpen, ChevronLeft, ChevronRight, X
 } from 'lucide-react';
-import { useAuth } from '../../../features/auth/context/AuthContext';
-import { useNotifications } from '../../../features/notifications/context/NotificationContext';
-import NavbarAvatar from '../../../features/profile/components/NavbarAvatar';
-import AvatarDropdown from '../../../features/profile/components/AvatarDropdown';
-import LanguageSwitcher from '../LanguageSwitcher';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -18,13 +12,8 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
 );
 
 export const Sidebar = ({ isOpen, onClose }) => {
-  const { t } = useTranslation(['nav', 'auth']);
-  const { currentUser, isAuthenticated, loginGuest, logout, showToast } = useAuth();
-  const { connectionStatus } = useNotifications();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const { t } = useTranslation(['nav']);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Desktop sidebar state
   const [isExpanded, setIsExpanded] = useState(() => {
@@ -47,20 +36,6 @@ export const Sidebar = ({ isOpen, onClose }) => {
   const isLearnActive = location.pathname.startsWith('/learn');
   const isForumActive = location.pathname.startsWith('/forum');
 
-  const handlePlayAsGuest = async () => {
-    if (isGuestLoading) return;
-    setIsGuestLoading(true);
-    try {
-      await loginGuest();
-      showToast(t('auth:guest_welcome_toast'), 'success');
-      navigate('/dashboard');
-    } catch {
-      showToast(t('auth:guest_failed_toast'), 'error');
-    } finally {
-      setIsGuestLoading(false);
-    }
-  };
-
   const navItems = [
     { to: '/', icon: Home, label: t('nav:home'), active: isHomeActive },
     { to: '/learn', icon: BookOpen, label: t('nav:learn'), active: isLearnActive },
@@ -81,24 +56,28 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-[#13161c] border-r border-[#2d323f] shadow-2xl transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarWidth} lg:shrink-0`}
+        className={`fixed lg:static inset-y-0 left-0 z-50 flex flex-col bg-chess-dark border-r border-chess-border shadow-2xl transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarWidth} lg:shrink-0`}
       >
         {/* Header / Brand */}
-        <div className="h-14 flex items-center justify-between px-4 border-b border-[#2d323f] shrink-0">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-chess-border shrink-0 bg-chess-surface/30">
           <a
             href="https://github.com/ximofam/web_game_chess_online_frontend"
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-3 text-[#f3f4f6] hover:text-[#d4af37] transition-colors focus:outline-none ${!isExpanded ? 'mx-auto' : ''}`}
+            className={`flex items-center gap-3 text-chess-text hover:text-chess-gold transition-colors focus:outline-none ${!isExpanded ? 'mx-auto' : ''}`}
             title="GitHub Repository"
           >
             <GithubIcon className="w-7 h-7 shrink-0" />
-            {isExpanded && <span className="font-bold text-lg whitespace-nowrap overflow-hidden">Chess Platform</span>}
+            {isExpanded && (
+              <span className="font-playfair font-bold text-xl whitespace-nowrap overflow-hidden tracking-wider text-chess-text">
+                V<span className="text-chess-gold">i</span>e<span className="text-chess-gold">C</span>hess
+              </span>
+            )}
           </a>
 
           {/* Mobile Close Button */}
           <button
-            className="lg:hidden text-[#9ca3af] hover:text-[#f3f4f6] transition-colors"
+            className="lg:hidden text-chess-muted hover:text-chess-text transition-colors focus:outline-none cursor-pointer"
             onClick={onClose}
           >
             <X className="w-5 h-5" />
@@ -106,16 +85,17 @@ export const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-2">
           {navItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               title={!isExpanded ? item.label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group ${item.active
-                ? 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30'
-                : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] border border-transparent'
-                } ${!isExpanded ? 'justify-center px-0' : ''}`}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-inter font-bold transition-all group focus:outline-none focus:ring-2 focus:ring-chess-gold cursor-pointer ${
+                item.active
+                  ? 'bg-chess-gold/15 text-chess-gold border border-chess-gold/30'
+                  : 'text-chess-muted hover:text-chess-text hover:bg-chess-surface border border-transparent'
+              } ${!isExpanded ? 'justify-center px-0' : ''}`}
             >
               <item.icon className="w-5 h-5 shrink-0" />
               {isExpanded && <span className="whitespace-nowrap">{item.label}</span>}
@@ -123,84 +103,16 @@ export const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        {/* Bottom Section (User & Actions) */}
-        <div className="p-3 border-t border-[#2d323f] flex flex-col gap-3 shrink-0">
+        {/* Bottom Section (Collapse Button only) */}
+        <div className="p-3 border-t border-chess-border flex flex-col shrink-0">
           {/* Desktop Toggle Button */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="hidden lg:flex items-center justify-center p-1.5 w-full text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#242834] rounded-lg transition-colors border border-transparent"
+            className="hidden lg:flex items-center justify-center p-2 w-full text-chess-muted hover:text-chess-text hover:bg-chess-surface rounded-lg transition-colors border border-transparent focus:outline-none focus:ring-2 focus:ring-chess-gold cursor-pointer"
             title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {isExpanded ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
-
-          {/* Auth Section */}
-          {isAuthenticated ? (
-            <div className={`relative z-50 flex items-center ${isExpanded ? 'gap-3' : 'justify-center'} bg-[#1a1d24] p-2 rounded-xl border border-[#2d323f]`}>
-              <NavbarAvatar
-                src={currentUser?.avatarUrl}
-                username={currentUser?.username}
-                isOnline={connectionStatus === 'CONNECTED'}
-                onClick={() => setIsExpanded(true) || setIsDropdownOpen(!isDropdownOpen)}
-              />
-
-              {isExpanded && (
-                <div className="flex-1 min-w-0 flex flex-col justify-center cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                  <span className="text-sm font-semibold text-[#f3f4f6] truncate block w-full">
-                    {currentUser?.username}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-[#d4af37] font-semibold">
-                    {currentUser?.role || 'USER'}
-                  </span>
-                </div>
-              )}
-
-              {isDropdownOpen && isExpanded && (
-                <AvatarDropdown
-                  user={currentUser}
-                  onClose={() => setIsDropdownOpen(false)}
-                  onLogout={logout}
-                  className="absolute bottom-full left-0 mb-2 z-[60]"
-                />
-              )}
-            </div>
-          ) : (
-            <div className={`flex flex-col gap-2 ${!isExpanded ? 'items-center' : ''}`}>
-              <button
-                onClick={handlePlayAsGuest}
-                disabled={isGuestLoading}
-                title={!isExpanded ? t('nav:play_as_guest') : undefined}
-                className={`flex items-center justify-center gap-2 bg-[#d4af37] text-[#0d0e12] hover:bg-[#f3cd57] disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs px-2 py-2.5 rounded-lg transition-all shadow cursor-pointer ${!isExpanded ? 'w-10 h-10 p-0' : 'w-full'}`}
-              >
-                {isGuestLoading ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <UserCheck className="w-5 h-5 shrink-0" />}
-                {isExpanded && <span className="whitespace-nowrap truncate">{t('nav:play_as_guest')}</span>}
-              </button>
-
-              <Link
-                to="/login"
-                title={!isExpanded ? t('nav:login') : undefined}
-                className={`flex items-center justify-center gap-2 bg-[#242834] border border-[#373d4e] hover:bg-[#2d3242] text-[#f3f4f6] font-semibold text-xs px-2 py-2.5 rounded-lg transition-all cursor-pointer ${!isExpanded ? 'w-10 h-10 p-0' : 'w-full'}`}
-              >
-                <LogIn className="w-5 h-5 text-[#d4af37] shrink-0" />
-                {isExpanded && <span className="whitespace-nowrap">{t('nav:login')}</span>}
-              </Link>
-
-              {isExpanded && (
-                <Link
-                  to="/register"
-                  className="flex items-center justify-center gap-2 bg-[#1a1d24] border border-[#2d323f] hover:border-[#d4af37]/50 text-[#f3f4f6] font-semibold text-xs px-2 py-2.5 rounded-lg transition-all cursor-pointer w-full"
-                >
-                  <UserPlus className="w-4 h-4 text-[#d4af37] shrink-0" />
-                  <span className="whitespace-nowrap">{t('nav:register')}</span>
-                </Link>
-              )}
-            </div>
-          )}
-
-          {/* Language Switcher */}
-          <div className={`flex ${isExpanded ? 'justify-start px-1' : 'justify-center'}`}>
-            <LanguageSwitcher />
-          </div>
         </div>
       </aside>
     </>

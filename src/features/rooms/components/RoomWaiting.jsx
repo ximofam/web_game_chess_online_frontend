@@ -98,7 +98,7 @@ export function RoomWaiting({
         </div>
 
         {/* CHAT SECTION (RIGHT) */}
-        <div className="lg:col-span-7 h-full min-h-[300px]">
+        <div className="lg:col-span-7 flex flex-col h-full min-h-[300px]">
           <RoomChat roomId={roomId} room={room} />
         </div>
       </div>

@@ -88,16 +88,16 @@ export default function ForumListPage() {
             <Link
               id="my-posts-nav-btn"
               to="/forum/my-posts"
-              className="flex items-center gap-2 px-4 py-2 border border-[#2d323f] bg-[#161922] text-[#e5e7eb] font-semibold text-sm rounded-xl hover:border-[#d4af37]/50 hover:text-[#d4af37] transition-all"
+              className="flex items-center gap-2 px-4 py-2 border border-chess-border bg-transparent text-chess-text font-inter font-semibold text-sm rounded-lg hover:border-chess-gold hover:text-chess-gold transition-colors"
             >
-              <FileText className="w-4 h-4 text-[#d4af37]" />
+              <FileText className="w-4 h-4" />
               {t('forum:my_posts_nav')}
             </Link>
 
             <Link
               id="create-post-btn"
               to="/forum/create"
-              className="flex items-center gap-2 px-4 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-chess-gold text-chess-dark font-inter font-bold text-sm rounded-lg hover:bg-chess-gold-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
               {t('forum:create_post_nav')}
@@ -107,7 +107,7 @@ export default function ForumListPage() {
       </div>
 
       {/* Controls: Search & Sort */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-[#161922] p-4 rounded-2xl border border-[#2d323f]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-chess-surface p-4 rounded-lg border border-chess-border shadow-sm">
         {/* Search Input */}
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
           <input
@@ -116,20 +116,20 @@ export default function ForumListPage() {
             placeholder={t('forum:search_placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#0d0e12] border border-[#2d323f] rounded-xl text-sm text-[#f3f4f6] placeholder-[#9ca3af] focus:outline-hidden focus:border-[#d4af37] transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-chess-dark border border-chess-border rounded-lg text-sm font-inter text-chess-text placeholder-chess-muted focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold transition-colors"
           />
-          <Search className="w-4 h-4 text-[#9ca3af] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-chess-muted absolute left-3 top-1/2 -translate-y-1/2" />
         </form>
 
         {/* Sort Select */}
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <ArrowUpDown className="w-4 h-4 text-[#9ca3af]" />
-          <span className="text-xs text-[#9ca3af] font-medium hidden sm:inline">{t('forum:sort_label')}</span>
+          <ArrowUpDown className="w-4 h-4 text-chess-muted" />
+          <span className="text-xs text-chess-muted font-inter uppercase tracking-widest font-semibold hidden sm:inline">{t('forum:sort_label')}</span>
           <select
             id="forum-sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-[#0d0e12] border border-[#2d323f] text-[#f3f4f6] text-xs font-semibold rounded-xl px-3 py-2 focus:outline-hidden focus:border-[#d4af37] cursor-pointer"
+            className="bg-chess-dark border border-chess-border text-chess-text font-inter text-xs font-semibold rounded-lg px-3 py-2 focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold cursor-pointer"
           >
             <option value="newest">{t('forum:sort_newest')}</option>
             <option value="mostViewed">{t('forum:sort_most_viewed')}</option>
@@ -146,17 +146,17 @@ export default function ForumListPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">{t('forum:err_cannot_load_posts')}</p>
+        <div className="text-center py-16 font-inter text-chess-muted bg-chess-surface border border-chess-border rounded-lg shadow-md">
+          <p className="text-lg font-semibold mb-2">{t('forum:err_cannot_load_posts')}</p>
           <p className="text-sm">{t('forum:please_try_again')}</p>
         </div>
       ) : allPosts.length === 0 ? (
-        <div className="text-center py-16 text-[#9ca3af] bg-[#161922] border border-[#2d323f] rounded-2xl">
-          <p className="text-lg mb-2">{t('forum:no_posts_yet')}</p>
+        <div className="text-center py-16 font-inter text-chess-muted bg-chess-surface border border-chess-border rounded-lg shadow-md">
+          <p className="text-lg font-semibold mb-2">{t('forum:no_posts_yet')}</p>
           {search ? (
             <p className="text-sm">{t('forum:no_posts_match', { search })}</p>
           ) : canPost ? (
-            <Link to="/forum/create" className="text-[#d4af37] text-sm hover:underline">
+            <Link to="/forum/create" className="text-chess-gold font-semibold text-sm hover:underline hover:text-chess-gold-hover transition-colors">
               {t('forum:be_the_first_to_share')}
             </Link>
           ) : null}
@@ -183,7 +183,7 @@ export default function ForumListPage() {
                 id="load-more-posts"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="flex items-center gap-2 px-6 py-2.5 border border-[#2d323f] rounded-xl text-sm font-semibold text-[#f3f4f6] hover:border-[#d4af37]/40 hover:text-[#d4af37] transition-all disabled:opacity-60"
+                className="flex items-center gap-2 px-6 py-2.5 border border-chess-border rounded-lg bg-transparent text-sm font-inter font-semibold text-chess-text hover:border-chess-gold hover:text-chess-gold transition-colors disabled:opacity-60"
               >
                 {isFetchingNextPage ? (
                   <>

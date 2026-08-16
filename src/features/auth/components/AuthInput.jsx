@@ -20,7 +20,7 @@ export const AuthInput = ({
       {/* Field Label */}
       <label
         htmlFor={id}
-        className="text-xs font-semibold uppercase tracking-wider text-chess-muted"
+        className="text-xs font-semibold uppercase tracking-widest text-chess-muted font-inter"
       >
         {label}
       </label>
@@ -32,9 +32,9 @@ export const AuthInput = ({
           type={type}
           aria-invalid={hasError ? 'true' : 'false'}
           aria-describedby={hasError ? errorId : undefined}
-          className={`w-full bg-chess-dark text-chess-text font-inter px-4 py-3 rounded border text-sm transition-all duration-200 outline-none focus:border-chess-gold focus:ring-1 focus:ring-chess-gold focus:shadow-[0_0_8px_rgba(212,175,55,0.15)] ${
+          className={`w-full bg-chess-dark text-chess-text font-inter px-4 py-3 rounded border text-sm transition-colors duration-200 outline-none focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold focus:ring-0 ${
             hasError
-              ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+              ? 'border-red-500/60 focus:border-red-500 focus:outline-red-500'
               : 'border-chess-border hover:border-chess-muted'
           }`}
           {...registration}

@@ -14,7 +14,7 @@ export function RoomPlaying({ room, roomId, handleReady, handleConfirmLeave, isR
         </div>
         
         {/* Chat */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col">
           <RoomChat roomId={roomId} room={room} />
         </div>
       </div>

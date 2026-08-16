@@ -25,8 +25,6 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
   const [expanded, setExpanded] = useState(false);
   const [loadingReplies, setLoadingReplies] = useState(false);
 
-  const _initial = author?.username?.charAt(0).toUpperCase() ?? 'U';
-
   const handleLike = async () => {
     const newLiked = !localLiked;
     setLocalLiked(newLiked);
@@ -70,9 +68,9 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
 
   return (
     <div id={`comment-${id}`} className="py-4">
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         {/* Avatar */}
-        <div className="w-8 h-8 rounded-full border border-[#d4af37]/20 bg-[#0d0e12] text-[#d4af37] flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+        <div className="w-8 h-8 rounded-md border border-chess-gold bg-chess-dark text-chess-gold flex items-center justify-center font-inter text-xs font-bold shrink-0 overflow-hidden">
           {author?.avatarUrl
             ? <img src={author.avatarUrl} alt={author.username} className="w-full h-full object-cover" />
             : <User className="w-4 h-4" />}
@@ -80,16 +78,16 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
 
         <div className="flex-1 min-w-0">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-[#f3f4f6]">{author?.username ?? t('forum:anonymous')}</span>
-            <span className="text-[10px] text-[#9ca3af]">{createdAt ? fmtDate(createdAt) : ''}</span>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="font-inter text-sm font-bold text-chess-text">{author?.username ?? t('forum:anonymous')}</span>
+            <span className="font-inter text-[10px] font-semibold text-chess-muted">{createdAt ? fmtDate(createdAt) : ''}</span>
           </div>
 
           {/* Content */}
-          <p className="text-sm text-[#d1d5db] leading-relaxed whitespace-pre-wrap break-words">{content}</p>
+          <p className="font-inter text-sm text-chess-text leading-relaxed whitespace-pre-wrap break-words">{content}</p>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-2.5">
             <LikeButton
               liked={localLiked}
               count={localCount}
@@ -100,7 +98,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
             {isAuth && (
               <button
                 onClick={() => setShowReplyForm(v => !v)}
-                className="text-xs text-[#9ca3af] hover:text-[#f3f4f6] font-medium transition-colors focus:outline-none"
+                className="font-inter text-xs text-chess-muted hover:text-chess-text font-semibold transition-colors focus:outline-none"
               >
                 {t('forum:reply')}
               </button>
@@ -111,7 +109,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
                 id={`toggle-replies-${id}`}
                 onClick={toggleReplies}
                 disabled={loadingReplies}
-                className="flex items-center gap-1 text-xs text-[#d4af37] hover:text-[#f3cd57] font-semibold transition-colors focus:outline-none disabled:opacity-60"
+                className="flex items-center gap-1 font-inter text-xs text-chess-gold hover:text-chess-gold-hover font-semibold transition-colors focus:outline-none disabled:opacity-60"
               >
                 {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 {expanded ? t('forum:hide') : t('forum:replies_count', { count: replyCount })}
@@ -121,7 +119,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
 
           {/* Reply form */}
           {showReplyForm && (
-            <div className="mt-3">
+            <div className="mt-4">
               <CommentForm
                 postId={postId}
                 parentId={id}
@@ -133,7 +131,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
 
           {/* Replies */}
           {expanded && replies.length > 0 && (
-            <div className="mt-3 pl-3 border-l border-[#2d323f] flex flex-col gap-3">
+            <div className="mt-4 pl-4 border-l-2 border-chess-border flex flex-col gap-3">
               {replies.map(reply => (
                 <CommentItem
                   key={reply.id}
@@ -146,7 +144,7 @@ export default function CommentItem({ comment, postId, isAuth, onLikeComment: _o
                 <button
                   onClick={() => loadReplies(repliesPage + 1)}
                   disabled={loadingReplies}
-                  className="text-xs text-[#d4af37] hover:text-[#f3cd57] self-start font-semibold focus:outline-none"
+                  className="font-inter text-xs text-chess-gold hover:text-chess-gold-hover self-start font-semibold focus:outline-none"
                 >
                   {loadingReplies ? t('forum:loading') : t('forum:load_more_replies')}
                 </button>

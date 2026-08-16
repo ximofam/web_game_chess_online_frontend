@@ -73,13 +73,13 @@ export function RoomChat({ roomId, room }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex-1 min-h-0 flex flex-col w-full bg-[#1a1d24] border border-[#2d323f] rounded-2xl shadow-lg overflow-hidden">
       <div className="flex items-center gap-2 p-3 border-b border-[#2d323f] bg-[#1a1d24]">
         <MessageSquare className="w-4 h-4 text-[#d4af37]" />
         <h3 className="text-xs font-bold text-[#f3f4f6] uppercase tracking-wider">{t('room:chat', 'Trò chuyện')}</h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 pr-2 space-y-3 bg-[#0d0e12]/30 scrollbar-thin flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 pr-2 space-y-3 bg-[#0d0e12]/30 scrollbar-thin flex flex-col">
         {isLoading ? (
           <div className="flex justify-center py-4">
             <Loader2 className="w-5 h-5 animate-spin text-[#d4af37]" />

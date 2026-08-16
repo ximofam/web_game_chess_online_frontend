@@ -32,10 +32,10 @@ export const DatePicker = ({ label, id, error, value = '', onChange, ...props })
   };
 
   return (
-    <div className="w-full flex flex-col items-start gap-1 text-left">
+    <div className="w-full flex flex-col items-start gap-1.5 text-left">
       <label
         htmlFor={id}
-        className="text-xs font-semibold uppercase tracking-wider text-[#9ca3af]"
+        className="font-inter text-xs font-semibold uppercase tracking-widest text-chess-muted"
       >
         {label}
       </label>
@@ -46,10 +46,10 @@ export const DatePicker = ({ label, id, error, value = '', onChange, ...props })
         onChange={handleDateChange}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={hasError ? errorId : undefined}
-        className={`w-full bg-[#0d0e12] text-[#f3f4f6] font-inter px-4 py-3 rounded border text-sm transition-all duration-200 outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] focus:shadow-[0_0_8px_rgba(212,175,55,0.15)] ${
+        className={`w-full bg-chess-dark text-chess-text font-inter px-4 py-3 rounded-md border text-sm transition-colors outline-none focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold ${
           hasError
-            ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
-            : 'border-[#2d323f] hover:border-[#9ca3af]'
+            ? 'border-red-500/60 focus:border-red-500'
+            : 'border-chess-border focus:border-chess-gold'
         }`}
         {...props}
       />
@@ -57,7 +57,7 @@ export const DatePicker = ({ label, id, error, value = '', onChange, ...props })
         <span
           id={errorId}
           role="alert"
-          className="text-xs text-red-400 font-medium mt-0.5 animate-fade-in"
+          className="text-xs text-red-500 font-medium mt-0.5 animate-fade-in"
         >
           {error.message || error}
         </span>

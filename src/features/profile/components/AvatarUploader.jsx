@@ -76,15 +76,16 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 select-none">
+    <div className="flex flex-col items-center gap-4 select-none">
       {/* Circle Photo Container */}
       <div
         onClick={handleAvatarClick}
-        className={`w-28 h-28 rounded-full border-2 border-[#d4af37] flex items-center justify-center bg-[#0d0e12] text-[#d4af37] relative group ${
-          isUploading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer hover:border-[#f3cd57]'
-        } overflow-hidden shadow-lg transition-all duration-300`}
+        className={`w-28 h-28 rounded-md border-2 border-chess-gold flex items-center justify-center bg-chess-dark text-chess-gold relative group ${
+          isUploading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer hover:border-chess-gold-hover'
+        } overflow-hidden shadow-md transition-colors`}
         aria-label="Upload profile avatar"
         role="button"
+        tabIndex={0}
       >
         {previewUrl || currentAvatarUrl ? (
           <img
@@ -93,14 +94,14 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <span className="text-3xl font-bold tracking-wider">{initial}</span>
+          <span className="font-playfair text-4xl font-bold tracking-wider">{initial}</span>
         )}
 
         {/* Hover Camera Overlay */}
         {!isUploading && (
-          <div className="absolute inset-0 bg-[#0d0e12]/75 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition-opacity duration-300">
-            <Camera className="w-5 h-5 text-[#d4af37] animate-pulse" />
-            <span className="text-[10px] text-[#f3f4f6] font-semibold tracking-wider">
+          <div className="absolute inset-0 bg-chess-dark/75 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-opacity duration-300">
+            <Camera className="w-5 h-5 text-chess-gold animate-pulse" />
+            <span className="font-inter text-[10px] text-chess-text font-bold uppercase tracking-widest">
               {t('profile:change_photo')}
             </span>
           </div>
@@ -108,9 +109,9 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
 
         {/* Uploading Overlay */}
         {isUploading && (
-          <div className="absolute inset-0 bg-[#0d0e12]/80 flex flex-col items-center justify-center gap-1.5">
-            <RefreshCw className="w-5 h-5 text-[#d4af37] animate-spin" />
-            <span className="text-[9px] text-[#d4af37] font-semibold tracking-wider">
+          <div className="absolute inset-0 bg-chess-dark/80 flex flex-col items-center justify-center gap-1.5">
+            <RefreshCw className="w-5 h-5 text-chess-gold animate-spin" />
+            <span className="font-inter text-[9px] text-chess-gold font-bold uppercase tracking-widest">
               {uploadProgress !== null ? `${uploadProgress}%` : t('profile:uploading')}
             </span>
           </div>
@@ -129,15 +130,15 @@ export const AvatarUploader = ({ currentAvatarUrl, username, onUploadSuccess }) 
 
       {/* Progress Bar (Visible outside if uploading) */}
       {isUploading && uploadProgress !== null && (
-        <div className="w-32 bg-[#2d323f] h-1.5 rounded-full overflow-hidden border border-[#2d323f]">
+        <div className="w-32 bg-chess-border h-1.5 rounded-full overflow-hidden border border-chess-border">
           <div
-            className="bg-[#d4af37] h-full transition-all duration-300"
+            className="bg-chess-gold h-full transition-all duration-300"
             style={{ width: `${uploadProgress}%` }}
           />
         </div>
       )}
 
-      <p className="text-[10px] text-[#9ca3af] uppercase tracking-wider">
+      <p className="font-inter text-[10px] text-chess-muted uppercase tracking-widest font-semibold">
         {t('profile:supported_formats')}
       </p>
     </div>

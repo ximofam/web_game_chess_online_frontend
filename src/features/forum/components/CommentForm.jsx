@@ -43,17 +43,17 @@ export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
         {...register('content')}
         rows={parentId ? 2 : 3}
         placeholder={parentId ? t('forum:placeholder_reply') : t('forum:placeholder_comment')}
-        className="w-full bg-[#13161c] border border-[#2d323f] rounded-lg px-3 py-2 text-sm text-[#f3f4f6] placeholder:text-[#9ca3af]/60 focus:outline-none focus:border-[#d4af37]/50 resize-none"
+        className="w-full bg-chess-dark border border-chess-border rounded-lg px-3 py-2 text-sm font-inter text-chess-text placeholder-chess-muted focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold resize-none transition-colors"
       />
       {errors.content && (
-        <p className="text-xs text-red-400">{errors.content.message}</p>
+        <p className="text-xs font-inter text-red-500">{errors.content.message}</p>
       )}
       <div className="flex items-center gap-2 self-end">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-[#9ca3af] hover:text-[#f3f4f6] border border-[#2d323f] rounded-lg transition-colors focus:outline-none"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-inter font-semibold text-chess-muted hover:text-chess-text hover:border-chess-gold border border-chess-border bg-transparent rounded-lg transition-colors focus:outline-none"
           >
             <X className="w-3.5 h-3.5" />
             {t('forum:cancel')}
@@ -63,7 +63,7 @@ export default function CommentForm({ postId, parentId, onSubmit, onCancel }) {
           id={parentId ? `submit-reply-${parentId}` : `submit-comment-${postId}`}
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-[#d4af37] text-[#0d0e12] rounded-lg hover:bg-[#f3cd57] transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-inter font-bold bg-chess-gold text-chess-dark rounded-lg hover:bg-chess-gold-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none"
         >
           <Send className="w-3.5 h-3.5" />
           {isSubmitting ? t('forum:sending') : parentId ? t('forum:reply') : t('forum:comment')}

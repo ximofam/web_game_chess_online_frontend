@@ -14,10 +14,10 @@ function ToolbarBtn({ onClick, active, title, children }) {
       type="button"
       onClick={onClick}
       title={title}
-      className={`p-1.5 rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#d4af37] ${
+      className={`p-1.5 rounded-md transition-colors focus:outline-none focus:ring-1 focus:ring-chess-gold ${
         active
-          ? 'bg-[#d4af37]/20 text-[#d4af37]'
-          : 'text-[#9ca3af] hover:text-[#f3f4f6] hover:bg-[#2d323f]'
+          ? 'bg-chess-gold/20 text-chess-gold'
+          : 'text-chess-muted hover:text-chess-text hover:bg-chess-dark'
       }`}
     >
       {children}
@@ -52,7 +52,7 @@ export default function TiptapEditor({ onChange, placeholder }) {
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none min-h-[220px] p-4 focus:outline-none text-[#f3f4f6] text-sm leading-relaxed',
+        class: 'prose prose-invert max-w-none min-h-[220px] p-4 focus:outline-none font-inter text-chess-text text-sm leading-relaxed',
       },
     },
     onUpdate({ editor }) {
@@ -82,25 +82,25 @@ export default function TiptapEditor({ onChange, placeholder }) {
 
   const btn = (action, title, Icon, isActive = false) => (
     <ToolbarBtn onClick={action} active={isActive} title={title}>
-      <Icon className="w-3.5 h-3.5" />
+      <Icon className="w-4 h-4" />
     </ToolbarBtn>
   );
 
   return (
-    <div className="border border-[#2d323f] rounded-xl overflow-hidden bg-[#13161c] focus-within:border-[#d4af37]/50 transition-colors">
+    <div className="border border-chess-border rounded-lg overflow-hidden bg-chess-dark focus-within:border-chess-gold shadow-sm transition-colors relative">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-[#2d323f] bg-[#0d0e12]">
+      <div className="flex flex-wrap items-center gap-1 px-3 py-2 border-b border-chess-border bg-chess-surface">
         {btn(() => editor.chain().focus().toggleBold().run(), 'Bold', Bold, editor.isActive('bold'))}
         {btn(() => editor.chain().focus().toggleItalic().run(), 'Italic', Italic, editor.isActive('italic'))}
         {btn(() => editor.chain().focus().toggleStrike().run(), 'Strikethrough', Strikethrough, editor.isActive('strike'))}
-        <span className="w-px h-5 bg-[#2d323f] mx-1" />
+        <span className="w-px h-5 bg-chess-border mx-1.5" />
         {btn(() => editor.chain().focus().toggleHeading({ level: 2 }).run(), 'Heading', Heading2, editor.isActive('heading', { level: 2 }))}
         {btn(() => editor.chain().focus().toggleBulletList().run(), t('forum:bullet_list'), List, editor.isActive('bulletList'))}
         {btn(() => editor.chain().focus().toggleOrderedList().run(), t('forum:ordered_list'), ListOrdered, editor.isActive('orderedList'))}
         {btn(() => editor.chain().focus().toggleBlockquote().run(), t('forum:blockquote'), Quote, editor.isActive('blockquote'))}
-        <span className="w-px h-5 bg-[#2d323f] mx-1" />
+        <span className="w-px h-5 bg-chess-border mx-1.5" />
         <ToolbarBtn onClick={handleImageUpload} title={t('forum:add_image')}>
-          <ImagePlus className="w-3.5 h-3.5" />
+          <ImagePlus className="w-4 h-4" />
         </ToolbarBtn>
         <span className="flex-1" />
         {btn(() => editor.chain().focus().undo().run(), 'Undo', Undo)}
@@ -112,7 +112,7 @@ export default function TiptapEditor({ onChange, placeholder }) {
 
       {/* Placeholder shown when empty */}
       {editor.isEmpty && (
-        <p className="absolute top-[52px] left-4 text-sm text-[#9ca3af]/60 pointer-events-none select-none">
+        <p className="absolute top-[52px] left-4 text-sm font-inter text-chess-muted pointer-events-none select-none">
           {finalPlaceholder}
         </p>
       )}

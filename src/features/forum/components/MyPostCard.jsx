@@ -32,14 +32,14 @@ export default function MyPostCard({ post, onDelete }) {
     switch (st) {
       case 'APPROVED':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border bg-emerald-500/10 text-emerald-500 border-emerald-500/20 font-inter font-bold uppercase tracking-widest text-[10px]">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t('forum:approved')}
           </span>
         );
       case 'DENIED':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border bg-red-500/10 text-red-500 border-red-500/20 font-inter font-bold uppercase tracking-widest text-[10px]">
             <AlertCircle className="w-3.5 h-3.5" />
             {t('forum:denied')}
           </span>
@@ -47,7 +47,7 @@ export default function MyPostCard({ post, onDelete }) {
       case 'PENDING':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded border bg-yellow-500/10 text-yellow-500 border-yellow-500/20 font-inter font-bold uppercase tracking-widest text-[10px]">
             <Clock className="w-3.5 h-3.5 animate-spin" />
             {t('forum:pending')}
           </span>
@@ -65,16 +65,16 @@ export default function MyPostCard({ post, onDelete }) {
 
   return (
     <>
-      <div className="bg-[#161922] border border-[#2d323f] rounded-2xl p-5 hover:border-[#3b4254] transition-all flex flex-col justify-between gap-4">
+      <div className="bg-chess-surface border border-chess-border rounded-lg p-5 hover:border-chess-gold shadow-sm transition-colors flex flex-col justify-between gap-4">
         <div>
           {/* Header row: status + date */}
           <div className="flex items-center justify-between mb-2">
             <div>{getStatusBadge(post.status)}</div>
-            <span className="text-xs text-[#9ca3af]">{formattedDate}</span>
+            <span className="font-inter text-xs font-semibold text-chess-muted">{formattedDate}</span>
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-[#f3f4f6] line-clamp-2 hover:text-[#d4af37] transition-colors">
+          <h3 className="font-playfair text-lg font-bold text-chess-text line-clamp-2 hover:text-chess-gold transition-colors">
             {post.status === 'APPROVED' ? (
               <RouterLink to={`/forum/posts/${post.id}`}>{post.title}</RouterLink>
             ) : (
@@ -84,19 +84,19 @@ export default function MyPostCard({ post, onDelete }) {
         </div>
 
         {/* Footer row: metrics & actions */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#2d323f]/60 text-xs text-[#9ca3af]">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-chess-border font-inter text-xs text-chess-muted font-semibold">
           {/* Metrics */}
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1" title={t('forum:views')}>
-              <Eye className="w-4 h-4 text-[#9ca3af]" />
+            <span className="flex items-center gap-1.5" title={t('forum:views')}>
+              <Eye className="w-4 h-4 text-chess-muted" />
               {post.viewCount ?? 0}
             </span>
-            <span className="flex items-center gap-1" title={t('forum:likes')}>
-              <Heart className="w-4 h-4 text-[#9ca3af]" />
+            <span className="flex items-center gap-1.5" title={t('forum:likes')}>
+              <Heart className="w-4 h-4 text-chess-muted" />
               {post.likeCount ?? 0}
             </span>
-            <span className="flex items-center gap-1" title={t('forum:comment')}>
-              <MessageSquare className="w-4 h-4 text-[#9ca3af]" />
+            <span className="flex items-center gap-1.5" title={t('forum:comment')}>
+              <MessageSquare className="w-4 h-4 text-chess-muted" />
               {post.commentCount ?? 0}
             </span>
           </div>
@@ -107,10 +107,10 @@ export default function MyPostCard({ post, onDelete }) {
               id={`approval-info-btn-${post.id}`}
               onClick={handleOpenInfo}
               disabled={loadingDetails}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#2d323f] bg-[#1a1e29] hover:bg-[#252a36] text-[#e5e7eb] font-medium transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-chess-border bg-chess-dark hover:bg-chess-border/50 text-chess-text font-inter font-bold transition-colors disabled:opacity-50 focus:outline-none"
               title={t('forum:view_moderation_info')}
             >
-              <Info className="w-3.5 h-3.5 text-[#d4af37]" />
+              <Info className="w-3.5 h-3.5 text-chess-gold" />
               {t('forum:moderation')}
             </button>
 
@@ -118,10 +118,10 @@ export default function MyPostCard({ post, onDelete }) {
               <RouterLink
                 id={`view-public-post-${post.id}`}
                 to={`/forum/posts/${post.id}`}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#2d323f] bg-[#1a1e29] hover:bg-[#252a36] text-[#e5e7eb] font-medium transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-chess-border bg-chess-dark hover:bg-chess-border/50 text-chess-text font-inter font-bold transition-colors focus:outline-none"
                 title={t('forum:view_post')}
               >
-                <ExternalLink className="w-3.5 h-3.5 text-[#9ca3af]" />
+                <ExternalLink className="w-3.5 h-3.5 text-chess-muted" />
                 {t('forum:view')}
               </RouterLink>
             )}
@@ -129,7 +129,7 @@ export default function MyPostCard({ post, onDelete }) {
             <button
               id={`delete-post-btn-${post.id}`}
               onClick={() => onDelete(post.id, post.title)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-500 font-inter font-bold transition-colors focus:outline-none"
               title={t('forum:delete_post')}
             >
               <Trash2 className="w-3.5 h-3.5" />

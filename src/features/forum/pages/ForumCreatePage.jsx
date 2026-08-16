@@ -65,20 +65,20 @@ export default function ForumCreatePage() {
       {/* Back */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm text-[#9ca3af] hover:text-[#f3f4f6] mb-6 transition-colors focus:outline-none"
+        className="flex items-center gap-2 text-sm font-inter font-semibold text-chess-muted hover:text-chess-text mb-6 transition-colors focus:outline-none"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('forum:back_to_forum')}
       </button>
 
-      <div className="bg-[#1a1d24] border border-[#2d323f] rounded-2xl p-6 md:p-8">
-        <h1 className="font-playfair text-2xl font-bold text-[#f3f4f6] mb-6">{t('forum:create_new_post')}</h1>
+      <div className="bg-chess-surface border border-chess-border rounded-lg shadow-md p-6 md:p-8">
+        <h1 className="font-playfair text-2xl font-bold text-chess-text mb-6">{t('forum:create_new_post')}</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           {/* Title */}
           <div>
-            <label htmlFor="post-title" className="block text-xs font-semibold text-[#9ca3af] uppercase tracking-wider mb-2">
-              {t('forum:title_label')} <span className="text-red-400">*</span>
+            <label htmlFor="post-title" className="block text-xs font-inter font-semibold text-chess-muted uppercase tracking-widest mb-2">
+              {t('forum:title_label')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -87,37 +87,37 @@ export default function ForumCreatePage() {
                 maxLength={100}
                 placeholder={t('forum:title_placeholder')}
                 {...register('title')}
-                className="w-full bg-[#13161c] border border-[#2d323f] rounded-xl px-4 py-3 text-[#f3f4f6] text-sm placeholder:text-[#9ca3af]/60 focus:outline-none focus:border-[#d4af37]/50 transition-colors pr-16"
+                className="w-full bg-chess-dark border border-chess-border rounded-lg px-4 py-3 text-chess-text font-inter text-sm placeholder:text-chess-muted focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:border-chess-gold transition-colors pr-16"
               />
-              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] ${
-                titleValue.length > 90 ? 'text-yellow-400' : 'text-[#9ca3af]/60'
+              <span className={`absolute right-3 top-1/2 -translate-y-1/2 font-inter text-[10px] font-semibold ${
+                titleValue.length > 90 ? 'text-yellow-500' : 'text-chess-muted'
               }`}>
                 {titleValue.length}/100
               </span>
             </div>
-            {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title.message}</p>}
+            {errors.title && <p className="text-xs font-inter text-red-500 mt-1">{errors.title.message}</p>}
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-xs font-semibold text-[#9ca3af] uppercase tracking-wider mb-2">
-              {t('forum:content_label')} <span className="text-red-400">*</span>
+            <label className="block text-xs font-inter font-semibold text-chess-muted uppercase tracking-widest mb-2">
+              {t('forum:content_label')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <TiptapEditor onChange={setEditorContent} placeholder={t('forum:content_placeholder')} />
             </div>
-            {contentError && <p className="text-xs text-red-400 mt-1">{contentError}</p>}
-            <p className="text-[10px] text-[#9ca3af]/60 mt-1">
+            {contentError && <p className="text-xs font-inter text-red-500 mt-1">{contentError}</p>}
+            <p className="text-[10px] font-inter text-chess-muted mt-1">
               {t('forum:content_helper')}
             </p>
           </div>
 
           {/* Submit */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#2d323f]">
+          <div className="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-chess-border">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-4 py-2 text-sm font-semibold text-[#9ca3af] border border-[#2d323f] rounded-xl hover:text-[#f3f4f6] hover:border-[#f3f4f6]/20 transition-colors focus:outline-none"
+              className="px-4 py-2 text-sm font-inter font-semibold text-chess-muted border border-chess-border bg-transparent rounded-lg hover:text-chess-gold hover:border-chess-gold transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold"
             >
               {t('forum:cancel')}
             </button>
@@ -125,7 +125,7 @@ export default function ForumCreatePage() {
               id="submit-post-btn"
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 bg-[#d4af37] text-[#0d0e12] font-bold text-sm rounded-xl hover:bg-[#f3cd57] hover:shadow-[0_4px_14px_rgba(212,175,55,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none"
+              className="flex items-center gap-2 px-5 py-2 bg-chess-gold text-chess-dark font-inter font-bold text-sm rounded-lg hover:bg-chess-gold-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold"
             >
               <Send className="w-4 h-4" />
               {isSubmitting ? t('forum:publishing') : t('forum:publish')}

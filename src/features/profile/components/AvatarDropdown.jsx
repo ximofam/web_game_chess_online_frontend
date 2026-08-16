@@ -42,13 +42,13 @@ export const AvatarDropdown = ({ user, onClose, onLogout, className = "absolute 
   return (
     <div
       ref={dropdownRef}
-      className={`${className} w-64 bg-[#1a1d24] border border-[#2d323f] rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in text-left`}
+      className={`${className} w-64 bg-chess-surface border border-chess-border rounded-lg shadow-xl z-50 overflow-hidden animate-fade-in text-left`}
       role="menu"
       aria-label="User profile dropdown"
     >
       {/* Header Info */}
-      <div className="p-4 border-b border-[#2d323f] bg-[#13161c] flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full border border-[#d4af37]/60 bg-[#0d0e12] text-[#d4af37] flex items-center justify-center font-bold shrink-0 overflow-hidden select-none">
+      <div className="p-4 border-b border-chess-border bg-chess-dark flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full border border-chess-gold/60 bg-chess-dark text-chess-gold flex items-center justify-center font-bold shrink-0 overflow-hidden select-none">
           {user?.avatarUrl ? (
             <img
               src={user.avatarUrl}
@@ -56,17 +56,17 @@ export const AvatarDropdown = ({ user, onClose, onLogout, className = "absolute 
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-base font-bold">{initial}</span>
+            <span className="font-playfair text-xl font-bold">{initial}</span>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-[#f3f4f6] truncate">
+          <p className="font-inter text-sm font-bold text-chess-text truncate">
             {user?.username}
           </p>
-          <p className="text-xs text-[#9ca3af] truncate mb-1">
+          <p className="font-inter text-xs text-chess-muted truncate mb-1">
             {user?.email || (isGuestUser ? t('profile:anonymous_account') : '')}
           </p>
-          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider bg-[#d4af37]/10 text-[#d4af37] px-2 py-0.5 rounded-full font-semibold border border-[#d4af37]/30">
+          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest bg-chess-gold/10 text-chess-gold px-2 py-0.5 rounded font-inter font-bold border border-chess-gold/30">
             <Shield className="w-2.5 h-2.5" />
             {roleText}
           </span>
@@ -79,7 +79,7 @@ export const AvatarDropdown = ({ user, onClose, onLogout, className = "absolute 
           <Link
             to="/register"
             onClick={onClose}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 mx-2 my-1 text-sm font-semibold text-[#0d0e12] bg-[#d4af37] hover:bg-[#b59226] rounded-lg transition-all shadow-md cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 mx-2 my-1 text-sm font-inter font-bold text-chess-dark bg-chess-gold hover:bg-chess-gold-hover rounded-md transition-colors shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-chess-gold focus:ring-offset-2 focus:ring-offset-chess-dark"
             role="menuitem"
           >
             <UserPlus className="w-4 h-4" />
@@ -90,43 +90,43 @@ export const AvatarDropdown = ({ user, onClose, onLogout, className = "absolute 
         <Link
           to="/profile"
           onClick={onClose}
-          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-[#f3f4f6] hover:bg-[#2d323f]/50 hover:text-[#d4af37] transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-inter font-semibold text-chess-text hover:bg-chess-dark hover:text-chess-gold transition-colors focus:outline-none focus:bg-chess-dark focus:text-chess-gold"
           role="menuitem"
         >
-          <User className="w-4 h-4 text-[#d4af37]" />
+          <User className="w-4 h-4 text-chess-gold" />
           <span>{t('nav:profile')}</span>
         </Link>
         <Link
           to="/forum/my-posts"
           onClick={onClose}
-          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-[#f3f4f6] hover:bg-[#2d323f]/50 hover:text-[#d4af37] transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-inter font-semibold text-chess-text hover:bg-chess-dark hover:text-chess-gold transition-colors focus:outline-none focus:bg-chess-dark focus:text-chess-gold"
           role="menuitem"
         >
-          <FileText className="w-4 h-4 text-[#d4af37]" />
+          <FileText className="w-4 h-4 text-chess-gold" />
           <span>{t('profile:manage_posts')}</span>
         </Link>
         <Link
           to="/profile?edit=true"
           onClick={onClose}
-          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-[#f3f4f6] hover:bg-[#2d323f]/50 hover:text-[#d4af37] transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-inter font-semibold text-chess-text hover:bg-chess-dark hover:text-chess-gold transition-colors focus:outline-none focus:bg-chess-dark focus:text-chess-gold"
           role="menuitem"
         >
-          <Settings className="w-4 h-4 text-[#d4af37]" />
+          <Settings className="w-4 h-4 text-chess-gold" />
           <span>{t('profile:edit_profile')}</span>
         </Link>
       </div>
 
       {/* Footer / Logout */}
-      <div className="border-t border-[#2d323f] py-1 bg-[#13161c]/40">
+      <div className="border-t border-chess-border py-1 bg-chess-dark/40">
         <button
           onClick={() => {
             onClose();
             onLogout();
           }}
-          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-red-400 hover:bg-red-950/20 hover:text-red-300 transition-colors cursor-pointer text-left"
+          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-inter font-bold text-red-500 hover:bg-red-950/20 hover:text-red-400 transition-colors cursor-pointer text-left focus:outline-none focus:bg-red-950/20"
           role="menuitem"
         >
-          <LogOut className="w-4 h-4 text-red-400" />
+          <LogOut className="w-4 h-4 text-red-500" />
           <span>{t('nav:logout')}</span>
         </button>
       </div>

@@ -67,9 +67,7 @@ export default function RegisterPage() {
   return (
     <main className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-chess-dark">
       {/* LEFT PANE - Beautiful Chess Scene (Desktop Only) */}
-      <section className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-[#13161c] border-r border-chess-border relative flex-col items-center justify-between p-12 select-none">
-        {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#2d323f_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
+      <section className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-chess-dark border-r border-chess-border relative flex-col items-center justify-between p-12 select-none">
         
         {/* Championship Brand */}
         <div className="w-full flex items-center gap-2.5 z-10">
@@ -81,10 +79,9 @@ export default function RegisterPage() {
 
         {/* Hero visual */}
         <div className="flex flex-col items-center justify-center text-center z-10 my-auto">
-          {/* Glowing float Chess piece SVG */}
-          <div className="w-48 h-48 mb-8 relative flex items-center justify-center animate-pulse duration-[3000ms]">
-            <div className="absolute inset-0 bg-chess-gold/10 rounded-full blur-3xl" />
-            <svg viewBox="0 0 24 24" className="w-36 h-36 fill-chess-gold/90 drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">
+          {/* Static flat Chess piece SVG */}
+          <div className="w-48 h-48 mb-8 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" className="w-36 h-36 fill-chess-gold opacity-90">
               <path d="M19 22H5v-2h14v2M12 2C8.69 2 6 4.69 6 8c0 1.2.35 2.3 1 3.25V13c0 2 1.5 3.5 3.5 3.5.3 0 .5.1.7.3.2.2.3.4.3.7v1.5H8.5v2h7v-2H13.5v-1.5c0-.3.1-.5.3-.7.2-.2.4-.3.7-.3 2 0 3.5-1.5 3.5-3.5v-1.75c.65-.95 1-2.05 1-3.25 0-3.31-2.69-6-6-6m0 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m-2.5 8c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .3-.1.5-.3.7-.2.2-.4.3-.7.3h-1c-.55 0-1-.45-1-1z" />
             </svg>
           </div>
@@ -92,13 +89,13 @@ export default function RegisterPage() {
           <blockquote className="font-playfair italic text-2xl text-chess-text max-w-md mb-2 leading-relaxed">
             &quot;Every chess master was once a beginner.&quot;
           </blockquote>
-          <cite className="text-xs uppercase tracking-widest text-chess-muted not-italic font-semibold">
+          <cite className="text-xs uppercase tracking-widest text-chess-muted not-italic font-inter font-semibold">
             — Chernev
           </cite>
         </div>
 
         {/* Tournament Meta */}
-        <div className="w-full flex items-center justify-between text-xs text-chess-muted z-10">
+        <div className="w-full flex items-center justify-between text-xs text-chess-muted z-10 font-inter">
           <span>{t('auth:series_2026', 'SERIES 2026')}</span>
           <span>{t('auth:online_chess_lobby', 'ONLINE CHESS LOBBY')}</span>
         </div>
@@ -106,7 +103,7 @@ export default function RegisterPage() {
 
       {/* RIGHT PANE - Form Card */}
       <section className="flex lg:col-span-6 xl:col-span-5 flex-col justify-center items-center px-6 py-12 md:px-12 relative">
-        <div className="w-full max-w-md bg-chess-surface border border-chess-border/80 p-8 rounded-xl shadow-2xl relative">
+        <div className="w-full max-w-md bg-chess-surface border border-chess-border p-8 rounded-lg shadow-md relative">
           
           {/* Header Mobile Brand logo */}
           <div className="flex lg:hidden items-center justify-center gap-2 mb-6">
@@ -133,7 +130,7 @@ export default function RegisterPage() {
               role="alert"
             >
               <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{serverError.response?.data?.message || t('common:something_went_wrong')}</span>
+              <span className="font-inter">{serverError.response?.data?.message || t('common:something_went_wrong')}</span>
             </div>
           )}
 
@@ -204,7 +201,7 @@ export default function RegisterPage() {
               id="register-submit-btn"
               type="submit"
               disabled={isPending}
-              className="w-full bg-chess-gold text-chess-dark font-semibold py-3 px-4 rounded transition-all duration-300 hover:bg-chess-gold-hover hover:shadow-[0_4px_12px_rgba(212,175,55,0.25)] focus:outline-none focus:ring-2 focus:ring-chess-gold focus:ring-offset-2 focus:ring-offset-chess-surface disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer mt-6"
+              className="w-full bg-chess-gold text-chess-dark font-inter font-bold py-3 px-4 rounded transition-colors duration-200 hover:bg-chess-gold-hover focus:outline-none focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-chess-gold focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer mt-6"
             >
               {isPending ? (
                 <>
@@ -221,7 +218,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Footer Navigation */}
-          <div className="text-center mt-6 text-xs text-chess-muted">
+          <div className="text-center mt-6 text-xs text-chess-muted font-inter">
             {t('auth:already_have_account')}{' '}
             <Link
               to="/login"
