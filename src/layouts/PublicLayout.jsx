@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../shared/components/Sidebar/Sidebar';
 import Header from '../shared/components/Header';
 import Footer from '../shared/components/Footer';
@@ -11,6 +11,8 @@ import FloatingRoomWidget from '../features/rooms/components/FloatingRoomWidget'
  */
 export const PublicLayout = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+  const isRoomRoute = location.pathname.startsWith('/room/');
 
   return (
     <div className="w-full h-screen bg-[#0d0e12] text-[#f3f4f6] flex select-none relative overflow-hidden">
@@ -20,13 +22,13 @@ export const PublicLayout = () => {
       />
       
       <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden relative">
-        <Header onOpenSidebar={() => setIsMobileSidebarOpen(true)} />
+        {!isRoomRoute && <Header onOpenSidebar={() => setIsMobileSidebarOpen(true)} />}
         
-        <div className="flex-1 overflow-y-auto flex flex-col relative">
+        <div className={`flex-1 flex flex-col relative ${isRoomRoute ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           <main className="flex-1 flex flex-col">
             <Outlet />
           </main>
-          <Footer />
+          {!isRoomRoute && <Footer />}
         </div>
       </div>
       

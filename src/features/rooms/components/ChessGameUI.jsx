@@ -169,10 +169,13 @@ export function ChessGameUI({ room, handleReady, handleConfirmLeave, isReadyPend
   return (
     <div className="flex flex-col h-full w-full animate-in fade-in zoom-in-95 duration-300">
       {/* Chess Board Area */}
-      <div className="flex-1 flex items-center justify-center min-h-0 w-full relative py-1 sm:py-2">
+      <div 
+        className="flex-1 flex items-center justify-center min-h-0 w-full relative p-2 sm:p-4"
+        style={{ containerType: 'size' }}
+      >
         <div 
           className="bg-[#13161c] rounded-2xl border border-[#2d323f] p-2 sm:p-3 shadow-xl relative overflow-hidden flex items-center justify-center"
-          style={{ height: '100%', maxWidth: '100%', aspectRatio: '1 / 1' }}
+          style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}
         >
           {/* Subtle background glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#d4af37]/5 rounded-full blur-[100px] pointer-events-none" />

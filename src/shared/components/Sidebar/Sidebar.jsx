@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Home, MessageSquare, BookOpen, ChevronLeft, ChevronRight, X
+  Home, MessageSquare, BookOpen, ChevronLeft, ChevronRight, X,
+  LogIn, UserCheck, Loader2
 } from 'lucide-react';
+import { useAuth } from '../../../features/auth/context/AuthContext';
+import { useNotifications } from '../../../features/notifications/context/NotificationContext';
+import NavbarAvatar from '../../../features/profile/components/NavbarAvatar';
+import AvatarDropdown from '../../../features/profile/components/AvatarDropdown';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -12,8 +17,15 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
 );
 
 export const Sidebar = ({ isOpen, onClose }) => {
-  const { t } = useTranslation(['nav']);
+  const { t } = useTranslation(['nav', 'auth']);
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const { currentUser, isAuthenticated, logout, loginGuest, showToast } = useAuth();
+  const { connectionStatus } = useNotifications();
+  
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
 
   // Desktop sidebar state
   const [isExpanded, setIsExpanded] = useState(() => {
@@ -31,6 +43,20 @@ export const Sidebar = ({ isOpen, onClose }) => {
       onClose();
     }
   }, [location.pathname, isOpen, onClose]);
+
+  const handlePlayAsGuest = async () => {
+    if (isGuestLoading) return;
+    setIsGuestLoading(true);
+    try {
+      await loginGuest();
+      showToast(t('auth:guest_welcome_toast', 'Welcome, Guest!'), 'success');
+      navigate('/dashboard');
+    } catch {
+      showToast(t('auth:guest_failed_toast', 'Failed to login as guest'), 'error');
+    } finally {
+      setIsGuestLoading(false);
+    }
+  };
 
   const isHomeActive = location.pathname === '/' || location.pathname === '/dashboard';
   const isLearnActive = location.pathname.startsWith('/learn');
@@ -103,8 +129,56 @@ export const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        {/* Bottom Section (Collapse Button only) */}
-        <div className="p-3 border-t border-chess-border flex flex-col shrink-0">
+        {/* Bottom Section */}
+        <div className="p-3 border-t border-chess-border flex flex-col shrink-0 gap-3">
+          
+          {/* Auth Section */}
+          {isAuthenticated ? (
+            <div className={`relative flex items-center justify-center ${!isExpanded ? 'w-full' : ''}`}>
+              <NavbarAvatar
+                src={currentUser?.avatarUrl}
+                username={currentUser?.username}
+                isOnline={connectionStatus === 'CONNECTED'}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              />
+              {isExpanded && (
+                <div className="ml-3 flex-1 min-w-0 overflow-hidden">
+                  <p className="font-inter text-sm font-bold text-chess-text truncate">{currentUser?.username}</p>
+                  <p className="font-inter text-xs text-chess-muted truncate">{currentUser?.email || (currentUser?.isGuest || currentUser?.role === 'GUEST' ? t('profile:anonymous_account') : '')}</p>
+                </div>
+              )}
+              {isDropdownOpen && (
+                <AvatarDropdown
+                  user={currentUser}
+                  onClose={() => setIsDropdownOpen(false)}
+                  onLogout={logout}
+                  className="absolute bottom-full left-0 mb-3 ml-2 lg:ml-0"
+                />
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handlePlayAsGuest}
+                disabled={isGuestLoading}
+                title={!isExpanded ? t('nav:play_as_guest') : undefined}
+                className={`flex items-center justify-center gap-2 bg-chess-gold text-chess-dark hover:bg-chess-gold-hover disabled:opacity-50 disabled:cursor-not-allowed font-inter font-bold text-sm p-2 rounded-lg transition-colors cursor-pointer focus:outline-none ${!isExpanded ? 'p-2' : 'px-3 py-2'}`}
+              >
+                {isGuestLoading ? <Loader2 className="w-5 h-5 animate-spin shrink-0" /> : <UserCheck className="w-5 h-5 shrink-0" />}
+                {isExpanded && <span className="whitespace-nowrap">{t('nav:play_as_guest')}</span>}
+              </button>
+
+              <Link
+                to="/login"
+                title={!isExpanded ? t('nav:login') : undefined}
+                className={`flex items-center justify-center gap-2 text-chess-text hover:text-chess-gold hover:bg-chess-surface border border-transparent hover:border-chess-border font-inter font-semibold text-sm p-2 transition-colors cursor-pointer focus:outline-none rounded-lg ${!isExpanded ? 'p-2' : 'px-3 py-2'}`}
+              >
+                <LogIn className="w-5 h-5 shrink-0" />
+                {isExpanded && <span className="whitespace-nowrap">{t('nav:login')}</span>}
+              </Link>
+            </div>
+          )}
+
           {/* Desktop Toggle Button */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}

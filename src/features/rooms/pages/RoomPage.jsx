@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate, useBlocker } from 'react-router-dom';
-import { AlertCircle, ShieldAlert, Minimize2, X, Loader2, LogOut, Copy, Check } from 'lucide-react';
+import { AlertCircle, ShieldAlert, Minimize2, X, Loader2, LogOut } from 'lucide-react';
 import { useRoomContext } from '../context/RoomContext';
 
 import { RoomWaiting } from '../components/RoomWaiting';
@@ -36,7 +36,6 @@ export function RoomPage() {
   }, [deletedRoomId, roomId, navigate]);
 
   const [isReadyPending, setIsReadyPending] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [postGameAcknowledged, setPostGameAcknowledged] = useState(false);
 
   useEffect(() => {
@@ -44,14 +43,6 @@ export function RoomPage() {
       setPostGameAcknowledged(false);
     }
   }, [room?.status]);
-
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/room/${roomId}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    showToast(t('room:copyLinkSuccess', 'Đã sao chép liên kết phòng!'), 'success');
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // Blocker to intercept navigation attempts (Back button, links, etc.)
   const blocker = useBlocker(
@@ -170,7 +161,7 @@ export function RoomPage() {
 
   return (
     <>
-      <div className="container mx-auto px-2 sm:px-4 max-w-[1400px] flex flex-col h-[calc(100dvh-64px)] overflow-hidden py-2 sm:py-4 gap-4">
+      <div className="container mx-auto px-2 sm:px-4 max-w-[1400px] flex flex-col h-full overflow-hidden py-2 sm:py-4 gap-4">
         {/* ROOM HEADER */}
         <RoomHeader room={room} onMinimize={handleConfirmMinimize} />
 

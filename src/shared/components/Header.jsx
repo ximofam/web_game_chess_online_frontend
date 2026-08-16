@@ -1,12 +1,8 @@
-import { useState } from 'react';
-import { Menu, LogIn, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+
+import { Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import NotificationBell from '../../features/notifications/components/NotificationBell';
-import NavbarAvatar from '../../features/profile/components/NavbarAvatar';
-import AvatarDropdown from '../../features/profile/components/AvatarDropdown';
 import { useAuth } from '../../features/auth/context/AuthContext';
-import { useNotifications } from '../../features/notifications/context/NotificationContext';
+import NotificationBell from '../../features/notifications/components/NotificationBell';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
@@ -17,25 +13,7 @@ const GithubIcon = ({ className = "w-5 h-5" }) => (
 
 export const Header = ({ onOpenSidebar }) => {
   const { t } = useTranslation(['nav', 'auth']);
-  const { currentUser, isAuthenticated, logout, loginGuest, showToast } = useAuth();
-  const { connectionStatus } = useNotifications();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isGuestLoading, setIsGuestLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handlePlayAsGuest = async () => {
-    if (isGuestLoading) return;
-    setIsGuestLoading(true);
-    try {
-      await loginGuest();
-      showToast(t('auth:guest_welcome_toast'), 'success');
-      navigate('/dashboard');
-    } catch {
-      showToast(t('auth:guest_failed_toast'), 'error');
-    } finally {
-      setIsGuestLoading(false);
-    }
-  };
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="w-full h-16 border-b border-chess-border bg-chess-dark px-4 lg:px-6 flex items-center justify-between shrink-0 select-none z-40 transition-colors">
@@ -63,53 +41,10 @@ export const Header = ({ onOpenSidebar }) => {
         <div className="hidden sm:block">
           <LanguageSwitcher />
         </div>
-
-        {isAuthenticated ? (
+        
+        {isAuthenticated && (
           <div className="flex items-center gap-4 lg:gap-5 relative">
             <NotificationBell />
-            <div className="relative">
-              <NavbarAvatar
-                src={currentUser?.avatarUrl}
-                username={currentUser?.username}
-                isOnline={connectionStatus === 'CONNECTED'}
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              />
-              {isDropdownOpen && (
-                <AvatarDropdown
-                  user={currentUser}
-                  onClose={() => setIsDropdownOpen(false)}
-                  onLogout={logout}
-                  className="absolute right-0 top-full mt-2"
-                />
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 lg:gap-3">
-            <button
-              onClick={handlePlayAsGuest}
-              disabled={isGuestLoading}
-              className="flex items-center justify-center gap-2 bg-chess-gold text-chess-dark hover:bg-chess-gold-hover disabled:opacity-50 disabled:cursor-not-allowed font-inter font-bold text-sm px-3 lg:px-4 py-2 rounded-lg transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-chess-gold"
-            >
-              {isGuestLoading ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <UserCheck className="w-4 h-4 shrink-0" />}
-              <span className="hidden sm:inline-block whitespace-nowrap">{t('nav:play_as_guest')}</span>
-            </button>
-
-            <Link
-              to="/login"
-              className="flex items-center justify-center gap-2 text-chess-text hover:text-chess-gold font-inter font-semibold text-sm px-2 lg:px-4 py-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-chess-gold rounded-lg"
-            >
-              <LogIn className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline-block whitespace-nowrap">{t('nav:login')}</span>
-            </Link>
-            
-            <Link
-              to="/register"
-              className="hidden md:flex items-center justify-center gap-2 bg-chess-surface border border-chess-border hover:border-chess-gold text-chess-text font-inter font-semibold text-sm px-4 py-2 rounded-lg transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-chess-gold"
-            >
-              <UserPlus className="w-4 h-4 text-chess-gold shrink-0" />
-              <span className="whitespace-nowrap">{t('nav:register')}</span>
-            </Link>
           </div>
         )}
       </div>
