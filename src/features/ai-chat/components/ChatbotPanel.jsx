@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, SquarePen, Menu, Sparkles, RefreshCw, ArrowLeft, Minus } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { X, SquarePen, Menu, Sparkles, RefreshCw, ArrowLeft, Minus, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useChatbot } from '../context/ChatbotContext';
+import { groupItemsByDate } from '../../../shared/utils/dateUtils';
 import ChatInput from './ChatInput';
 import ChatMessage from './ChatMessage';
 
@@ -14,7 +15,26 @@ const MOCK_SUGGESTIONS = [
 
 const ChatbotPanel = () => {
   const { t } = useTranslation(['chatbot']);
-  const { isOpen, isMinimized, minimizeChat, restoreChat, closeChat, messages, isGenerating, error, handleSend, handleNewChat } = useChatbot();
+  const { 
+    isOpen, 
+    isMinimized, 
+    minimizeChat, 
+    restoreChat, 
+    closeChat, 
+    messages, 
+    messagesLoading,
+    messagesError,
+    isGenerating, 
+    error, 
+    handleSend, 
+    handleNewChat,
+    sessions,
+    sessionsLoading,
+    sessionsError,
+    activeSessionId,
+    selectSession
+  } = useChatbot();
+  
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -24,11 +44,20 @@ const ChatbotPanel = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isGenerating]);
+  }, [messages, isGenerating, messagesLoading]);
 
   const toggleHistory = () => {
     setShowHistory(!showHistory);
   };
+
+  const handleSelectSession = (sessionId) => {
+    selectSession(sessionId);
+    setShowHistory(false);
+  };
+
+  const groupedSessions = useMemo(() => {
+    return groupItemsByDate(sessions, 'created_at');
+  }, [sessions]);
 
   if (!isOpen) return null;
 
@@ -123,28 +152,88 @@ const ChatbotPanel = () => {
               </div>
             </div>
             <div className="p-2 space-y-1 overflow-y-auto h-[calc(100%-3.5rem)]">
-              <div className="px-2 py-1.5 text-xs font-semibold text-chess-muted uppercase tracking-wider mt-2">
-                {t('chatbot:today')}
-              </div>
-              <button className="w-full text-left px-3 py-2 rounded text-sm text-chess-text hover:bg-chess-dark truncate">
-                How does castling work?
-              </button>
-              <button className="w-full text-left px-3 py-2 rounded text-sm text-chess-text hover:bg-chess-dark truncate">
-                Magnus Carlsen
-              </button>
-              <div className="px-2 py-1.5 text-xs font-semibold text-chess-muted uppercase tracking-wider mt-4">
-                {t('chatbot:yesterday')}
-              </div>
-              <button className="w-full text-left px-3 py-2 rounded text-sm text-chess-text hover:bg-chess-dark truncate">
-                En passant explanation
-              </button>
+              {sessionsLoading && sessions.length === 0 ? (
+                <div className="flex justify-center p-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-chess-gold" />
+                </div>
+              ) : sessionsError ? (
+                <div className="p-4 text-center text-sm text-red-400">
+                  {sessionsError}
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="p-4 text-center text-sm text-chess-muted">
+                  {t('chatbot:empty_history')}
+                </div>
+              ) : (
+                <>
+                  {groupedSessions.today.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-chess-muted uppercase tracking-wider mt-2">
+                        {t('chatbot:today')}
+                      </div>
+                      {groupedSessions.today.map((session) => (
+                        <button
+                          key={session.id}
+                          onClick={() => handleSelectSession(session.id)}
+                          className={`w-full text-left px-3 py-2 rounded text-sm truncate transition-colors ${activeSessionId === session.id ? 'bg-chess-dark text-chess-gold' : 'text-chess-text hover:bg-chess-dark'}`}
+                          title={session.title}
+                        >
+                          {session.title || t('chatbot:generating_title')}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                  {groupedSessions.yesterday.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-chess-muted uppercase tracking-wider mt-4">
+                        {t('chatbot:yesterday')}
+                      </div>
+                      {groupedSessions.yesterday.map((session) => (
+                        <button
+                          key={session.id}
+                          onClick={() => handleSelectSession(session.id)}
+                          className={`w-full text-left px-3 py-2 rounded text-sm truncate transition-colors ${activeSessionId === session.id ? 'bg-chess-dark text-chess-gold' : 'text-chess-text hover:bg-chess-dark'}`}
+                          title={session.title}
+                        >
+                          {session.title || t('chatbot:generating_title')}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                  {groupedSessions.older.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-chess-muted uppercase tracking-wider mt-4">
+                        {t('chatbot:older')}
+                      </div>
+                      {groupedSessions.older.map((session) => (
+                        <button
+                          key={session.id}
+                          onClick={() => handleSelectSession(session.id)}
+                          className={`w-full text-left px-3 py-2 rounded text-sm truncate transition-colors ${activeSessionId === session.id ? 'bg-chess-dark text-chess-gold' : 'text-chess-text hover:bg-chess-dark'}`}
+                          title={session.title}
+                        >
+                          {session.title || t('chatbot:generating_title')}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 ? (
+          {messagesLoading ? (
+            <div className="h-full flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-chess-gold" />
+            </div>
+          ) : messagesError ? (
+            <div className="h-full flex items-center justify-center text-sm text-red-400">
+              {messagesError}
+            </div>
+          ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center max-w-[280px] mx-auto space-y-5">
               <div className="w-12 h-12 rounded-full bg-chess-surface border border-chess-border flex items-center justify-center text-chess-gold mb-1">
                 <Sparkles className="w-6 h-6" />
@@ -169,7 +258,7 @@ const ChatbotPanel = () => {
           ) : (
             <>
               {messages.map((msg, idx) => (
-                <ChatMessage key={idx} role={msg.role} content={msg.content} />
+                <ChatMessage key={msg.id || idx} role={msg.role} content={msg.content} />
               ))}
               {isGenerating && (
                 <div className="flex items-start gap-3 w-full">
@@ -188,7 +277,7 @@ const ChatbotPanel = () => {
                   <p className="text-sm text-red-200">{t('chatbot:error_message')}</p>
                   <button 
                     className="text-xs text-chess-gold hover:underline self-start flex items-center gap-1"
-                    onClick={() => handleSend(messages[messages.length-1].content)}
+                    onClick={() => handleSend(messages[messages.length-1]?.content || '')}
                   >
                     <RefreshCw className="w-3 h-3" />
                     {t('chatbot:retry')}
@@ -203,7 +292,7 @@ const ChatbotPanel = () => {
 
       {/* Input Area */}
       <div className="p-3 bg-chess-dark shrink-0 border-t border-chess-border/50">
-        <ChatInput onSend={handleSend} disabled={isGenerating} />
+        <ChatInput onSend={handleSend} disabled={isGenerating || messagesLoading} />
       </div>
     </div>
   );

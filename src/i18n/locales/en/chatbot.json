@@ -11,6 +11,8 @@
   "chat_history": "Chat History",
   "today": "Today",
   "yesterday": "Yesterday",
+  "older": "Older",
+  "empty_history": "No recent chats.",
   "error_message": "Something went wrong. Please try again.",
   "retry": "Retry",
   "generating_title": "Generating title...",

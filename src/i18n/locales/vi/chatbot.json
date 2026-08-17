@@ -11,6 +11,8 @@
   "chat_history": "Lịch sử trò chuyện",
   "today": "Hôm nay",
   "yesterday": "Hôm qua",
+  "older": "Cũ hơn",
+  "empty_history": "Không có đoạn chat gần đây.",
   "error_message": "Đã xảy ra lỗi. Vui lòng thử lại.",
   "retry": "Thử lại",
   "generating_title": "Đang tạo tiêu đề...",

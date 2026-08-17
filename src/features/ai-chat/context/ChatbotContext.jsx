@@ -1,15 +1,75 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { chatService } from '../services/chatService';
+
 /* eslint-disable react-refresh/only-export-components */
 
 const ChatbotContext = createContext(null);
 
 export const ChatbotProvider = ({ children }) => {
+  // UI State
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState(null);
 
+  // Sessions State
+  const [sessions, setSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [sessionsError, setSessionsError] = useState(null);
+  
+  // Current Conversation State
+  const [activeSessionId, setActiveSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesError, setMessagesError] = useState(null);
+  
+  // Message Sending State
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState(null); // General error for sending
+
+  // Fetch Sessions
+  const fetchSessions = useCallback(async (page = 1, size = 20, silent = false) => {
+    if (!silent) setSessionsLoading(true);
+    setSessionsError(null);
+    try {
+      const data = await chatService.listChatSessions({ page, size });
+      setSessions(data.items || []);
+    } catch (_err) {
+      setSessionsError('Failed to load chat history.');
+    } finally {
+      if (!silent) setSessionsLoading(false);
+    }
+  }, []);
+
+  // Fetch Messages for a specific session
+  const fetchMessages = useCallback(async (sessionId) => {
+    setMessagesLoading(true);
+    setMessagesError(null);
+    try {
+      const data = await chatService.getChatMessages(sessionId);
+      setMessages(data.items || []);
+    } catch (_err) {
+      setMessagesError('Failed to load messages.');
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, []);
+
+  // Select a session from history
+  const selectSession = useCallback((sessionId) => {
+    setActiveSessionId(sessionId);
+    setMessages([]); // Clear current
+    fetchMessages(sessionId);
+  }, [fetchMessages]);
+
+  // Load initial history when chat is first opened
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
+  useEffect(() => {
+    if (isOpen && !hasLoadedHistory) {
+      fetchSessions();
+      setHasLoadedHistory(true);
+    }
+  }, [isOpen, hasLoadedHistory, fetchSessions]);
+
+  // UI Handlers
   const toggleChat = useCallback(() => {
     setIsOpen(prev => !prev);
     setIsMinimized(false);
@@ -33,29 +93,64 @@ export const ChatbotProvider = ({ children }) => {
     setIsMinimized(false);
   }, []);
 
-  const handleSend = useCallback((text) => {
-    if (!text.trim()) return;
-    setError(null);
-    setMessages((prev) => [...prev, { role: 'user', content: text }]);
-    setIsGenerating(true);
-
-    // Mock API call
-    setTimeout(() => {
-      setIsGenerating(false);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'ai',
-          content: "Here is a simulated response about chess. En passant is a special pawn capture that can occur when a pawn moves two squares from its starting position.",
-        },
-      ]);
-    }, 1500);
-  }, []);
-
   const handleNewChat = useCallback(() => {
+    setActiveSessionId(null);
     setMessages([]);
     setError(null);
+    setMessagesError(null);
   }, []);
+
+  // Send Message
+  const handleSend = useCallback(async (text) => {
+    if (!text.trim()) return;
+    setError(null);
+    
+    // Optimistic user message
+    const optimisticUserMsg = { id: Date.now().toString(), role: 'user', content: text, created_at: new Date().toISOString() };
+    setMessages((prev) => [...prev, optimisticUserMsg]);
+    setIsSending(true);
+
+    try {
+      let currentSessionId = activeSessionId;
+      let isFirstMessage = false;
+
+      // Lazy Session Creation
+      if (!currentSessionId) {
+        const sessionData = await chatService.createChatSession();
+        currentSessionId = sessionData.session_id;
+        setActiveSessionId(currentSessionId);
+        isFirstMessage = true;
+      }
+
+      // Send the actual message
+      const response = await chatService.sendChatMessage(currentSessionId, text);
+      
+      const assistantMsg = { 
+        id: Date.now().toString() + '-ai', 
+        role: 'assistant', 
+        content: response.answer, 
+        question_type: response.question_type,
+        created_at: new Date().toISOString()
+      };
+      
+      setMessages((prev) => [...prev, assistantMsg]);
+
+      // If this was the first message, refresh sessions to capture the generated title
+      if (isFirstMessage) {
+        // Immediate refresh to show the new session (even if title is default)
+        fetchSessions(1, 20, true);
+        // Delayed refresh to get the asynchronous title generated by backend
+        setTimeout(() => {
+          fetchSessions(1, 20, true);
+        }, 3000);
+      }
+
+    } catch (_err) {
+      setError('Failed to send message.');
+    } finally {
+      setIsSending(false);
+    }
+  }, [activeSessionId, fetchSessions]);
 
   const value = {
     isOpen,
@@ -65,9 +160,23 @@ export const ChatbotProvider = ({ children }) => {
     openChat,
     minimizeChat,
     restoreChat,
+    
+    sessions,
+    sessionsLoading,
+    sessionsError,
+    fetchSessions,
+    
+    activeSessionId,
+    selectSession,
+    
     messages,
-    isGenerating,
+    messagesLoading,
+    messagesError,
+    
+    isGenerating: isSending,
+    isSending,
     error,
+    
     handleSend,
     handleNewChat,
     setError
