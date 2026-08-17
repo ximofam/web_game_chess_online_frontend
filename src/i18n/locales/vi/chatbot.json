@@ -1,0 +1,21 @@
+{
+  "ask_ai": "Hỏi AI Cờ Vua",
+  "ai_name": "AI Cờ Vua",
+  "ai_description": "Người bạn đồng hành cờ vua cá nhân của bạn.",
+  "online": "Trực tuyến",
+  "placeholder": "Hỏi bất cứ điều gì về cờ vua...",
+  "new_chat": "Đoạn chat mới",
+  "close": "Đóng",
+  "minimize": "Thu nhỏ",
+  "open": "Mở",
+  "chat_history": "Lịch sử trò chuyện",
+  "today": "Hôm nay",
+  "yesterday": "Hôm qua",
+  "error_message": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "retry": "Thử lại",
+  "generating_title": "Đang tạo tiêu đề...",
+  "suggestion_1": "Nhập thành hoạt động như thế nào?",
+  "suggestion_2": "Magnus Carlsen là ai?",
+  "suggestion_3": "Giải thích Phòng thủ Sicilian",
+  "suggestion_4": "Bắt tốt qua đường là gì?"
+}

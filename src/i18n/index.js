@@ -15,6 +15,7 @@ import notificationsEn from './locales/en/notifications.json';
 import roomEn from './locales/en/room.json';
 import gameEn from './locales/en/game.json';
 import errorEn from './locales/en/error.json';
+import chatbotEn from './locales/en/chatbot.json';
 
 // VI
 import commonVi from './locales/vi/common.json';
@@ -29,6 +30,7 @@ import notificationsVi from './locales/vi/notifications.json';
 import roomVi from './locales/vi/room.json';
 import gameVi from './locales/vi/game.json';
 import errorVi from './locales/vi/error.json';
+import chatbotVi from './locales/vi/chatbot.json';
 
 const resources = {
   en: {
@@ -44,6 +46,7 @@ const resources = {
     room: roomEn,
     game: gameEn,
     error: errorEn,
+    chatbot: chatbotEn,
   },
   vi: {
     common: commonVi,
@@ -58,13 +61,14 @@ const resources = {
     room: roomVi,
     game: gameVi,
     error: errorVi,
+    chatbot: chatbotVi,
   },
 };
 
 const namespaces = [
   'common', 'nav', 'auth', 'home', 'learn', 
   'chess', 'forum', 'profile', 'notifications', 
-  'room', 'game', 'error'
+  'room', 'game', 'error', 'chatbot'
 ];
 
 i18n

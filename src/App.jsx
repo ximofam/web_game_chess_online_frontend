@@ -25,6 +25,9 @@ import GlobalApiErrorHandler from './shared/errors/components/GlobalApiErrorHand
 import NotFoundPage from './shared/errors/pages/NotFoundPage';
 import ForbiddenPage from './shared/errors/pages/ForbiddenPage';
 
+import { ChatbotProvider } from './features/ai-chat/context/ChatbotContext';
+import ChatbotPanel from './features/ai-chat/components/ChatbotPanel';
+
 // Create a client for TanStack Query
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,8 +54,11 @@ const router = createBrowserRouter([
           <PresenceProvider>
             <NotificationProvider>
               <RoomProvider>
-                <GlobalApiErrorHandler />
-                <Outlet />
+                <ChatbotProvider>
+                  <GlobalApiErrorHandler />
+                  <Outlet />
+                  <ChatbotPanel />
+                </ChatbotProvider>
               </RoomProvider>
             </NotificationProvider>
           </PresenceProvider>

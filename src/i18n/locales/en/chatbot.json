@@ -1,0 +1,21 @@
+{
+  "ask_ai": "Ask Chess AI",
+  "ai_name": "Chess AI",
+  "ai_description": "Your personal chess companion.",
+  "online": "Online",
+  "placeholder": "Ask anything about chess...",
+  "new_chat": "New chat",
+  "close": "Close",
+  "minimize": "Minimize",
+  "open": "Open",
+  "chat_history": "Chat History",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "error_message": "Something went wrong. Please try again.",
+  "retry": "Retry",
+  "generating_title": "Generating title...",
+  "suggestion_1": "How does castling work?",
+  "suggestion_2": "Who is Magnus Carlsen?",
+  "suggestion_3": "Explain the Sicilian Defense",
+  "suggestion_4": "What is en passant?"
+}

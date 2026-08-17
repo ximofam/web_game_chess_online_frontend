@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import NotificationBell from '../../features/notifications/components/NotificationBell';
+import ChatbotWidget from '../../features/ai-chat/components/ChatbotWidget';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const GithubIcon = ({ className = "w-5 h-5" }) => (
@@ -45,6 +46,7 @@ export const Header = ({ onOpenSidebar }) => {
         {isAuthenticated && (
           <div className="flex items-center gap-4 lg:gap-5 relative">
             <NotificationBell />
+            <ChatbotWidget />
           </div>
         )}
       </div>
